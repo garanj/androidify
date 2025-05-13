@@ -39,6 +39,13 @@ android {
     }
 }
 
+// Explicitly disable the connectedAndroidTest task for this module
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        variant.enableAndroidTest = false
+    }
+}
+
 dependencies {
     api(libs.kotlinx.coroutines.test)
     implementation(platform(libs.androidx.compose.bom))

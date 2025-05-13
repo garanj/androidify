@@ -50,6 +50,13 @@ android {
     }
 }
 
+// Explicitly disable the connectedAndroidTest task for this module
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        variant.enableAndroidTest = false
+    }
+}
+
 dependencies {
     implementation(libs.androidx.app.startup)
     implementation(libs.kotlinx.serialization.json)

@@ -214,11 +214,12 @@ fun ResultsScreenContents(
     verboseLayout: Boolean = allowsFullContent(),
     downloadClicked: () -> Unit,
     shareClicked: () -> Unit,
+    defaultSelectedResult: ResultOption = ResultOption.ResultImage,
 ) {
     ResultsBackground()
     val showResult = state.value.resultImageBitmap != null
     var selectedResultOption by remember {
-        mutableStateOf(ResultOption.ResultImage)
+        mutableStateOf(defaultSelectedResult)
     }
     val wasPromptUsed = state.value.originalImageUrl == null
     val promptToolbar = @Composable { modifier: Modifier ->
@@ -323,10 +324,15 @@ fun ResultsScreenContents(
 
 @Composable
 private fun BackgroundRandomQuotes(verboseLayout: Boolean = true) {
+    val locaInspectionMode = LocalInspectionMode.current
     Box(modifier = Modifier.fillMaxSize()) {
         val listResultCompliments = stringArrayResource(R.array.list_compliments)
         val randomQuote = remember {
-            listResultCompliments.random()
+            if (locaInspectionMode) {
+                listResultCompliments.first()
+            } else {
+                listResultCompliments.random()
+            }
         }
         // Disable animation in tests
         val iterations = if (LocalInspectionMode.current) 0 else 100
@@ -341,7 +347,11 @@ private fun BackgroundRandomQuotes(verboseLayout: Boolean = true) {
         if (verboseLayout) {
             val listMinusOther = listResultCompliments.asList().minus(randomQuote)
             val randomQuote2 = remember {
-                listMinusOther.random()
+                if (locaInspectionMode) {
+                    listMinusOther.first()
+                } else {
+                    listMinusOther.random()
+                }
             }
             Text(
                 randomQuote2,
