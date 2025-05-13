@@ -87,6 +87,9 @@ jobs:
     needs: build_test_lint # Run after the build job
     runs-on: ubuntu-latest # GMD requires Linux runner with KVM
     timeout-minutes: 60
+    strategy:
+      matrix:
+        api-level: [26, 34]
 
     steps:
       - name: Delete unnecessary tools 🔧
@@ -115,20 +118,24 @@ jobs:
 
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v4
-        # Add cache-encryption-key if you set up the GRADLE_ENCRYPTION_KEY secret
-        # with:
-        #   cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
-      - name: Run instrumentation tests (Gradle Managed Device)
-        run: ./gradlew pixel5DebugAndroidTest
+      - name: Build projects and run instrumentation tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: ${{ matrix.api-level }}
+          arch: x86_64
+          disable-animations: true
+          disk-size: 6000M
+          heap-size: 600M
+          script: ./gradlew connectedDebugAndroidTest --daemon
+
 
       - name: Upload test reports
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports-gmd-pixel5
-          # GMD reports are typically in a path like this, adjust if needed
-          path: '**/build/outputs/androidTest-results/managedDevice/'
+          name: test-reports-${{ matrix.api-level }}
+          path: '**/build/reports/androidTests'
