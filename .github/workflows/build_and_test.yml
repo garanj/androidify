@@ -84,8 +84,7 @@ jobs:
 
   androidTest:
     name: "Instrumentation Tests (GMD)"
-    needs: build_test_lint # Run after the build job
-    runs-on: ubuntu-latest # GMD requires Linux runner with KVM
+    runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       matrix:
@@ -131,7 +130,7 @@ jobs:
           cores: 4
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedDebugAndroidTest --daemon
+          script: ./gradlew connectedDebugAndroidTest --daemon --info
 
 
       - name: Upload test reports
