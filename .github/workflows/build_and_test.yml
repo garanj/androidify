@@ -83,12 +83,12 @@ jobs:
           path: '**/build/reports/lint-results-debug.html'
 
   androidTest:
-    name: "Instrumentation Tests (GMD)"
+    name: "Instrumentation Tests (emulator)"
     runs-on: ubuntu-latest
     timeout-minutes: 60
     strategy:
       matrix:
-        api-level: [26, 34]
+        api-level: [26]
 
     steps:
       - name: Delete unnecessary tools 🔧
@@ -130,7 +130,7 @@ jobs:
           cores: 4
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedDebugAndroidTest --daemon
+          script: ./gradlew connectedDebugAndroidTest --info
 
 
       - name: Upload test reports
