@@ -121,16 +121,18 @@ jobs:
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
+      - name: Build
+        run: ./gradlew assembleDebug assembleDebugAndroidTest
+
       - name: Build projects and run instrumentation tests
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: ${{ matrix.api-level }}
           arch: x86_64
           disable-animations: true
-          cores: 4
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedDebugAndroidTest --info
+          script: ./gradlew connectedDebugAndroidTest
 
 
       - name: Upload test reports
