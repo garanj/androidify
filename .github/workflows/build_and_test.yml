@@ -130,7 +130,7 @@ jobs:
           cores: 4
           disk-size: 6000M
           heap-size: 600M
-          script: ./gradlew connectedDebugAndroidTest --daemon --info
+          script: ./gradlew connectedDebugAndroidTest --daemon
 
 
       - name: Upload test reports

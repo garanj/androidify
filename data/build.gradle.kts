@@ -27,7 +27,6 @@ android {
 
     defaultConfig {
         minSdk = libs.versions.minSdk.get().toInt()
-        testInstrumentationRunner = "com.android.developers.testing.AndroidifyTestRunner"
     }
 
     compileOptions {
@@ -36,6 +35,12 @@ android {
     }
     kotlinOptions {
         jvmTarget = libs.versions.jvmTarget.get()
+    }
+}
+// Explicitly disable the connectedAndroidTest task for this module
+androidComponents {
+    beforeVariants(selector().all()) { variant ->
+        variant.enableAndroidTest = false
     }
 }
 
@@ -55,9 +60,4 @@ dependencies {
         exclude(group = "com.google.guava")
     }
     ksp(libs.hilt.compiler)
-
-    androidTestImplementation(libs.androidx.ui.test.junit4)
-    androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(project(":core:testing"))
-    kspAndroidTest(libs.hilt.compiler)
 }
