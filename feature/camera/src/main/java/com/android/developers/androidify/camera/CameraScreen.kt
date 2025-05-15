@@ -137,6 +137,7 @@ fun CameraPreviewScreen(
                     // so CameraX can retrieve the new Surface.
                     LaunchedEffect(surface) {
                         val oldIsTableTop = isTableTopPosture(foldingFeature)
+
                         snapshotFlow { foldingFeature }
                             .takeWhile {
                                 val newIsTableTop = isTableTopPosture(it)

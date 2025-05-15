@@ -89,7 +89,7 @@ class CreationViewModel @Inject constructor(
     val snackbarHostState: StateFlow<SnackbarHostState>
         get() = _snackbarHostState
 
-    fun onImageSelected(uri: Uri) {
+    fun onImageSelected(uri: Uri?) {
         _uiState.update {
             it.copy(
                 imageUri = uri,
@@ -116,14 +116,21 @@ class CreationViewModel @Inject constructor(
             _uiState.update {
                 it.copy(promptGenerationInProgress = true)
             }
-            val prompt = textGenerationRepository.getNextGeneratedBotPrompt()
-            Log.d("CreationViewModel", "Prompt: $prompt")
-            if (prompt != null) {
+            try {
+                val prompt = textGenerationRepository.getNextGeneratedBotPrompt()
+                Log.d("CreationViewModel", "Prompt: $prompt")
+                if (prompt != null) {
+                    _uiState.update {
+                        it.copy(
+                            generatedPrompt = prompt,
+                            promptGenerationInProgress = false,
+                        )
+                    }
+                }
+            } catch (exception: Exception) {
+                Log.e("CreationViewModel", "Error generating prompt", exception)
                 _uiState.update {
-                    it.copy(
-                        generatedPrompt = prompt,
-                        promptGenerationInProgress = false,
-                    )
+                    it.copy(promptGenerationInProgress = false)
                 }
             }
         }

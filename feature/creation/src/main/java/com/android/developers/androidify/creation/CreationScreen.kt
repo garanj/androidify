@@ -169,6 +169,7 @@ fun CreationScreen(
     }
     LaunchedEffect(Unit) {
         if (fileName != null) creationViewModel.onImageSelected(fileName.toUri())
+        else creationViewModel.onImageSelected(null)
     }
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {

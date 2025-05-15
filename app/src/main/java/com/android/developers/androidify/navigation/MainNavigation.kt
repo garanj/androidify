@@ -89,7 +89,6 @@ fun MainNavigation() {
                 fadeIn(motionScheme.defaultEffectsSpec()),
                 scaleOut(
                     targetScale = 0.7f,
-                    transformOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 0.5f),
                 ),
             )
         },
@@ -108,7 +107,9 @@ fun MainNavigation() {
             entry<Camera> {
                 CameraPreviewScreen(
                     onImageCaptured = { uri ->
+                        backStack.removeAll { it is Create }
                         backStack.add(Create(uri.toString()))
+                        backStack.removeAll { it is Camera }
                     },
                 )
             }
@@ -116,6 +117,7 @@ fun MainNavigation() {
                 CreationScreen(
                     createKey.fileName,
                     onCameraPressed = {
+                        backStack.removeAll { it is Camera }
                         backStack.add(Camera)
                     },
                     onBackPressed = {
@@ -142,7 +144,7 @@ fun MainNavigation() {
                 showSplash = false
             },
             onTransitionMidpoint = {
-                backStack.add(Create())
+                backStack.add(Create(fileName = null))
             },
         )
     }
