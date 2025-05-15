@@ -32,9 +32,11 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavEntryDecorator
+import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.SavedStateNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
 import androidx.navigation3.ui.SceneSetupNavEntryDecorator
 import com.android.developers.androidify.camera.CameraPreviewScreen
@@ -73,9 +75,9 @@ fun MainNavigation() {
         backStack = backStack,
         onBack = { backStack.removeLastOrNull() },
         entryDecorators = listOf(
-            SceneSetupNavEntryDecorator,
-            SavedStateNavEntryDecorator,
-            ViewModelStoreNavEntryDecorator,
+            SceneSetupNavEntryDecorator(),
+            rememberSavedStateNavEntryDecorator(),
+            rememberViewModelStoreNavEntryDecorator(),
         ),
         transitionSpec = {
             ContentTransform(
