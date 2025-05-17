@@ -47,7 +47,6 @@ import androidx.compose.runtime.mutableFloatStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
@@ -71,7 +70,6 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
-import kotlinx.coroutines.flow.takeWhile
 import kotlinx.coroutines.launch
 
 @OptIn(
@@ -131,22 +129,6 @@ fun CameraPreviewScreen(
                 }
 
                 uiState.surfaceRequest?.let { surface ->
-                    // Workaround for https://issuetracker.google.com/275157240
-                    // When switching to/from tabletop posture, the underlying SurfaceView
-                    // destroys its Surface. Invalidate the SurfaceRequest when this happens
-                    // so CameraX can retrieve the new Surface.
-                    LaunchedEffect(surface) {
-                        val oldIsTableTop = isTableTopPosture(foldingFeature)
-
-                        snapshotFlow { foldingFeature }
-                            .takeWhile {
-                                val newIsTableTop = isTableTopPosture(it)
-                                val shouldInvalidate = oldIsTableTop != newIsTableTop
-                                if (shouldInvalidate) surface.invalidate()
-                                !shouldInvalidate
-                            }.collect {}
-                    }
-
                     CameraPreviewContent(
                         surfaceRequest = surface,
                         autofocusUiState = uiState.autofocusUiState,
