@@ -148,7 +148,7 @@ class CameraViewModel
                         processCameraProvider.runWith(cameraType, cameraUseCaseGroup) { camera ->
                             cameraControl = camera.cameraControl
                             cameraInfo = camera.cameraInfo
-
+                            _uiState.update { it.copy(cameraSessionId = it.cameraSessionId + 1) }
                             // Suspend on zoom updates
                             camera.cameraInfo.zoomState.asFlow().collectLatest { zoomState ->
                                 _uiState.update {
@@ -342,6 +342,7 @@ class CameraViewModel
  */
 data class CameraUiState(
     val surfaceRequest: SurfaceRequest? = null,
+    val cameraSessionId: Int = 0,
     val imageUri: Uri? = null,
     val detectedPose: Boolean = false,
     val zoomMaxRatio: Float = 1f,

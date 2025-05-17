@@ -58,7 +58,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -79,7 +79,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -102,7 +102,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
             )
         }
 
@@ -124,7 +124,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -145,7 +145,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -168,7 +168,7 @@ class CameraScreenTest {
                 detectedPose = true,
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -193,7 +193,7 @@ class CameraScreenTest {
                 canFlipCamera = true,
                 requestFlipCamera = {},
                 detectedPose = true,
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -215,7 +215,7 @@ class CameraScreenTest {
                 canFlipCamera = true,
                 requestFlipCamera = {},
                 detectedPose = true,
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -235,7 +235,7 @@ class CameraScreenTest {
                 viewfinder = dummyViewfinder,
                 defaultZoomOptions = zoomOptions,
                 zoomLevel = { 1.0f }, // Start at second option to ensure first button click changes it
-                onChangeZoomLevel = { changedZoomLevel = it }, // Callback to test
+                onAnimateZoom = { changedZoomLevel = it }, // Callback to test
                 // Default values for other params
                 canFlipCamera = true,
                 requestFlipCamera = {},
@@ -261,7 +261,7 @@ class CameraScreenTest {
                 viewfinder = dummyViewfinder,
                 defaultZoomOptions = zoomOptions,
                 zoomLevel = { 0.6f }, // Start at first option
-                onChangeZoomLevel = { changedZoomLevel = it }, // Callback to test
+                onAnimateZoom = { changedZoomLevel = it }, // Callback to test
                 // Default values for other params
                 canFlipCamera = true,
                 requestFlipCamera = {},
@@ -289,7 +289,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -310,7 +310,7 @@ class CameraScreenTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }

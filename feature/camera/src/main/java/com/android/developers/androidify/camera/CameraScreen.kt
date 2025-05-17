@@ -130,6 +130,7 @@ fun CameraPreviewScreen(
 
                 uiState.surfaceRequest?.let { surface ->
                     CameraPreviewContent(
+                        modifier = Modifier.fillMaxSize(),
                         surfaceRequest = surface,
                         autofocusUiState = uiState.autofocusUiState,
                         tapToFocus = viewModel::tapToFocus,
@@ -138,13 +139,14 @@ fun CameraPreviewScreen(
                         requestFlipCamera = viewModel::flipCameraDirection,
                         canFlipCamera = uiState.canFlipCamera,
                         requestCaptureImage = viewModel::captureImage,
+                        zoomRange = uiState.zoomMinRatio..uiState.zoomMaxRatio,
                         zoomLevel = { uiState.zoomLevel },
                         onChangeZoomLevel = viewModel::setZoomLevel,
                         foldingFeature = foldingFeature,
-                        modifier = Modifier.fillMaxSize(),
                         shouldShowRearCameraFeature = viewModel::shouldShowRearDisplayFeature,
                         toggleRearCameraFeature = { viewModel.toggleRearDisplayFeature(activity) },
                         isRearCameraEnabled = uiState.isRearCameraActive,
+                        cameraSessionId = uiState.cameraSessionId
                     )
                 }
             } else {
@@ -198,7 +200,7 @@ fun StatelessCameraPreviewContent(
     detectedPose: Boolean,
     defaultZoomOptions: List<Float>,
     zoomLevel: () -> Float,
-    onChangeZoomLevel: (Float) -> Unit,
+    onAnimateZoom: (Float) -> Unit,
     requestCaptureImage: () -> Unit,
     modifier: Modifier = Modifier,
     foldingFeature: FoldingFeature? = null,
@@ -238,9 +240,9 @@ fun StatelessCameraPreviewContent(
         zoomButton = { zoomModifier ->
             ZoomToolbar(
                 defaultZoomOptions = defaultZoomOptions,
-                zoomLevel = zoomLevel,
-                onZoomLevelChanged = onChangeZoomLevel,
+                onZoomLevelSelected = onAnimateZoom,
                 modifier = zoomModifier,
+                zoomLevel = zoomLevel,
             )
         },
         guideText = { guideTextModifier ->
@@ -287,12 +289,14 @@ private fun CameraPreviewContent(
     surfaceRequest: SurfaceRequest,
     autofocusUiState: AutofocusUiState,
     tapToFocus: (Offset) -> Unit,
+    cameraSessionId: Int,
     canFlipCamera: Boolean,
     requestFlipCamera: () -> Unit,
     detectedPose: Boolean,
     defaultZoomOptions: List<Float>,
+    zoomRange: ClosedFloatingPointRange<Float>,
     zoomLevel: () -> Float,
-    onChangeZoomLevel: (Float) -> Unit,
+    onChangeZoomLevel: (zoomLevel: Float) -> Unit,
     requestCaptureImage: () -> Unit,
     modifier: Modifier = Modifier,
     foldingFeature: FoldingFeature? = null,
@@ -300,6 +304,14 @@ private fun CameraPreviewContent(
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
 ) {
+  val scope = rememberCoroutineScope()
+    val zoomState = remember(cameraSessionId) {
+      ZoomState(
+        initialZoomLevel = zoomLevel(),
+        onChangeZoomLevel = onChangeZoomLevel,
+        zoomRange = zoomRange,
+      )
+    }
     // Delegate the layout to the stateless version
     StatelessCameraPreviewContent(
         viewfinder = { viewfinderModifier ->
@@ -309,8 +321,7 @@ private fun CameraPreviewContent(
                 surfaceRequest = surfaceRequest,
                 autofocusUiState = autofocusUiState,
                 tapToFocus = tapToFocus,
-                zoomLevel = zoomLevel,
-                onChangeZoomLevel = onChangeZoomLevel,
+                onScaleZoom = { scope.launch { zoomState.scaleZoom(it) }},
                 modifier = viewfinderModifier.onSizeChanged { size -> // Apply modifier from slot
                     if (size.height > 0) {
                         aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
@@ -322,9 +333,9 @@ private fun CameraPreviewContent(
         canFlipCamera = canFlipCamera,
         requestFlipCamera = requestFlipCamera,
         detectedPose = detectedPose,
-        defaultZoomOptions = defaultZoomOptions,
         zoomLevel = zoomLevel,
-        onChangeZoomLevel = onChangeZoomLevel,
+        defaultZoomOptions = defaultZoomOptions,
+        onAnimateZoom = { scope.launch { zoomState.animatedZoom(it) } },
         requestCaptureImage = requestCaptureImage,
         foldingFeature = foldingFeature,
         shouldShowRearCameraFeature = shouldShowRearCameraFeature,
