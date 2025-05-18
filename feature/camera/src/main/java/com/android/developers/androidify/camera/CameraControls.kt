@@ -35,7 +35,7 @@ internal fun CameraControls(
     detectedPose: Boolean,
     defaultZoomOptions: List<Float>,
     zoomLevel: () -> Float,
-    onChangeZoomLevel: (Float) -> Unit,
+    onZoomLevelSelected: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(
@@ -45,7 +45,7 @@ internal fun CameraControls(
         ZoomToolbar(
             defaultZoomOptions = defaultZoomOptions,
             zoomLevel = zoomLevel,
-            onZoomLevelChanged = onChangeZoomLevel,
+            onZoomLevelSelected = onZoomLevelSelected
         )
         Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -74,8 +74,8 @@ private fun CameraControlsPreview() {
             canFlipCamera = true,
             flipCameraDirectionClicked = { },
             detectedPose = true,
-            zoomLevel = { 0.4f },
-            onChangeZoomLevel = { },
+            zoomLevel = {0.4f},
+            onZoomLevelSelected = {},
             defaultZoomOptions = listOf(.6f, 1f),
         )
     }

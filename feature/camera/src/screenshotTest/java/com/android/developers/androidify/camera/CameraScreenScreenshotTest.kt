@@ -61,7 +61,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -78,7 +78,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -95,7 +95,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -112,7 +112,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
                 shouldShowRearCameraFeature = { true }, // Changed
                 isRearCameraEnabled = false, // Changed
@@ -132,7 +132,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
                 shouldShowRearCameraFeature = { true }, // Changed
                 isRearCameraEnabled = true, // Changed
@@ -156,7 +156,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
                 foldingFeature = tabletopFoldingFeature, // Changed
             )
@@ -174,7 +174,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }
@@ -191,7 +191,7 @@ class CameraScreenScreenshotTest {
                 requestFlipCamera = {},
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { 1f },
-                onChangeZoomLevel = {},
+                onAnimateZoom = {},
                 requestCaptureImage = {},
             )
         }

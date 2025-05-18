@@ -46,7 +46,7 @@ import kotlin.math.roundToInt
 internal fun ZoomToolbar(
     defaultZoomOptions: List<Float>,
     zoomLevel: () -> Float,
-    onZoomLevelChanged: (Float) -> Unit,
+    onZoomLevelSelected: (Float) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     // Only render the zoom toolbar when there's exactly two options
@@ -87,7 +87,7 @@ internal fun ZoomToolbar(
     ) {
         ToggleButton(
             checked = selectedOptionIndex == 0,
-            onCheckedChange = { onZoomLevelChanged(defaultZoomOptions[0]) },
+            onCheckedChange = { onZoomLevelSelected(defaultZoomOptions[0]) },
             shapes = ButtonGroupDefaults.connectedLeadingButtonShapes(),
             colors = ToggleButtonDefaults.toggleButtonColors(),
             modifier = Modifier,
@@ -98,7 +98,7 @@ internal fun ZoomToolbar(
         }
         ToggleButton(
             checked = selectedOptionIndex == 1,
-            onCheckedChange = { onZoomLevelChanged(defaultZoomOptions[1]) },
+            onCheckedChange = { onZoomLevelSelected(defaultZoomOptions[1]) },
             shapes = ButtonGroupDefaults.connectedTrailingButtonShapes(),
             colors = ToggleButtonDefaults.toggleButtonColors(),
             modifier = Modifier,
@@ -120,24 +120,18 @@ private fun ZoomToolbarPreview() {
             ZoomToolbar(
                 defaultZoomOptions = listOf(0.6f, 1f),
                 zoomLevel = { zoomLevel },
-                onZoomLevelChanged = {
-                    zoomLevel = it
-                },
+                onZoomLevelSelected = { zoomLevel = it },
             )
             ZoomToolbar(
                 defaultZoomOptions = listOf(1f, 2f),
                 zoomLevel = { zoomLevel },
-                onZoomLevelChanged = {
-                    zoomLevel = it
-                },
+                onZoomLevelSelected = { zoomLevel = it },
             )
             // Doesn't render
             ZoomToolbar(
                 defaultZoomOptions = listOf(1f),
                 zoomLevel = { zoomLevel },
-                onZoomLevelChanged = {
-                    zoomLevel = it
-                },
+                onZoomLevelSelected = { zoomLevel = it },
             )
             Row {
                 Button(onClick = { zoomLevel -= 0.1f }) {
