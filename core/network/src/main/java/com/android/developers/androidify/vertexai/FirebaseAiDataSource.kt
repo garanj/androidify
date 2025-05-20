@@ -22,19 +22,20 @@ import com.android.developers.androidify.model.ImageValidationError
 import com.android.developers.androidify.model.ValidatedDescription
 import com.android.developers.androidify.model.ValidatedImage
 import com.google.firebase.Firebase
-import com.google.firebase.vertexai.GenerativeModel
-import com.google.firebase.vertexai.ImagenModel
-import com.google.firebase.vertexai.type.HarmBlockThreshold
-import com.google.firebase.vertexai.type.HarmCategory
-import com.google.firebase.vertexai.type.ImagenPersonFilterLevel
-import com.google.firebase.vertexai.type.ImagenSafetyFilterLevel
-import com.google.firebase.vertexai.type.ImagenSafetySettings
-import com.google.firebase.vertexai.type.PublicPreviewAPI
-import com.google.firebase.vertexai.type.SafetySetting
-import com.google.firebase.vertexai.type.Schema
-import com.google.firebase.vertexai.type.content
-import com.google.firebase.vertexai.type.generationConfig
-import com.google.firebase.vertexai.vertexAI
+import com.google.firebase.ai.GenerativeModel
+import com.google.firebase.ai.ImagenModel
+import com.google.firebase.ai.type.HarmBlockThreshold
+import com.google.firebase.ai.type.HarmCategory
+import com.google.firebase.ai.type.ImagenPersonFilterLevel
+import com.google.firebase.ai.type.ImagenSafetyFilterLevel
+import com.google.firebase.ai.type.ImagenSafetySettings
+import com.google.firebase.ai.type.PublicPreviewAPI
+import com.google.firebase.ai.type.SafetySetting
+import com.google.firebase.ai.type.Schema
+import com.google.firebase.ai.type.content
+import com.google.firebase.ai.type.generationConfig
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -73,7 +74,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
     private val remoteConfigDataSource: RemoteConfigDataSource,
 ) : FirebaseAiDataSource {
     private fun createGenerativeTextModel(jsonSchema: Schema, temperature: Float? = null): GenerativeModel {
-        return Firebase.vertexAI.generativeModel(
+        return Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel(
             modelName = remoteConfigDataSource.textModelName(),
             generationConfig = generationConfig {
                 responseMimeType = "application/json"
@@ -91,7 +92,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
     }
 
     private fun createGenerativeImageModel(): ImagenModel {
-        return Firebase.vertexAI.imagenModel(
+        return Firebase.ai.imagenModel(
             remoteConfigDataSource.imageModelName(),
             safetySettings =
             ImagenSafetySettings(
