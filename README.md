@@ -26,7 +26,7 @@ The app combines a variety of different Google technologies, such as:
 ## Setup and installation
 
 1. Clone the repository.
-2. Create a [Firebase project](https://firebase.google.com/products/vertex-ai-in-firebase) and
+2. Create a [Firebase project](https://firebase.google.com/products/firebase-ai-logic) and
    generate a `google-services.json` file.
    Replace the current placeholder app/google-services.json file with your own json file created
    above. Be sure to enable Vertex AI SDK.
