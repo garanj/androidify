@@ -92,7 +92,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
     }
 
     private fun createGenerativeImageModel(): ImagenModel {
-        return Firebase.ai.imagenModel(
+        return Firebase.ai(backend = GenerativeBackend.vertexAI()).imagenModel(
             remoteConfigDataSource.imageModelName(),
             safetySettings =
             ImagenSafetySettings(
