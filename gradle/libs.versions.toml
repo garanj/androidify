@@ -25,7 +25,7 @@ coreKtx = "1.15.0"
 coreSplashscreen = "1.0.1"
 crashlytics = "3.0.3"
 espressoCore = "3.6.1"
-firebaseBom = "33.13.0"
+firebaseBom = "33.14.0"
 firebaseConfigKtx = "22.1.1"
 googleServices = "4.4.2"
 hiltAndroid = "2.56.2"
@@ -107,7 +107,7 @@ firebase-bom = { module = "com.google.firebase:firebase-bom", version.ref = "fir
 firebase-config = { module = "com.google.firebase:firebase-config" }
 firebase-config-ktx = { group = "com.google.firebase", name = "firebase-config-ktx", version.ref = "firebaseConfigKtx" }
 firebase-crashlytics = { module = "com.google.firebase:firebase-crashlytics" }
-firebase-vertexai = { module = "com.google.firebase:firebase-vertexai" }
+firebase-ai = { module = "com.google.firebase:firebase-ai" }
 hilt-android = { group = "com.google.dagger", name = "hilt-android", version.ref = "hiltAndroid" }
 hilt-android-testing = { group = "com.google.dagger", name = "hilt-android-testing", version.ref = "hiltAndroid" }
 hilt-compiler = { group = "com.google.dagger", name = "hilt-compiler", version.ref = "hiltAndroid" }

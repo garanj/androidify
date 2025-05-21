@@ -121,7 +121,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
-    implementation(libs.firebase.vertexai)
+    implementation(libs.firebase.ai)
     implementation(libs.firebase.app.check)
     implementation(libs.firebase.config)
     implementation(libs.firebase.appcheck.debug)
