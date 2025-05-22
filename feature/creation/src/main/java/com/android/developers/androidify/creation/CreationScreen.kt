@@ -363,7 +363,9 @@ fun EditScreen(
                     }
                 } else {
                     BottomButtons(
-                        onButtonColorClicked = { showColorPickerBottomSheet = !showColorPickerBottomSheet },
+                        onButtonColorClicked = {
+                            showColorPickerBottomSheet = !showColorPickerBottomSheet
+                        },
                         uiState = uiState,
                         onStartClicked = onStartClicked,
                         modifier = Modifier
@@ -403,10 +405,16 @@ private fun MainCreationPane(
         val pagerState = rememberPagerState(0) { PromptType.entries.size }
         val focusManager = LocalFocusManager.current
         LaunchedEffect(uiState.selectedPromptOption) {
-            pagerState.animateScrollToPage(
-                uiState.selectedPromptOption.ordinal,
-                animationSpec = spatialSpec,
-            )
+            launch {
+                pagerState.animateScrollToPage(
+                    uiState.selectedPromptOption.ordinal,
+                    animationSpec = spatialSpec,
+                )
+            }.invokeOnCompletion {
+                if (uiState.selectedPromptOption != PromptType.entries[pagerState.currentPage]) {
+                    onSelectedPromptOptionChanged(PromptType.entries[pagerState.currentPage])
+                }
+            }
         }
         LaunchedEffect(pagerState) {
             snapshotFlow { pagerState.currentPage }.collect { page ->
