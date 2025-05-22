@@ -151,7 +151,6 @@ import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import com.android.developers.androidify.creation.R as CreationR
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 fun CreationScreen(
     fileName: String? = null,
