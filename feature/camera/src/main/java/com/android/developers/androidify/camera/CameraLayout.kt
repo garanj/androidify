@@ -255,13 +255,13 @@ private fun TableTopReadyCameraLayout(
             )
         }
         HorizontalControlsLayout(
+            modifier = Modifier
+                .weight(1f)
+                .padding(bottom = 16.dp),
             captureButton,
             flipCameraButton,
             zoomButton,
             rearCameraButton,
-            modifier = Modifier
-                .weight(1f)
-                .padding(bottom = 16.dp),
         )
     }
 }
@@ -296,11 +296,11 @@ private fun TableTopCameraLayout(
         ) {
             guideText(Modifier.align(Alignment.TopCenter))
             HorizontalControlsLayout(
+                modifier = Modifier.align(Alignment.Center),
                 captureButton,
                 flipCameraButton,
                 zoomButton,
                 rearCameraButton,
-                modifier = Modifier.align(Alignment.Center),
             )
         }
     }
@@ -373,6 +373,7 @@ private fun VerticalCameraLayout(
                 )
             }
             HorizontalControlsLayout(
+                modifier = Modifier,
                 captureButton,
                 flipCameraButton,
                 zoomButton,
@@ -384,11 +385,11 @@ private fun VerticalCameraLayout(
 
 @Composable
 private fun HorizontalControlsLayout(
+    modifier: Modifier = Modifier,
     captureButton: @Composable (modifier: Modifier) -> Unit,
     flipCameraButton: (@Composable (modifier: Modifier) -> Unit)?,
     zoomButton: (@Composable (modifier: Modifier) -> Unit)?,
     rearCameraButton: (@Composable (modifier: Modifier) -> Unit)? = null,
-    modifier: Modifier = Modifier,
 ) {
     Column(
         modifier = modifier,
@@ -414,10 +415,10 @@ private fun HorizontalControlsLayout(
 
 @Composable
 private fun VerticalControlsLayout(
-    modifier: Modifier = Modifier,
     captureButton: @Composable (modifier: Modifier) -> Unit,
     flipCameraButton: (@Composable (modifier: Modifier) -> Unit)?,
     zoomButton: (@Composable (modifier: Modifier) -> Unit)?,
+    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
