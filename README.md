@@ -28,7 +28,7 @@ The app combines a variety of different Google technologies, such as:
 1. Clone the repository.
 2. Create a [Firebase project](https://firebase.google.com/products/firebase-ai-logic) and
    generate a `google-services.json` file.
-   Replace the current placeholder `app/google-services.json` file with your own JSON file created
+   Replace the current placeholder [`app/google-services.json`](app/google-services.json) file with your own JSON file created
    above. Be sure to enable [Vertex AI API](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com).
    Ensure to also enable [AppCheck](https://console.firebase.google.com/project/_/appcheck) on your Firebase project to prevent API abuse.
 
