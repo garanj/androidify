@@ -50,6 +50,7 @@ import com.android.developers.androidify.util.supportsTabletop
 
 @Composable
 internal fun CameraLayout(
+    modifier: Modifier = Modifier,
     viewfinder: @Composable (modifier: Modifier) -> Unit,
     captureButton: @Composable (modifier: Modifier) -> Unit,
     flipCameraButton: @Composable (modifier: Modifier) -> Unit,
@@ -59,7 +60,6 @@ internal fun CameraLayout(
     rearCameraButton: @Composable (modifier: Modifier) -> Unit,
     supportsTabletop: Boolean = supportsTabletop(),
     isTabletop: Boolean = false,
-    modifier: Modifier = Modifier,
 ) {
     BoxWithConstraints(
         modifier
@@ -414,10 +414,10 @@ private fun HorizontalControlsLayout(
 
 @Composable
 private fun VerticalControlsLayout(
+    modifier: Modifier = Modifier,
     captureButton: @Composable (modifier: Modifier) -> Unit,
     flipCameraButton: (@Composable (modifier: Modifier) -> Unit)?,
     zoomButton: (@Composable (modifier: Modifier) -> Unit)?,
-    modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier,
