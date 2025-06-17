@@ -76,6 +76,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onLayoutRectChanged
+import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.platform.LocalView
@@ -541,9 +542,10 @@ private fun VideoPlayer(
         Modifier
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .onVisibilityChanged(
-                containerWidth = LocalView.current.width,
-                containerHeight = LocalView.current.height,
-            ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
+                minDurationMs = 100,
+                minFractionVisible = 1f
+            )
+            { fullyVisible -> videoFullyOnScreen = fullyVisible }
             .then(modifier),
     ) {
         player?.let { currentPlayer ->
@@ -578,17 +580,4 @@ private fun VideoPlayer(
             }
         }
     }
-}
-
-fun Modifier.onVisibilityChanged(
-    containerWidth: Int,
-    containerHeight: Int,
-    onChanged: (visible: Boolean) -> Unit,
-) = this then Modifier.onLayoutRectChanged(100, 0) { layoutBounds ->
-    onChanged(
-        layoutBounds.boundsInRoot.top > 0 &&
-            layoutBounds.boundsInRoot.bottom < containerHeight &&
-            layoutBounds.boundsInRoot.left > 0 &&
-            layoutBounds.boundsInRoot.right < containerWidth,
-    )
 }
