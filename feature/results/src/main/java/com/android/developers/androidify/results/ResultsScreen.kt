@@ -255,6 +255,7 @@ fun ResultsScreenContents(
             },
             modifier = modifier,
             verboseLayout = verboseLayout,
+            hasWearDevice = state.value.hasWearDevice
         )
     }
     val backgroundQuotes = @Composable { modifier: Modifier ->
@@ -356,6 +357,7 @@ private fun BotActionsButtonRow(
     onDownloadClicked: () -> Unit,
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = false,
+    hasWearDevice: Boolean = false,
 ) {
     Row(modifier) {
         PrimaryButton(
@@ -407,6 +409,19 @@ private fun BotActionsButtonRow(
                 )
             },
         )
+        if (hasWearDevice) {
+            Spacer(Modifier.width(8.dp))
+            PrimaryButton(
+                onClick = {},
+                leadingIcon = {
+                    Icon(
+                        ImageVector
+                            .vectorResource(R.drawable.watch_24),
+                        contentDescription = stringResource(R.string.send_to_watch),
+                    )
+                },
+            )
+        }
         PermissionRationaleDialog(
             showRationaleDialog,
             onDismiss = {

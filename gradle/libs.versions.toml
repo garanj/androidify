@@ -45,6 +45,7 @@ material = "1.12.0"
 media3 = "1.6.1"
 navigation3 = "1.0.0-SNAPSHOT"
 okhttp = "4.12.0"
+playServicesWearable = "19.0.0"
 poseDetection = "18.0.0-beta5"
 profileinstaller = "1.4.1"
 retrofit = "2.11.0"
@@ -120,6 +121,7 @@ logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-intercep
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 mlkit-pose-detection = { module = "com.google.mlkit:pose-detection", version.ref = "poseDetection" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+play-services-wearable = { module = "com.google.android.gms:play-services-wearable", version.ref = "playServicesWearable" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }

@@ -101,4 +101,9 @@ internal object DataModule {
         internetConnectivityManager = internetConnectivityManager,
         firebaseAiDataSource = firebaseAiDataSource,
     )
+
+    @Provides
+    @Singleton
+    fun providesWearDeviceRepository(@ApplicationContext appContext: Context): WearDeviceRepository =
+        WearDeviceRepositoryImpl(appContext)
 }

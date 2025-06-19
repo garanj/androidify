@@ -21,6 +21,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
+import com.android.developers.androidify.data.WearDeviceRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -32,10 +33,22 @@ import javax.inject.Inject
 @HiltViewModel
 class ResultsViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
+    val wearDeviceRepository: WearDeviceRepository
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            wearDeviceRepository.connectedDevice.collect { device ->
+                _state.update {
+                    it.copy(hasWearDevice = device != null)
+                }
+            }
+        }
+    }
+
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -48,7 +61,7 @@ class ResultsViewModel @Inject constructor(
         promptText: String?,
     ) {
         _state.update {
-            ResultState(resultImageUrl, originalImageUrl, promptText = promptText)
+            ResultState(resultImageUrl, originalImageUrl, promptText = promptText, hasWearDevice = it.hasWearDevice)
         }
     }
 
@@ -92,4 +105,5 @@ data class ResultState(
     val externalSavedUri: Uri? = null,
     val externalOriginalSavedUri: Uri? = null,
     val promptText: String? = null,
+    val hasWearDevice: Boolean = false
 )
