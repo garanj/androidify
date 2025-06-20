@@ -24,6 +24,8 @@ import com.android.developers.androidify.model.ValidatedImage
 import com.google.firebase.Firebase
 import com.google.firebase.ai.GenerativeModel
 import com.google.firebase.ai.ImagenModel
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.type.HarmBlockThreshold
 import com.google.firebase.ai.type.HarmCategory
 import com.google.firebase.ai.type.ImagenPersonFilterLevel
@@ -34,8 +36,6 @@ import com.google.firebase.ai.type.SafetySetting
 import com.google.firebase.ai.type.Schema
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement

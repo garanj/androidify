@@ -45,7 +45,7 @@ internal fun CameraControls(
         ZoomToolbar(
             defaultZoomOptions = defaultZoomOptions,
             zoomLevel = zoomLevel,
-            onZoomLevelSelected = onZoomLevelSelected
+            onZoomLevelSelected = onZoomLevelSelected,
         )
         Spacer(Modifier.height(12.dp))
         Row(verticalAlignment = Alignment.CenterVertically) {
@@ -74,7 +74,7 @@ private fun CameraControlsPreview() {
             canFlipCamera = true,
             flipCameraDirectionClicked = { },
             detectedPose = true,
-            zoomLevel = {0.4f},
+            zoomLevel = { 0.4f },
             onZoomLevelSelected = {},
             defaultZoomOptions = listOf(.6f, 1f),
         )

@@ -19,8 +19,6 @@ import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -222,7 +220,6 @@ class CreationScreenTest {
                 )
             }
         }
-
 
         composeTestRule.onNodeWithText(headlineText).assertIsDisplayed()
         // TODO: Fails in pixel 5

@@ -25,12 +25,10 @@ import android.provider.MediaStore
 import androidx.annotation.WorkerThread
 import androidx.core.content.FileProvider
 import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
 import java.io.FileOutputStream
 import java.io.IOException
-import java.nio.file.Files
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Named
@@ -39,15 +37,20 @@ import javax.inject.Singleton
 interface LocalFileProvider {
     @WorkerThread
     suspend fun saveBitmapToFile(bitmap: Bitmap, file: File)
+
     @WorkerThread
     suspend fun getFileFromCache(fileName: String): File
+
     @WorkerThread
     suspend fun createCacheFile(fileName: String): File
+
     @WorkerThread
     suspend fun saveToSharedStorage(file: File, fileName: String, mimeType: String): Uri
     fun sharingUriForFile(file: File): Uri
+
     @WorkerThread
     suspend fun copyToInternalStorage(uri: Uri): File
+
     @WorkerThread
     suspend fun saveUriToSharedStorage(inputUri: Uri, fileName: String, mimeType: String): Uri
 }
@@ -104,7 +107,7 @@ open class LocalFileProviderImpl @Inject constructor(
         inputUri: Uri,
         fileName: String,
         mimeType: String,
-    ): Uri = withContext(ioDispatcher)  {
+    ): Uri = withContext(ioDispatcher) {
         val (newUri, contentValues) = createSharedStorageEntry(fileName, mimeType)
         application.contentResolver.openOutputStream(newUri)?.use { outputStream ->
             application.contentResolver.openInputStream(inputUri)?.use { inputStream ->
