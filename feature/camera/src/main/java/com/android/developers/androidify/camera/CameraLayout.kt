@@ -73,7 +73,7 @@ internal fun CameraLayout(
 ) {
     val mContext = LocalContext.current
     var isCameraLeft by remember { mutableStateOf(false) }
-    LifecycleStartEffect(Unit){
+    LifecycleStartEffect(Unit) {
         val displayManager = mContext.getSystemService(Context.DISPLAY_SERVICE) as DisplayManager
         val displayListener = object : DisplayManager.DisplayListener {
             override fun onDisplayChanged(displayId: Int) {
@@ -115,7 +115,7 @@ internal fun CameraLayout(
                 zoomButton,
                 guideText,
                 guide,
-                isCameraLeft
+                isCameraLeft,
             )
 
             this.maxWidth > maxHeight && allowsFullContent() -> CompactHorizontalCameraLayout(
@@ -472,9 +472,9 @@ private fun VerticalControlsLayout(
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = if(isCameraLeft) Arrangement.End else Arrangement.Start,
+        horizontalArrangement = if (isCameraLeft) Arrangement.End else Arrangement.Start,
     ) {
-        if(isCameraLeft){
+        if (isCameraLeft) {
             if (zoomButton != null) zoomButton(Modifier)
             Spacer(Modifier.width(12.dp))
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
@@ -484,7 +484,7 @@ private fun VerticalControlsLayout(
                 captureButton(Modifier)
                 Spacer(modifier = Modifier.weight(1f))
             }
-        }else{
+        } else {
             Column(horizontalAlignment = Alignment.CenterHorizontally) {
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
                     if (flipCameraButton != null) flipCameraButton(Modifier)
