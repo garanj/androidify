@@ -19,7 +19,9 @@ package com.android.developers.androidify.results
 
 import android.graphics.Bitmap
 import android.net.Uri
+import com.android.developers.androidify.data.ConnectedDevice
 import com.android.developers.testing.repository.FakeImageGenerationRepository
+import com.android.developers.testing.repository.FakeWearDeviceRepository
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
@@ -32,6 +34,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class ResultsViewModelTest {
@@ -39,6 +42,7 @@ class ResultsViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: ResultsViewModel
+    private lateinit var fakeWearDeviceRepository: FakeWearDeviceRepository
 
     private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val fakePromptText = "Pink Hair, plaid shirt, jeans"
@@ -46,8 +50,10 @@ class ResultsViewModelTest {
 
     @Before
     fun setup() {
+        fakeWearDeviceRepository = FakeWearDeviceRepository()
         viewModel = ResultsViewModel(
-            FakeImageGenerationRepository(),
+            imageGenerationRepository = FakeImageGenerationRepository(),
+            wearDeviceRepository = fakeWearDeviceRepository,
         )
     }
 
@@ -131,5 +137,22 @@ class ResultsViewModelTest {
 
         viewModel.shareClicked()
         assertNotNull(values.last().savedUri)
+    }
+
+    @Test
+    fun hasWearDevice() = runTest {
+        val wearDevice = ConnectedDevice(
+            nodeId = "abcd1234",
+            displayName = "Pixel Watch 3",
+            hasAndroidify = true,
+        )
+        val values = mutableListOf<ResultState>()
+        fakeWearDeviceRepository.setDevice(wearDevice)
+        backgroundScope.launch(UnconfinedTestDispatcher()) {
+            viewModel.state.collect {
+                values.add(it)
+            }
+        }
+        assertTrue(values.last().hasWearDevice)
     }
 }

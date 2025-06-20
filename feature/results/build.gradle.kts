@@ -47,6 +47,11 @@ android {
 
     testOptions {
         targetSdk = 36
+        testOptions {
+            screenshotTests {
+                imageDifferenceThreshold = 0.0001f // 0.01%
+            }
+        }
     }
 }
 

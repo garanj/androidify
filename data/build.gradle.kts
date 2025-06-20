@@ -59,5 +59,8 @@ dependencies {
     implementation(libs.ai.edge) {
         exclude(group = "com.google.guava")
     }
+
+    implementation(libs.play.services.wearable)
+    implementation(libs.kotlinx.coroutines.play.services)
     ksp(libs.hilt.compiler)
 }

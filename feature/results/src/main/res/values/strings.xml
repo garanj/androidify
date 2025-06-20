@@ -37,4 +37,5 @@
         <item>Dressed to impress!</item>
         <item>Hey good looking!</item>
     </string-array>
+    <string name="send_to_watch">Send to watch</string>
 </resources>
