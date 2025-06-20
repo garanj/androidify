@@ -38,6 +38,7 @@ ksp = "2.1.20-1.0.32"
 kotlinxCoroutines = "1.10.2"
 kotlinxSerialization = "2.1.20"
 kotlinxSerializationJson = "1.8.1"
+ktlint = "1.5.0"
 lifecycleRuntimeKtx = "2.8.7"
 lifecycleViewmodelNavigation3 = "1.0.0-SNAPSHOT"
 loggingInterceptor = "5.0.0-alpha.14"
@@ -49,6 +50,7 @@ poseDetection = "18.0.0-beta5"
 profileinstaller = "1.4.1"
 retrofit = "2.11.0"
 robolectric = "4.14.1"
+spotless = "7.0.2"
 startup = "1.2.0"
 runner = "1.6.2"
 uiTextGoogleFonts = "1.8.0"
@@ -142,3 +144,4 @@ serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref 
 android-test = { id = "com.android.test", version.ref = "agp" }
 baselineprofile = { id = "androidx.baselineprofile", version.ref = "baselineprofile" }
 composeScreenshot = { id = "com.android.compose.screenshot", version = "0.0.1-alpha09" }
+spotless = { id = "com.diffplug.spotless", version.ref = "spotless" }
