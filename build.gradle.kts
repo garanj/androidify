@@ -14,7 +14,6 @@ plugins {
     alias(libs.plugins.spotless) apply false
 }
 
-val ktlintVersion = "1.5.0"
 
 subprojects {
     apply(plugin = "com.diffplug.spotless")
@@ -22,7 +21,7 @@ subprojects {
         kotlin {
             target("**/*.kt")
             targetExclude("**/build/**/*.kt")
-            ktlint(ktlintVersion).editorConfigOverride(
+            ktlint(libs.versions.ktlint.get()).editorConfigOverride(
                 mapOf(
                     "android" to "true",
                     "ktlint_standard_property-naming" to "disabled"
@@ -30,7 +29,7 @@ subprojects {
             )
             licenseHeaderFile(rootProject.file("spotless/copyright.kt"))
         }
-        format("kts") {
+        kotlinGradle {
             target("**/*.kts")
             targetExclude("**/build/**/*.kts")
             // Look for the first line that doesn't have a block comment (assumed to be the license)
