@@ -33,7 +33,7 @@ import javax.inject.Inject
 @HiltViewModel
 class ResultsViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
-    val wearDeviceRepository: WearDeviceRepository
+    val wearDeviceRepository: WearDeviceRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
@@ -48,7 +48,6 @@ class ResultsViewModel @Inject constructor(
             }
         }
     }
-
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -105,5 +104,5 @@ data class ResultState(
     val externalSavedUri: Uri? = null,
     val externalOriginalSavedUri: Uri? = null,
     val promptText: String? = null,
-    val hasWearDevice: Boolean = false
+    val hasWearDevice: Boolean = false,
 )

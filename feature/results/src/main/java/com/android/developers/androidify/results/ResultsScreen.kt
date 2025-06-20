@@ -91,6 +91,7 @@ fun ResultsScreen(
     verboseLayout: Boolean = allowsFullContent(),
     onBackPress: () -> Unit,
     onAboutPress: () -> Unit,
+    onWearDevicePressed: () -> Unit,
     viewModel: ResultsViewModel = hiltViewModel<ResultsViewModel>(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -139,6 +140,7 @@ fun ResultsScreen(
             shareClicked = {
                 viewModel.shareClicked()
             },
+            wearDeviceclicked = onWearDevicePressed,
         )
     }
 }
@@ -164,6 +166,7 @@ private fun ResultsScreenPreview() {
             state = state,
             downloadClicked = {},
             shareClicked = {},
+            wearDeviceclicked = {},
         )
     }
 }
@@ -188,6 +191,7 @@ private fun ResultsScreenPreviewSmall() {
             verboseLayout = false,
             downloadClicked = {},
             shareClicked = {},
+            wearDeviceclicked = {},
         )
     }
 }
@@ -199,6 +203,7 @@ fun ResultsScreenContents(
     verboseLayout: Boolean = allowsFullContent(),
     downloadClicked: () -> Unit,
     shareClicked: () -> Unit,
+    wearDeviceclicked: () -> Unit,
     defaultSelectedResult: ResultOption = ResultOption.ResultImage,
 ) {
     ResultsBackground()
@@ -253,9 +258,12 @@ fun ResultsScreenContents(
             onDownloadClicked = {
                 downloadClicked()
             },
+            onWearDeviceClick = {
+                wearDeviceclicked()
+            },
             modifier = modifier,
             verboseLayout = verboseLayout,
-            hasWearDevice = state.value.hasWearDevice
+            hasWearDevice = state.value.hasWearDevice,
         )
     }
     val backgroundQuotes = @Composable { modifier: Modifier ->
@@ -355,6 +363,7 @@ private fun BackgroundRandomQuotes(verboseLayout: Boolean = true) {
 private fun BotActionsButtonRow(
     onShareClicked: () -> Unit,
     onDownloadClicked: () -> Unit,
+    onWearDeviceClick: () -> Unit,
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = false,
     hasWearDevice: Boolean = false,
@@ -412,7 +421,7 @@ private fun BotActionsButtonRow(
         if (hasWearDevice) {
             Spacer(Modifier.width(8.dp))
             PrimaryButton(
-                onClick = {},
+                onClick = onWearDeviceClick,
                 leadingIcon = {
                     Icon(
                         ImageVector

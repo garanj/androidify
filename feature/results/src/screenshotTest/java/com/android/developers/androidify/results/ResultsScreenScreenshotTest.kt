@@ -56,6 +56,7 @@ class ResultsScreenScreenshotTest {
                     verboseLayout = true, // Replicates ResultsScreenPreview
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -82,6 +83,7 @@ class ResultsScreenScreenshotTest {
                     verboseLayout = false, // Replicates ResultsScreenPreviewSmall
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -108,6 +110,35 @@ class ResultsScreenScreenshotTest {
                     downloadClicked = {},
                     shareClicked = {},
                     defaultSelectedResult = ResultOption.OriginalInput, // Set the non-default option
+                    wearDeviceclicked = {},
+                )
+            }
+        }
+    }
+
+    @SmallPhonePreview
+    @Preview(showBackground = true)
+    @Composable
+    fun ResultsScreen_WearDevicePreview() {
+        val mockBitmap = createMockBitmap()
+        val state = remember {
+            mutableStateOf(
+                ResultState(
+                    resultImageBitmap = mockBitmap,
+                    promptText = "wearing a hat with straw hair",
+                    hasWearDevice = true
+                ),
+            )
+        }
+        CompositionLocalProvider(value = LocalInspectionMode provides true) {
+            AndroidifyTheme {
+                ResultsScreenContents(
+                    contentPadding = PaddingValues(0.dp),
+                    state = state,
+                    verboseLayout = false, // Replicates ResultsScreenPreviewSmall
+                    downloadClicked = {},
+                    shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }

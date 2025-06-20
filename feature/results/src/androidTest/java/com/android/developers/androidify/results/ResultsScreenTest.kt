@@ -60,6 +60,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -90,6 +91,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -121,6 +123,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -157,6 +160,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -190,6 +194,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = {},
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -226,6 +231,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = {},
                     shareClicked = { shareClicked = true }, // Callback to test
+                    wearDeviceclicked = {},
                 )
             }
         }
@@ -252,6 +258,7 @@ class ResultsScreenTest {
                     state = state,
                     downloadClicked = { downloadClicked = true }, // Callback to test
                     shareClicked = {},
+                    wearDeviceclicked = {},
                 )
             }
         }
