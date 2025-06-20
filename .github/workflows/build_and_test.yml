@@ -40,7 +40,7 @@ jobs:
         run: chmod +x gradlew
 
       - name: Apply Spotless
-        run: ./gradlew spotlessApply --init-script gradle/init.gradle.kts --no-configuration-cache
+        run: ./gradlew spotlessApply
 
       - name: Commit Spotless changes
         uses: stefanzweifel/git-auto-commit-action@v5
