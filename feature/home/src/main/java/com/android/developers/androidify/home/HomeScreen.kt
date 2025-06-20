@@ -79,7 +79,6 @@ import androidx.compose.ui.layout.onLayoutRectChanged
 import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -543,9 +542,8 @@ private fun VideoPlayer(
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .onVisibilityChanged(
                 minDurationMs = 100,
-                minFractionVisible = 1f
-            )
-            { fullyVisible -> videoFullyOnScreen = fullyVisible }
+                minFractionVisible = 1f,
+            ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
             .then(modifier),
     ) {
         player?.let { currentPlayer ->
