@@ -81,12 +81,12 @@
         <!-- need to use Theme.AppCompat -->
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/AppCompatAndroidify" />
 
         <!-- needs to use Theme.AppCompat -->
         <activity
             android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
-            android:theme="@style/Theme.AppCompat" />
+            android:theme="@style/AppCompatAndroidify" />
     </application>
 
 </manifest>
