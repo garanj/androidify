@@ -16,13 +16,13 @@
 -->
 <resources>
 
-    <style name="Theme.Androidify" parent="android:Theme.Material.Light.NoActionBar" />
-
     <style name="AppCompatAndroidify" parent="Theme.AppCompat.DayNight">
         <item name="android:windowTranslucentStatus">false</item>
         <item name="android:windowDrawsSystemBarBackgrounds">true</item>
         <item name="android:statusBarColor">@android:color/white</item>
         <item name="android:fitsSystemWindows">true</item>
+        <!-- https://github.com/google/play-services-plugins/issues/296 -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
         <item name="android:windowLightStatusBar">true</item>
     </style>
 </resources>

@@ -13,7 +13,15 @@ plugins {
     alias(libs.plugins.baselineprofile) apply false
     alias(libs.plugins.spotless) apply false
 }
-
+buildscript {
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        classpath(libs.google.oss.licenses.plugin)
+    }
+}
 
 subprojects {
     apply(plugin = "com.diffplug.spotless")

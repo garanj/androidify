@@ -78,6 +78,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- need to use Theme.AppCompat -->
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/AppCompatAndroidify" />
+
+        <!-- needs to use Theme.AppCompat -->
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/AppCompatAndroidify" />
     </application>
 
 </manifest>
