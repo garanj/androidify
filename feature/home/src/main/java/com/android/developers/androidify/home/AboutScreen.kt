@@ -17,7 +17,6 @@
 
 package com.android.developers.androidify.home
 
-import android.content.Intent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +48,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -67,8 +65,6 @@ import com.android.developers.androidify.theme.sharedBoundsReveal
 import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.isAtLeastMedium
-import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import kotlin.jvm.java
 
 @PhonePreview
 @Composable
