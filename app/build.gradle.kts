@@ -25,6 +25,7 @@ plugins {
     alias(libs.plugins.google.services)
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.baselineprofile)
+    id("com.google.android.gms.oss-licenses-plugin")
 }
 
 android {
@@ -60,7 +61,7 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            baselineProfile.automaticGenerationDuringBuild = true
+            //baselineProfile.automaticGenerationDuringBuild = true
             configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = true
             }
@@ -111,6 +112,10 @@ dependencies {
     implementation(libs.firebase.appcheck.debug)
 
     implementation(libs.androidx.window)
+    implementation(libs.androidx.appcompat)
+    implementation(libs.google.oss.licenses) {
+        exclude(group = "androidx.appcompat")
+    }
 
     implementation(projects.feature.camera)
     implementation(projects.feature.creation)

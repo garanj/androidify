@@ -17,11 +17,13 @@
 
 package com.android.developers.androidify.home
 
+import android.content.Intent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -47,6 +49,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -64,12 +67,14 @@ import com.android.developers.androidify.theme.sharedBoundsReveal
 import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.isAtLeastMedium
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
+import kotlin.jvm.java
 
 @PhonePreview
 @Composable
 private fun AboutPreviewCompact() {
     SharedElementContextPreview {
-        AboutScreen(isMediumWindowSize = false) {}
+        AboutScreen(isMediumWindowSize = false, {}, {})
     }
 }
 
@@ -77,7 +82,7 @@ private fun AboutPreviewCompact() {
 @Composable
 private fun AboutPreviewLargeScreens() {
     SharedElementContextPreview {
-        AboutScreen(isMediumWindowSize = true) {}
+        AboutScreen(isMediumWindowSize = true, {}, {})
     }
 }
 
@@ -85,6 +90,7 @@ private fun AboutPreviewLargeScreens() {
 fun AboutScreen(
     isMediumWindowSize: Boolean = isAtLeastMedium(),
     onBackPressed: () -> Unit,
+    onLicensesClicked: () -> Unit
 ) {
     val sharedElementScope = LocalSharedTransitionScope.current
     val navScope = LocalNavAnimatedContentScope.current
@@ -163,7 +169,8 @@ fun AboutScreen(
                             )
                         }
                         Spacer(Modifier.size(48.dp))
-                        FooterButtons(modifier = Modifier.padding(bottom = 8.dp))
+                        FooterButtons(modifier = Modifier.padding(bottom = 8.dp),
+                            onLicensesClicked)
                     }
                 }
             } else {
@@ -197,7 +204,7 @@ fun AboutScreen(
                         stringResource(R.string.about_step3_label),
                     )
                     Spacer(modifier = Modifier.size(24.dp))
-                    FooterButtons(modifier = Modifier.padding(bottom = 8.dp))
+                    FooterButtons(modifier = Modifier.padding(bottom = 8.dp), onLicensesClicked)
                 }
             }
         }
@@ -205,21 +212,27 @@ fun AboutScreen(
 }
 
 @Composable
-private fun FooterButtons(modifier: Modifier = Modifier) {
+private fun FooterButtons(modifier: Modifier = Modifier,
+                          onLicensesClicked: () -> Unit) {
     val uriHandler = LocalUriHandler.current
-    Row(modifier) {
+    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
         SecondaryOutlinedButton(
             onClick = {
                 uriHandler.openUri("https://policies.google.com/terms")
             },
             buttonText = stringResource(R.string.terms),
         )
-        Spacer(modifier = Modifier.size(16.dp))
         SecondaryOutlinedButton(
             onClick = {
                 uriHandler.openUri("https://policies.google.com/privacy")
             },
             buttonText = stringResource(R.string.privacy),
+        )
+        SecondaryOutlinedButton(
+            onClick = {
+                onLicensesClicked()
+            },
+            buttonText = stringResource(R.string.oss_license),
         )
     }
 }
