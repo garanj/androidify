@@ -17,6 +17,7 @@
 
 package com.android.developers.androidify.navigation
 
+import android.content.Intent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.fadeIn
@@ -29,6 +30,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
 import androidx.navigation3.runtime.entry
@@ -40,6 +42,8 @@ import com.android.developers.androidify.creation.CreationScreen
 import com.android.developers.androidify.home.AboutScreen
 import com.android.developers.androidify.home.HomeScreen
 import com.android.developers.androidify.theme.transitions.ColorSplashTransitionScreen
+import com.google.android.gms.oss.licenses.OssLicensesActivity
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 import com.android.developers.androidify.watchface.WatchFaceScreen
 
 @ExperimentalMaterial3ExpressiveApi
@@ -114,6 +118,7 @@ fun MainNavigation() {
                 )
             }
             entry<About> {
+                val context = LocalContext.current
                 AboutScreen(
                     onBackPressed = {
                         backStack.removeLastOrNull()
@@ -125,6 +130,9 @@ fun MainNavigation() {
                     onBackPress = {
                         backStack.removeLastOrNull()
                     },
+                    onLicensesClicked = {
+                        context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                    }
                 )
             }
         },
