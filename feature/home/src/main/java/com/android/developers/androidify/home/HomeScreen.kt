@@ -457,7 +457,7 @@ private fun DancingBot(
     AsyncImage(
         model = dancingBotLink,
         modifier = modifier,
-        contentDescription = stringResource(R.string.dancing_android_bot),
+        contentDescription = null,
     )
 }
 
