@@ -37,6 +37,5 @@
     <string name="terms">Terms</string>
     <string name="privacy">Privacy</string>
     <string name="oss_license">Licenses</string>
-    <string name="video_card_content_description">A video showcasing the creation of an Android bot.</string>
     <string name="dancing_android_bot">A dancing Android bot.</string>
 </resources>

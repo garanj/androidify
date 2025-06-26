@@ -301,7 +301,7 @@ private fun VideoPlayerRotatedCard(
     modifier: Modifier = Modifier,
 ) {
     val aspectRatio = 280f / 380f
-    val videoInstructionText = stringResource(R.string.video_card_content_description)
+    val videoInstructionText = stringResource(R.string.instruction_video_transcript)
     Box(
         modifier = modifier
             .focusable()
