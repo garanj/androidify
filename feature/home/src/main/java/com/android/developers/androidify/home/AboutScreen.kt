@@ -211,7 +211,11 @@ fun AboutScreen(
 private fun FooterButtons(modifier: Modifier = Modifier,
                           onLicensesClicked: () -> Unit) {
     val uriHandler = LocalUriHandler.current
-    FlowRow(modifier, horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+    FlowRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         SecondaryOutlinedButton(
             onClick = {
                 uriHandler.openUri("https://policies.google.com/terms")
