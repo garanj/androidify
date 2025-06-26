@@ -40,6 +40,8 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.theme.AndroidifyTheme
@@ -78,6 +80,13 @@ internal fun CameraCaptureButton(
     val disabledColor = MaterialTheme.colorScheme.surfaceContainer
     val interactionSource = remember { MutableInteractionSource() }
     val animationSpec = MaterialTheme.motionScheme.defaultSpatialSpec<Float>()
+
+    val semanticsDescription = if (enabled) {
+        stringResource(R.string.capture_image_button_enabled_content_description)
+    } else {
+        stringResource(R.string.capture_image_button_disabled_content_description)
+    }
+
     Spacer(
         modifier
             .indication(interactionSource, ScaleIndicationNodeFactory(animationSpec))
@@ -90,6 +99,9 @@ internal fun CameraCaptureButton(
                 role = Role.Button,
                 onClickLabel = stringResource(R.string.cd_capture_button),
             )
+            .semantics {
+                contentDescription = semanticsDescription
+            }
             .size(size)
             .drawWithCache {
                 val outerPath = path.copy().apply {
