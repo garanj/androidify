@@ -301,7 +301,7 @@ private fun VideoPlayerRotatedCard(
     modifier: Modifier = Modifier,
 ) {
     val aspectRatio = 280f / 380f
-    val videoInstructionText = stringResource(R.string.instruction_video_transcript)
+    val videoInstructionText = stringResource(R.string.video_card_content_description)
     Box(
         modifier = modifier
             .focusable()
@@ -457,7 +457,7 @@ private fun DancingBot(
     AsyncImage(
         model = dancingBotLink,
         modifier = modifier,
-        contentDescription = null,
+        contentDescription = stringResource(R.string.dancing_android_bot),
     )
 }
 

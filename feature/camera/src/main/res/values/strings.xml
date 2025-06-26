@@ -25,6 +25,8 @@
     <string name="flip_camera_direction">Flip camera direction</string>
     <string name="rear_camera_description">Enable Rear Camera</string>
     <string name="camera_guide_text_label">Use guides to frame yourself for the perfect Bot</string>
+    <string name="capture_image_button_enabled_content_description">Capture image</string>
+    <string name="capture_image_button_disabled_content_description">Image capture disabled. Make sure your face is clearly visible in the frame.</string>
 
     <string-array name="camera_result_compliments">
         <item>Great shot!</item>
