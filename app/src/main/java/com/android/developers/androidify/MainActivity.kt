@@ -15,12 +15,16 @@
  */
 package com.android.developers.androidify
 
+import android.os.Build
 import android.os.Bundle
+import android.view.WindowManager
+import android.window.TrustedPresentationThresholds
 import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.android.developers.androidify.navigation.MainNavigation
@@ -30,6 +34,8 @@ import dagger.hilt.android.AndroidEntryPoint
 @ExperimentalMaterial3ExpressiveApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
+
+    private val isWindowNotOccluded = mutableStateOf(true)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -46,8 +52,25 @@ class MainActivity : ComponentActivity() {
                         Color.Transparent.toArgb(),
                     ),
                 )
-                MainNavigation()
+                MainNavigation(isWindowNotOccluded)
             }
         }
     }
+
+    override fun onAttachedToWindow() {
+        super.onAttachedToWindow()
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            val presentationThreshold = TrustedPresentationThresholds(
+                1f, 0.25f, 500
+            )
+
+            val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
+            windowManager.registerTrustedPresentationListener(
+                window.decorView.windowToken,
+                presentationThreshold,
+                mainExecutor
+            ) { notOccluded -> isWindowNotOccluded.value = notOccluded }
+        }
+    }
+
 }

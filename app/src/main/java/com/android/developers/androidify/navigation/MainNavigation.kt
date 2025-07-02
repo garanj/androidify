@@ -26,6 +26,7 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -42,12 +43,11 @@ import com.android.developers.androidify.creation.CreationScreen
 import com.android.developers.androidify.home.AboutScreen
 import com.android.developers.androidify.home.HomeScreen
 import com.android.developers.androidify.theme.transitions.ColorSplashTransitionScreen
-import com.google.android.gms.oss.licenses.OssLicensesActivity
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun MainNavigation() {
+fun MainNavigation(isWindowNotOccluded: MutableState<Boolean>) {
     val backStack = rememberMutableStateListOf<NavigationRoute>(Home)
     var positionReveal by remember {
         mutableStateOf(IntOffset.Zero)
@@ -80,6 +80,7 @@ fun MainNavigation() {
         entryProvider = entryProvider {
             entry<Home> { entry ->
                 HomeScreen(
+                    isWindowNotOccluded = isWindowNotOccluded,
                     onClickLetsGo = { positionOffset ->
                         showSplash = true
                         positionReveal = positionOffset
