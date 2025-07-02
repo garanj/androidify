@@ -47,7 +47,7 @@ import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
-fun MainNavigation(isWindowNotOccluded: MutableState<Boolean>) {
+fun MainNavigation() {
     val backStack = rememberMutableStateListOf<NavigationRoute>(Home)
     var positionReveal by remember {
         mutableStateOf(IntOffset.Zero)
@@ -80,7 +80,6 @@ fun MainNavigation(isWindowNotOccluded: MutableState<Boolean>) {
         entryProvider = entryProvider {
             entry<Home> { entry ->
                 HomeScreen(
-                    isWindowNotOccluded = isWindowNotOccluded,
                     onClickLetsGo = { positionOffset ->
                         showSplash = true
                         positionReveal = positionOffset

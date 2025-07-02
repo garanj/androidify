@@ -17,6 +17,7 @@ package com.android.developers.androidify
 
 import android.os.Build
 import android.os.Bundle
+import android.util.Log
 import android.view.WindowManager
 import android.window.TrustedPresentationThresholds
 import androidx.activity.ComponentActivity
@@ -24,18 +25,20 @@ import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.toArgb
 import com.android.developers.androidify.navigation.MainNavigation
 import com.android.developers.androidify.theme.AndroidifyTheme
+import com.android.developers.androidify.util.LocalOcclusion
 import dagger.hilt.android.AndroidEntryPoint
 
 @ExperimentalMaterial3ExpressiveApi
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
 
-    private val isWindowNotOccluded = mutableStateOf(true)
+    private val isWindowOccluded = mutableStateOf(false)
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -52,7 +55,9 @@ class MainActivity : ComponentActivity() {
                         Color.Transparent.toArgb(),
                     ),
                 )
-                MainNavigation(isWindowNotOccluded)
+                CompositionLocalProvider(LocalOcclusion provides isWindowOccluded) {
+                    MainNavigation()
+                }
             }
         }
     }
@@ -60,8 +65,11 @@ class MainActivity : ComponentActivity() {
     override fun onAttachedToWindow() {
         super.onAttachedToWindow()
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.VANILLA_ICE_CREAM) {
+            val minAlpha = 1f
+            val minFractionRendered = 0.25f
+            val stabilityRequirements = 500
             val presentationThreshold = TrustedPresentationThresholds(
-                1f, 0.25f, 500
+                minAlpha, minFractionRendered, stabilityRequirements
             )
 
             val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
@@ -69,7 +77,7 @@ class MainActivity : ComponentActivity() {
                 window.decorView.windowToken,
                 presentationThreshold,
                 mainExecutor
-            ) { notOccluded -> isWindowNotOccluded.value = notOccluded }
+            ) { isMinFractionRendered -> isWindowOccluded.value = !isMinFractionRendered }
         }
     }
 
