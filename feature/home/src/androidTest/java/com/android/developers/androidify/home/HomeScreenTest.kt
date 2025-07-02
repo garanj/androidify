@@ -55,6 +55,7 @@ class HomeScreenTest {
                     onAboutClicked = {}, // Provide a default or mock value,
                     videoLink = "",
                     dancingBotLink = "",
+                    isWindowNotOccluded = true,
                 )
             }
         }
@@ -79,6 +80,7 @@ class HomeScreenTest {
                     onAboutClicked = {},
                     videoLink = "",
                     dancingBotLink = "",
+                    isWindowNotOccluded = true,
                 )
             }
         }

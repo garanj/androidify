@@ -36,6 +36,7 @@ class HomeScreenScreenshotTest {
                     onAboutClicked = {},
                     videoLink = "",
                     dancingBotLink = "",
+                    isWindowNotOccluded = true,
                 )
             }
         }
