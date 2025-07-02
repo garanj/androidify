@@ -60,6 +60,7 @@ import androidx.compose.material3.OutlinedIconButton
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -119,10 +120,12 @@ import com.android.developers.androidify.theme.R as ThemeR
 fun HomeScreen(
     homeScreenViewModel: HomeViewModel = hiltViewModel(),
     isMediumWindowSize: Boolean = isAtLeastMedium(),
+    isWindowNotOccluded: MutableState<Boolean>,
     onClickLetsGo: (IntOffset) -> Unit = {},
     onAboutClicked: () -> Unit = {},
 ) {
     val state = homeScreenViewModel.state.collectAsStateWithLifecycle()
+
     if (!state.value.isAppActive) {
         AppInactiveScreen()
     } else {
@@ -130,6 +133,7 @@ fun HomeScreen(
             state.value.videoLink,
             state.value.dancingDroidLink,
             isMediumWindowSize,
+            isWindowNotOccluded.value,
             onClickLetsGo,
             onAboutClicked,
         )
@@ -141,6 +145,7 @@ fun HomeScreenContents(
     videoLink: String?,
     dancingBotLink: String?,
     isMediumWindowSize: Boolean,
+    isWindowNotOccluded: Boolean,
     onClickLetsGo: (IntOffset) -> Unit,
     onAboutClicked: () -> Unit,
 ) {
@@ -168,6 +173,7 @@ fun HomeScreenContents(
                     ) {
                         VideoPlayerRotatedCard(
                             videoLink,
+                            isWindowNotOccluded,
                             modifier = Modifier
                                 .padding(32.dp)
                                 .align(Alignment.Center),
@@ -198,6 +204,7 @@ fun HomeScreenContents(
                 CompactPager(
                     videoLink,
                     dancingBotLink,
+                    isWindowNotOccluded = isWindowNotOccluded,
                     onClickLetsGo,
                     onAboutClicked,
                 )
@@ -210,6 +217,7 @@ fun HomeScreenContents(
 private fun CompactPager(
     videoLink: String?,
     dancingBotLink: String?,
+    isWindowNotOccluded: Boolean,
     onClick: (IntOffset) -> Unit,
     onAboutClicked: () -> Unit,
 ) {
@@ -239,6 +247,7 @@ private fun CompactPager(
                 Box(modifier = Modifier.fillMaxSize()) {
                     VideoPlayerRotatedCard(
                         videoLink = videoLink,
+                        isWindowNotOccluded = isWindowNotOccluded,
                         modifier = Modifier
                             .padding(horizontal = 32.dp)
                             .align(Alignment.Center),
@@ -298,6 +307,7 @@ private fun CompactPager(
 @Composable
 private fun VideoPlayerRotatedCard(
     videoLink: String?,
+    isWindowNotOccluded: Boolean,
     modifier: Modifier = Modifier,
 ) {
     val aspectRatio = 280f / 380f
@@ -316,6 +326,7 @@ private fun VideoPlayerRotatedCard(
     ) {
         VideoPlayer(
             videoLink,
+            isWindowNotOccluded,
             modifier = Modifier
                 .aspectRatio(aspectRatio)
                 .align(Alignment.Center)
@@ -334,6 +345,7 @@ private fun HomeScreenPhonePreview() {
             isMediumWindowSize = false,
             onClickLetsGo = {},
             videoLink = "",
+            isWindowNotOccluded = true,
             dancingBotLink = "https://services.google.com/fh/files/misc/android_dancing.gif",
             onAboutClicked = {},
         )
@@ -349,6 +361,7 @@ private fun HomeScreenLargeScreensPreview() {
             isMediumWindowSize = true,
             onClickLetsGo = { },
             videoLink = "",
+            isWindowNotOccluded = true,
             dancingBotLink = "https://services.google.com/fh/files/misc/android_dancing.gif",
             onAboutClicked = {},
         )
@@ -516,6 +529,7 @@ private fun DancingBotHeadlineText(
 @Composable
 private fun VideoPlayer(
     videoLink: String?,
+    isWindowNotOccluded: Boolean,
     modifier: Modifier = Modifier,
 ) {
     if (LocalInspectionMode.current) return // Layoutlib does not support ExoPlayer
@@ -547,8 +561,8 @@ private fun VideoPlayer(
             .then(modifier),
     ) {
         player?.let { currentPlayer ->
-            LaunchedEffect(videoFullyOnScreen) {
-                if (videoFullyOnScreen) currentPlayer.play() else currentPlayer.pause()
+            LaunchedEffect(videoFullyOnScreen, isWindowNotOccluded) {
+                if (videoFullyOnScreen && isWindowNotOccluded) currentPlayer.play() else currentPlayer.pause()
             }
 
             // Render the video
