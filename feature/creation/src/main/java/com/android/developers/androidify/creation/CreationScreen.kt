@@ -22,7 +22,10 @@
 
 package com.android.developers.androidify.creation
 
+import android.content.ClipDescription
 import android.net.Uri
+import android.util.Log
+import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -36,6 +39,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.draganddrop.dragAndDropTarget
 import androidx.compose.foundation.indication
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -99,6 +103,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draganddrop.DragAndDropEvent
+import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.mimeTypes
+import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -194,6 +202,7 @@ fun CreationScreen(
                 onPromptGenerationPressed = creationViewModel::onPromptGenerationClicked,
                 onBotColorSelected = creationViewModel::onBotColorChanged,
                 onStartClicked = creationViewModel::startClicked,
+                onDropCallback = creationViewModel::onImageSelected,
             )
         }
 
@@ -242,6 +251,7 @@ fun EditScreen(
     onPromptGenerationPressed: () -> Unit,
     onBotColorSelected: (BotColor) -> Unit,
     onStartClicked: () -> Unit,
+    onDropCallback: (Uri) -> Unit = {},
 ) {
     Scaffold(
         snackbarHost = {
@@ -313,6 +323,7 @@ fun EditScreen(
                             onUndoPressed = onUndoPressed,
                             onPromptGenerationPressed = onPromptGenerationPressed,
                             onSelectedPromptOptionChanged = onPromptOptionSelected,
+                            onDropCallback = onDropCallback,
                         )
                         Box(
                             modifier = Modifier
@@ -348,6 +359,7 @@ fun EditScreen(
                         onUndoPressed = onUndoPressed,
                         onPromptGenerationPressed = onPromptGenerationPressed,
                         onSelectedPromptOptionChanged = onPromptOptionSelected,
+                        onDropCallback = onDropCallback
                     )
                 }
 
@@ -400,12 +412,29 @@ private fun MainCreationPane(
     onUndoPressed: () -> Unit = {},
     onPromptGenerationPressed: () -> Unit,
     onSelectedPromptOptionChanged: (PromptType) -> Unit,
+    onDropCallback: (Uri) -> Unit,
 ) {
+    val defaultDropAreaBackgroundColor = MaterialTheme.colorScheme.surface
+    val alternateDropAreaBackgroundColor = MaterialTheme.colorScheme.surfaceVariant
+    var background by remember { mutableStateOf(defaultDropAreaBackgroundColor) }
+
+
+    val activity = LocalContext.current as ComponentActivity
+    val externalAppCallback = remember {
+        DropBehaviour(activity).createTargetCallback(
+            onImageDropped = { uri -> onDropCallback(uri) },
+            onDropStarted = { background = alternateDropAreaBackgroundColor },
+            onDropEnded = { background = defaultDropAreaBackgroundColor },
+        )
+    }
+
+
     Box(
         modifier = modifier,
     ) {
         val spatialSpec = MaterialTheme.motionScheme.slowSpatialSpec<Float>()
-        val pagerState = rememberPagerState(uiState.selectedPromptOption.ordinal) { PromptType.entries.size }
+        val pagerState =
+            rememberPagerState(uiState.selectedPromptOption.ordinal) { PromptType.entries.size }
         val focusManager = LocalFocusManager.current
         LaunchedEffect(uiState.selectedPromptOption) {
             launch {
@@ -443,6 +472,21 @@ private fun MainCreationPane(
                     if (imageUri == null) {
                         UploadEmptyState(
                             modifier = Modifier
+                                .background(
+                                    color = background,
+                                    shape = RoundedCornerShape(28.dp),
+                                )
+                                .dashedRoundedRectBorder(
+                                    2.dp,
+                                    MaterialTheme.colorScheme.outline,
+                                    cornerRadius = 28.dp,
+                                )
+                                .dragAndDropTarget(
+                                    shouldStartDragAndDrop = { event ->
+                                        event.mimeTypes().contains("image/jpeg")
+                                    },
+                                    target = externalAppCallback,
+                                )
                                 .fillMaxSize()
                                 .padding(2.dp),
                             onCameraPressed = onCameraPressed,
@@ -614,6 +658,9 @@ fun ImagePreview(
                     .clip(MaterialTheme.shapes.large)
                     .fillMaxSize(),
                 contentScale = ContentScale.Crop,
+                onLoading = { println("ROB-Loading")},
+                onError = { println("ROB-Error: ${it.result.throwable}")},
+                onSuccess = { println("ROB-Success")}
             )
 
             Row(
@@ -855,15 +902,6 @@ private fun UploadEmptyState(
 ) {
     Column(
         modifier = modifier
-            .background(
-                color = MaterialTheme.colorScheme.surface,
-                shape = RoundedCornerShape(28.dp),
-            )
-            .dashedRoundedRectBorder(
-                2.dp,
-                MaterialTheme.colorScheme.outline,
-                cornerRadius = 28.dp,
-            )
             .verticalScroll(rememberScrollState())
             .padding(16.dp),
         horizontalAlignment = Alignment.CenterHorizontally,
