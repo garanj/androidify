@@ -75,10 +75,11 @@ fun <T : ToolOption> GenericToolButton(
     Surface(
         modifier.height(128.dp)
             .padding(8.dp)
+            .clip(MaterialTheme.shapes.medium)
             .clickable {
                 onToolSelected(tool)
             },
-        color = MaterialTheme.colorScheme.background,
+        color = MaterialTheme.colorScheme.surfaceContainerLowest,
     ) {
         val backgroundModifier = if (isSelected) {
             Modifier.background(

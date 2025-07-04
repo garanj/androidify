@@ -22,6 +22,8 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -139,6 +141,7 @@ private fun CustomizeExportContents(
                 onAboutClicked = onInfoPress,
             )
         },
+        containerColor = MaterialTheme.colorScheme.surface
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -149,6 +152,7 @@ private fun CustomizeExportContents(
         ) {
             ImageResult(
                 state.resultImageBitmap,
+                state.selectedAspectRatio,
                 Modifier.weight(1f),
             )
             Spacer(modifier = Modifier.height(16.dp))
@@ -186,7 +190,11 @@ fun SelectedToolDetail(
     onSelectedToolStateChanged: (ToolState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedContent(state.selectedTool, modifier = modifier) { targetState ->
+    AnimatedContent(state.selectedTool,
+        modifier = modifier
+            .padding(8.dp)
+            .background(MaterialTheme.colorScheme.surfaceContainerLowest,
+            shape = MaterialTheme.shapes.medium)) { targetState ->
         val toolState = state.toolState[targetState]
         when (targetState) {
             CustomizeTool.Size -> {
@@ -217,21 +225,22 @@ fun SelectedToolDetail(
 @Composable
 private fun ImageResult(
     bitmap: Bitmap?,
+    selectedAspectRatio: Float,
     modifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier
             .aspectRatio(1f)
-            .padding(32.dp),
+            .padding(32.dp)
+            .animateContentSize(),
+        contentAlignment = Alignment.Center,
     ) {
         AsyncImage(
             model = bitmap,
             contentDescription = stringResource(R.string.resultant_android_bot),
             contentScale = ContentScale.Crop,
             modifier = Modifier
-                .fillMaxSize()
-                .aspectRatio(1f)
-                .shadow(8.dp, shape = MaterialTheme.shapes.large)
+                .aspectRatio(selectedAspectRatio, matchHeightConstraintsFirst = true)
                 .clip(MaterialTheme.shapes.large),
         )
     }

@@ -42,10 +42,10 @@ sealed class SizeOption(
 sealed class BackgroundOption(
     override val displayName: String,
     override val key: String,
-    val drawableId: Int,
+    val drawableId: Int?,
 ) : ToolOption {
-    object None : BackgroundOption("None", "None", R.drawable.placeholderbot)
-    object Lightspeed : BackgroundOption("Lightspeed", "Lightspeed", R.drawable.placeholderbot)
-    object IO : BackgroundOption("I/O", "IO", R.drawable.placeholderbot)
-    object Create : BackgroundOption("Create", "Create", R.drawable.placeholderbot)
+    object None : BackgroundOption("None", "None", null)
+    object Lightspeed : BackgroundOption("Lightspeed", "Lightspeed", R.drawable.light_speed_dots)
+    object IO : BackgroundOption("I/O", "IO", R.drawable.background_option_io)
+    object Create : BackgroundOption("Create", "Create", R.drawable.background_create)
 }

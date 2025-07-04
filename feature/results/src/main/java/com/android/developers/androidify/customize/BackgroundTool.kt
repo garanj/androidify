@@ -16,6 +16,7 @@
 package com.android.developers.androidify.customize
 
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
@@ -53,16 +54,22 @@ fun BackgroundTool(
                         color = MaterialTheme.colorScheme.primary,
                         shape = MaterialTheme.shapes.medium,
                     )
+                    .background(
+                        MaterialTheme.colorScheme.background,
+                        shape = MaterialTheme.shapes.medium,
+                    )
                     .padding(6.dp),
             ) {
-                Image(
-                    rememberAsyncImagePainter(tool.drawableId),
-                    contentDescription = null, // described below
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier
-                        .aspectRatio(1f)
-                        .clip(MaterialTheme.shapes.small),
-                )
+                if (tool.drawableId != null){
+                    Image(
+                        rememberAsyncImagePainter(tool.drawableId),
+                        contentDescription = null, // described below
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier
+                            .aspectRatio(1f)
+                            .clip(MaterialTheme.shapes.small),
+                    )
+                }
             }
         },
     )
