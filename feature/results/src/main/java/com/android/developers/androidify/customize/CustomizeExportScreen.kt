@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 @file:OptIn(ExperimentalPermissionsApi::class)
 
 package com.android.developers.androidify.customize
@@ -6,6 +21,7 @@ import android.Manifest
 import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -83,22 +99,28 @@ fun CustomizeAndExportScreen(
         }
     }
     CustomizeExportContents(
-        resultImage,
+        state.value,
         onBackPress,
         onInfoPress,
+        onToolSelected = { tool ->
+            viewModel.changeSelectedTool(tool)
+        },
         onShareClicked = viewModel::shareClicked,
         onDownloadClicked = viewModel::downloadClicked,
+        onSelectedToolStateChanged = viewModel::selectedToolStateChanged,
         snackbarHostState = viewModel.snackbarHostState.collectAsStateWithLifecycle().value,
     )
 }
 
 @Composable
 private fun CustomizeExportContents(
-    bitmap: Bitmap,
+    state: CustomizeExportState,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
     onShareClicked: () -> Unit,
     onDownloadClicked: () -> Unit,
+    onToolSelected: (CustomizeTool) -> Unit,
+    onSelectedToolStateChanged: (ToolState) -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
@@ -126,11 +148,24 @@ private fun CustomizeExportContents(
             verticalArrangement = Arrangement.SpaceBetween,
         ) {
             ImageResult(
-                bitmap,
+                state.resultImageBitmap,
                 Modifier.weight(1f),
             )
             Spacer(modifier = Modifier.height(16.dp))
-            //SizeOptions()
+            ToolSelector(
+                tools = state.tools,
+                selectedOption = state.selectedTool,
+                onToolSelected = { tool ->
+                    onToolSelected(tool)
+                },
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            SelectedToolDetail(
+                state,
+                onSelectedToolStateChanged = { toolState ->
+                    onSelectedToolStateChanged(toolState)
+                },
+            )
             Spacer(modifier = Modifier.height(16.dp))
             BotActionsButtonRow(
                 onShareClicked = {
@@ -146,8 +181,42 @@ private fun CustomizeExportContents(
 }
 
 @Composable
+fun SelectedToolDetail(
+    state: CustomizeExportState,
+    onSelectedToolStateChanged: (ToolState) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    AnimatedContent(state.selectedTool, modifier = modifier) { targetState ->
+        val toolState = state.toolState[targetState]
+        when (targetState) {
+            CustomizeTool.Size -> {
+                val aspectRatioToolState = toolState as AspectRatioToolState
+                AspectRatioTool(
+                    aspectRatioToolState.options,
+                    aspectRatioToolState.selectedToolOption,
+                    {
+                        onSelectedToolStateChanged(aspectRatioToolState.copy(selectedToolOption = it))
+                    },
+                )
+            }
+
+            CustomizeTool.Background -> {
+                val backgroundToolState = toolState as BackgroundToolState
+                BackgroundTool(
+                    backgroundToolState.options,
+                    backgroundToolState.selectedToolOption,
+                    {
+                        onSelectedToolStateChanged(backgroundToolState.copy(selectedToolOption = it))
+                    },
+                )
+            }
+        }
+    }
+}
+
+@Composable
 private fun ImageResult(
-    bitmap: Bitmap,
+    bitmap: Bitmap?,
     modifier: Modifier = Modifier,
 ) {
     Box(
@@ -167,7 +236,6 @@ private fun ImageResult(
         )
     }
 }
-
 
 @Composable
 private fun BotActionsButtonRow(
@@ -242,14 +310,16 @@ private fun BotActionsButtonRow(
 fun CustomizeExportPreview() {
     AndroidifyTheme {
         val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-
+        val state = CustomizeExportState(resultImageBitmap = bitmap.asAndroidBitmap())
         CustomizeExportContents(
-            bitmap = bitmap.asAndroidBitmap(),
+            state = state,
             onDownloadClicked = {},
             onShareClicked = {},
             onBackPress = {},
             onInfoPress = {},
+            onToolSelected = {},
             snackbarHostState = SnackbarHostState(),
+            onSelectedToolStateChanged = {},
         )
     }
 }
