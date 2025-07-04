@@ -27,8 +27,7 @@ import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
 @HiltViewModel
-class ResultsViewModel @Inject constructor(
-) : ViewModel() {
+class ResultsViewModel @Inject constructor() : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
     val state = _state.asStateFlow()
@@ -47,7 +46,6 @@ class ResultsViewModel @Inject constructor(
             ResultState(resultImageUrl, originalImageUrl, promptText = promptText)
         }
     }
-
 }
 
 data class ResultState(

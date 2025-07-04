@@ -257,7 +257,7 @@ enum class ScreenState {
     EDIT,
     LOADING,
     RESULT,
-    CUSTOMIZE
+    CUSTOMIZE,
 }
 
 data class BotColor(
