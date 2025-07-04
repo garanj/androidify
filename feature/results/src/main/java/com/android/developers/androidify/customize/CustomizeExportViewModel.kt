@@ -142,15 +142,14 @@ data class BackgroundToolState(
     ),
 ) : ToolState
 
-
 data class ExportImageCanvas(
     var aspectRatio: Float = 1f,
     var canvasSize: Size = Size(1000f, 1000f),
     var imageRect: Rect = Rect(offset = Offset.Zero, size = Size(1000f, 1000f)),
     var mainImageUri: Uri,
-    var imageOriginalBitmapSize: Size? = Size(1024f, 1024f)
+    var imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
 ) {
-    fun updateAspectRatio(newAspectRatio: Float, strategy: ImageScalingStrategy = ImageScalingStrategy.FILL) : ExportImageCanvas {
+    fun updateAspectRatio(newAspectRatio: Float, strategy: ImageScalingStrategy = ImageScalingStrategy.FILL): ExportImageCanvas {
         if (newAspectRatio <= 0f) {
             return this.copy()
         }
@@ -179,7 +178,7 @@ data class ExportImageCanvas(
         return this.copy(
             aspectRatio = newAspectRatio,
             canvasSize = adjustedCanvasSize,
-            imageRect = newImageRect
+            imageRect = newImageRect,
         )
     }
 
@@ -229,5 +228,6 @@ data class ExportImageCanvas(
     }
 }
 enum class ImageScalingStrategy {
-    FIT, FILL
+    FIT,
+    FILL,
 }

@@ -30,7 +30,6 @@ import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
 import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
-import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -58,7 +57,7 @@ class ResultsScreenTest {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }
@@ -87,7 +86,7 @@ class ResultsScreenTest {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }
@@ -117,7 +116,7 @@ class ResultsScreenTest {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }
@@ -152,7 +151,7 @@ class ResultsScreenTest {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }
@@ -184,7 +183,7 @@ class ResultsScreenTest {
                 ResultsScreenContents(
                     contentPadding = PaddingValues(0.dp),
                     state = state,
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }

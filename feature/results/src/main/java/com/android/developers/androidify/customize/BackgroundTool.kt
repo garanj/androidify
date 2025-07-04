@@ -60,7 +60,7 @@ fun BackgroundTool(
                     )
                     .padding(6.dp),
             ) {
-                if (tool.drawableId != null){
+                if (tool.drawableId != null) {
                     Image(
                         rememberAsyncImagePainter(tool.drawableId),
                         contentDescription = null, // described below

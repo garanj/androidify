@@ -51,7 +51,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
@@ -141,7 +140,7 @@ private fun CustomizeExportContents(
                 onAboutClicked = onInfoPress,
             )
         },
-        containerColor = MaterialTheme.colorScheme.surface
+        containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         Column(
             modifier = Modifier
@@ -190,11 +189,15 @@ fun SelectedToolDetail(
     onSelectedToolStateChanged: (ToolState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    AnimatedContent(state.selectedTool,
+    AnimatedContent(
+        state.selectedTool,
         modifier = modifier
             .padding(8.dp)
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest,
-            shape = MaterialTheme.shapes.medium)) { targetState ->
+            .background(
+                MaterialTheme.colorScheme.surfaceContainerLowest,
+                shape = MaterialTheme.shapes.medium,
+            ),
+    ) { targetState ->
         val toolState = state.toolState[targetState]
         when (targetState) {
             CustomizeTool.Size -> {
