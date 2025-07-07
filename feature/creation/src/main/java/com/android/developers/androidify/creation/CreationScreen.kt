@@ -101,7 +101,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -359,7 +358,7 @@ fun EditScreen(
                         onUndoPressed = onUndoPressed,
                         onPromptGenerationPressed = onPromptGenerationPressed,
                         onSelectedPromptOptionChanged = onPromptOptionSelected,
-                        onDropCallback = onDropCallback
+                        onDropCallback = onDropCallback,
                     )
                 }
 
@@ -484,7 +483,9 @@ private fun MainCreationPane(
                                 )
                                 .dragAndDropTarget(
                                     shouldStartDragAndDrop = { event ->
-                                        event.mimeTypes().contains("image/jpeg")
+                                        dropBehaviourFactory.shouldStartDragAndDrop(
+                                            event,
+                                        )
                                     },
                                     target = externalAppCallback,
                                 )
@@ -659,9 +660,6 @@ fun ImagePreview(
                     .clip(MaterialTheme.shapes.large)
                     .fillMaxSize(),
                 contentScale = ContentScale.Crop,
-                onLoading = { println("ROB-Loading")},
-                onError = { println("ROB-Error: ${it.result.throwable}")},
-                onSuccess = { println("ROB-Success")}
             )
 
             Row(

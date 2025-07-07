@@ -5,12 +5,15 @@ import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
+import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 class DropBehaviourFactory @Inject constructor(val imageGenerationRepository: ImageGenerationRepository) {
+
+    fun shouldStartDragAndDrop(event: DragAndDropEvent) : Boolean = event.mimeTypes().contains("image/")
 
     fun createTargetCallback(
         activity: ComponentActivity,
@@ -37,6 +40,11 @@ class DropBehaviourFactory @Inject constructor(val imageGenerationRepository: Im
              */
             override fun onDrop(event: DragAndDropEvent): Boolean {
                 val targetEvent = event.toAndroidDragEvent()
+
+                if(targetEvent.clipData.itemCount == 0) {
+                    return false
+                }
+
                 activity.lifecycleScope.launch {
                     val permission = activity.requestDragAndDropPermissions(targetEvent)
                     if (permission != null) {
