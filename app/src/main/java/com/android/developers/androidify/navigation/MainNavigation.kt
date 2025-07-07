@@ -17,6 +17,7 @@
 
 package com.android.developers.androidify.navigation
 
+import android.content.Intent
 import androidx.compose.animation.ContentTransform
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.fadeIn
@@ -25,25 +26,24 @@ import androidx.compose.animation.scaleOut
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.IntOffset
-import androidx.lifecycle.viewmodel.navigation3.ViewModelStoreNavEntryDecorator
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
-import androidx.navigation3.runtime.SavedStateNavEntryDecorator
 import androidx.navigation3.runtime.entry
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.runtime.rememberSavedStateNavEntryDecorator
 import androidx.navigation3.ui.NavDisplay
-import androidx.navigation3.ui.SceneSetupNavEntryDecorator
 import com.android.developers.androidify.camera.CameraPreviewScreen
 import com.android.developers.androidify.creation.CreationScreen
 import com.android.developers.androidify.home.AboutScreen
 import com.android.developers.androidify.home.HomeScreen
 import com.android.developers.androidify.theme.transitions.ColorSplashTransitionScreen
+import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -114,10 +114,14 @@ fun MainNavigation() {
                 )
             }
             entry<About> {
+                val context = LocalContext.current
                 AboutScreen(
                     onBackPressed = {
                         backStack.removeLastOrNull()
                     },
+                    onLicensesClicked = {
+                        context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
+                    }
                 )
             }
         },

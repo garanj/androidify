@@ -22,6 +22,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -69,7 +70,7 @@ import com.android.developers.androidify.util.isAtLeastMedium
 @Composable
 private fun AboutPreviewCompact() {
     SharedElementContextPreview {
-        AboutScreen(isMediumWindowSize = false) {}
+        AboutScreen(isMediumWindowSize = false, {}, {})
     }
 }
 
@@ -77,7 +78,7 @@ private fun AboutPreviewCompact() {
 @Composable
 private fun AboutPreviewLargeScreens() {
     SharedElementContextPreview {
-        AboutScreen(isMediumWindowSize = true) {}
+        AboutScreen(isMediumWindowSize = true, {}, {})
     }
 }
 
@@ -85,6 +86,7 @@ private fun AboutPreviewLargeScreens() {
 fun AboutScreen(
     isMediumWindowSize: Boolean = isAtLeastMedium(),
     onBackPressed: () -> Unit,
+    onLicensesClicked: () -> Unit
 ) {
     val sharedElementScope = LocalSharedTransitionScope.current
     val navScope = LocalNavAnimatedContentScope.current
@@ -92,7 +94,8 @@ fun AboutScreen(
         Scaffold(
             topBar = {
                 IconButton(
-                    modifier = Modifier.safeDrawingPadding()
+                    modifier = Modifier
+                        .safeDrawingPadding()
                         .padding(16.dp),
                     shape = CircleShape,
                     colors = IconButtonDefaults.iconButtonColors(
@@ -162,7 +165,8 @@ fun AboutScreen(
                             )
                         }
                         Spacer(Modifier.size(48.dp))
-                        FooterButtons()
+                        FooterButtons(modifier = Modifier.padding(bottom = 8.dp),
+                            onLicensesClicked)
                     }
                 }
             } else {
@@ -196,7 +200,7 @@ fun AboutScreen(
                         stringResource(R.string.about_step3_label),
                     )
                     Spacer(modifier = Modifier.size(24.dp))
-                    FooterButtons()
+                    FooterButtons(modifier = Modifier.padding(bottom = 8.dp), onLicensesClicked)
                 }
             }
         }
@@ -204,21 +208,31 @@ fun AboutScreen(
 }
 
 @Composable
-private fun FooterButtons() {
+private fun FooterButtons(modifier: Modifier = Modifier,
+                          onLicensesClicked: () -> Unit) {
     val uriHandler = LocalUriHandler.current
-    Row {
+    FlowRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         SecondaryOutlinedButton(
             onClick = {
                 uriHandler.openUri("https://policies.google.com/terms")
             },
             buttonText = stringResource(R.string.terms),
         )
-        Spacer(modifier = Modifier.size(16.dp))
         SecondaryOutlinedButton(
             onClick = {
                 uriHandler.openUri("https://policies.google.com/privacy")
             },
             buttonText = stringResource(R.string.privacy),
+        )
+        SecondaryOutlinedButton(
+            onClick = {
+                onLicensesClicked()
+            },
+            buttonText = stringResource(R.string.oss_license),
         )
     }
 }

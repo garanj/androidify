@@ -24,6 +24,8 @@ import com.android.developers.androidify.model.ValidatedImage
 import com.google.firebase.Firebase
 import com.google.firebase.ai.GenerativeModel
 import com.google.firebase.ai.ImagenModel
+import com.google.firebase.ai.ai
+import com.google.firebase.ai.type.GenerativeBackend
 import com.google.firebase.ai.type.HarmBlockThreshold
 import com.google.firebase.ai.type.HarmCategory
 import com.google.firebase.ai.type.ImagenPersonFilterLevel
@@ -34,8 +36,6 @@ import com.google.firebase.ai.type.SafetySetting
 import com.google.firebase.ai.type.Schema
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
-import com.google.firebase.ai.ai
-import com.google.firebase.ai.type.GenerativeBackend
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.booleanOrNull
 import kotlinx.serialization.json.decodeFromJsonElement
@@ -80,8 +80,10 @@ class FirebaseAiDataSourceImpl @Inject constructor(
             remoteConfigDataSource.imageModelName(),
             safetySettings =
             ImagenSafetySettings(
-                ImagenSafetyFilterLevel.BLOCK_LOW_AND_ABOVE,
-                personFilterLevel = ImagenPersonFilterLevel.ALLOW_ALL,
+                safetyFilterLevel = ImagenSafetyFilterLevel.BLOCK_LOW_AND_ABOVE,
+                // Uses `ALLOW_ADULT` filter since `ALLOW_ALL` requires a special approval
+                // See https://cloud.google.com/vertex-ai/generative-ai/docs/image/responsible-ai-imagen#person-face-gen
+                personFilterLevel = ImagenPersonFilterLevel.ALLOW_ADULT,
             ),
         )
     }

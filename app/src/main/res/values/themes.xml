@@ -17,4 +17,12 @@
 <resources>
 
     <style name="Theme.Androidify" parent="android:Theme.Material.Light.NoActionBar" />
+
+    <style name="AppCompatAndroidify" parent="Theme.AppCompat.DayNight">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>

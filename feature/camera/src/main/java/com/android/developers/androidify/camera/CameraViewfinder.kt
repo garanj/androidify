@@ -47,11 +47,11 @@ private val TAP_TO_FOCUS_INDICATOR_SIZE = 48.dp
 
 @Composable
 internal fun CameraViewfinder(
-  surfaceRequest: SurfaceRequest,
-  autofocusUiState: AutofocusUiState,
-  tapToFocus: (tapCoords: Offset) -> Unit,
-  onScaleZoom: (zoomScaleFactor: Float) -> Unit,
-  modifier: Modifier = Modifier,
+    surfaceRequest: SurfaceRequest,
+    autofocusUiState: AutofocusUiState,
+    tapToFocus: (tapCoords: Offset) -> Unit,
+    onScaleZoom: (zoomScaleFactor: Float) -> Unit,
+    modifier: Modifier = Modifier,
 ) {
     val onScaleCurrentZoom by rememberUpdatedState(onScaleZoom)
     val currentTapToFocus by rememberUpdatedState(tapToFocus)

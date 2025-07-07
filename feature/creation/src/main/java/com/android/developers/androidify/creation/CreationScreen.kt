@@ -167,8 +167,11 @@ fun CreationScreen(
         creationViewModel.onBackPress()
     }
     LaunchedEffect(Unit) {
-        if (fileName != null) creationViewModel.onImageSelected(fileName.toUri())
-        else creationViewModel.onImageSelected(null)
+        if (fileName != null) {
+            creationViewModel.onImageSelected(fileName.toUri())
+        } else {
+            creationViewModel.onImageSelected(null)
+        }
     }
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
@@ -655,7 +658,7 @@ private fun TextPromptGenerationPreview() {
             TextFieldState(),
             false,
             generatedPrompt = "wearing a red sweater",
-            {},
+            onPromptGenerationPressed = {},
         )
     }
 }
@@ -668,7 +671,7 @@ private fun TextPromptGenerationInProgressPreview() {
             TextFieldState(),
             true,
             generatedPrompt = "wearing a red sweater",
-            {},
+            onPromptGenerationPressed = {},
         )
     }
 }
@@ -677,9 +680,9 @@ private fun TextPromptGenerationInProgressPreview() {
 fun TextPrompt(
     textFieldState: TextFieldState,
     promptGenerationInProgress: Boolean,
+    modifier: Modifier = Modifier,
     generatedPrompt: String? = null,
     onPromptGenerationPressed: () -> Unit,
-    modifier: Modifier = Modifier,
 ) {
     Column(modifier) {
         Row(verticalAlignment = Alignment.CenterVertically) {

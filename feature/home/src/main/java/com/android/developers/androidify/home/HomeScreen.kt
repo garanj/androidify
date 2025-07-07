@@ -76,9 +76,9 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
 import androidx.compose.ui.layout.onLayoutRectChanged
+import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -109,6 +109,7 @@ import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.AndroidifyTranslucentTopAppBar
 import com.android.developers.androidify.theme.components.SquiggleBackground
 import com.android.developers.androidify.util.LargeScreensPreview
+import com.android.developers.androidify.util.LocalOcclusion
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.isAtLeastMedium
 import com.android.developers.androidify.theme.R as ThemeR
@@ -123,6 +124,7 @@ fun HomeScreen(
     onAboutClicked: () -> Unit = {},
 ) {
     val state = homeScreenViewModel.state.collectAsStateWithLifecycle()
+
     if (!state.value.isAppActive) {
         AppInactiveScreen()
     } else {
@@ -537,18 +539,19 @@ private fun VideoPlayer(
     }
 
     var videoFullyOnScreen by remember { mutableStateOf(false) }
+    val isWindowOccluded  = LocalOcclusion.current
     Box(
         Modifier
             .background(MaterialTheme.colorScheme.surfaceContainerLowest)
             .onVisibilityChanged(
-                containerWidth = LocalView.current.width,
-                containerHeight = LocalView.current.height,
+                minDurationMs = 100,
+                minFractionVisible = 1f,
             ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
             .then(modifier),
     ) {
         player?.let { currentPlayer ->
-            LaunchedEffect(videoFullyOnScreen) {
-                if (videoFullyOnScreen) currentPlayer.play() else currentPlayer.pause()
+            LaunchedEffect(videoFullyOnScreen, LocalOcclusion.current.value) {
+                if (videoFullyOnScreen && !isWindowOccluded.value) currentPlayer.play() else currentPlayer.pause()
             }
 
             // Render the video
@@ -578,17 +581,4 @@ private fun VideoPlayer(
             }
         }
     }
-}
-
-fun Modifier.onVisibilityChanged(
-    containerWidth: Int,
-    containerHeight: Int,
-    onChanged: (visible: Boolean) -> Unit,
-) = this then Modifier.onLayoutRectChanged(100, 0) { layoutBounds ->
-    onChanged(
-        layoutBounds.boundsInRoot.top > 0 &&
-            layoutBounds.boundsInRoot.bottom < containerHeight &&
-            layoutBounds.boundsInRoot.left > 0 &&
-            layoutBounds.boundsInRoot.right < containerWidth,
-    )
 }
