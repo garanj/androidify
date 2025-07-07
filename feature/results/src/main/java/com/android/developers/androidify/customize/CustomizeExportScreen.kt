@@ -204,8 +204,7 @@ private fun CustomizeExportContents(
             ) {
                 imageResult(
                     Modifier
-                        .weight(1f)
-                        .fillMaxHeight(),
+                        .weight(1f, fill = false),
                 )
                 Column(
                     Modifier
@@ -218,10 +217,13 @@ private fun CustomizeExportContents(
                         Modifier
                             .weight(1f)
                             .fillMaxSize(),
-                        horizontalArrangement = Arrangement.Center,
+                        horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
+
                     ) {
-                        toolDetail(Modifier, false)
+                        Box(modifier = Modifier.weight(1f)) {
+                            toolDetail(Modifier.align(Alignment.CenterEnd), false)
+                        }
                         Spacer(modifier = Modifier.size(16.dp))
                         toolSelector(Modifier.requiredSizeIn(minWidth = 56.dp), false)
                         Spacer(modifier = Modifier.size(16.dp))

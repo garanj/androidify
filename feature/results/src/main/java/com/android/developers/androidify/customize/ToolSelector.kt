@@ -49,7 +49,7 @@ fun ToolSelector(
                 2.dp,
                 color = MaterialTheme.colorScheme.outline,
                 shape = MaterialTheme.shapes.large,
-            ).padding(4.dp),
+            ).padding(2.dp),
             colors = FloatingToolbarColors(
                 toolbarContainerColor = MaterialTheme.colorScheme.surface,
                 toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
@@ -85,7 +85,7 @@ fun ToolSelector(
                 2.dp,
                 color = MaterialTheme.colorScheme.outline,
                 shape = MaterialTheme.shapes.large,
-            ).padding(4.dp),
+            ).padding(2.dp),
             colors = FloatingToolbarColors(
                 toolbarContainerColor = MaterialTheme.colorScheme.surface,
                 toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
