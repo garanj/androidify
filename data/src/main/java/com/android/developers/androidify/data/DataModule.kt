@@ -42,7 +42,10 @@ internal object DataModule {
 
     @Provides
     @Singleton
-    fun provideLocalFileProvider(@ApplicationContext appContext: Context, @Named("IO") ioDispatcher: CoroutineDispatcher): LocalFileProvider =
+    fun provideLocalFileProvider(
+        @ApplicationContext appContext: Context,
+        @Named("IO") ioDispatcher: CoroutineDispatcher,
+    ): LocalFileProvider =
         LocalFileProviderImpl(appContext, ioDispatcher)
 
     @Provides
@@ -101,4 +104,8 @@ internal object DataModule {
         internetConnectivityManager = internetConnectivityManager,
         firebaseAiDataSource = firebaseAiDataSource,
     )
+
+    @Provides
+    fun dropBehaviourFactory(localFileProvider: LocalFileProvider,): DropBehaviourFactory =
+        DropBehaviourFactoryImpl(localFileProvider = localFileProvider)
 }
