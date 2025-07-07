@@ -11,15 +11,27 @@ import androidx.lifecycle.lifecycleScope
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-class DropBehaviourFactory @Inject constructor(val imageGenerationRepository: ImageGenerationRepository) {
 
-    fun shouldStartDragAndDrop(event: DragAndDropEvent) : Boolean = event.mimeTypes().contains("image/")
-
+interface DropBehaviourFactory {
+    fun shouldStartDragAndDrop(event: DragAndDropEvent) : Boolean
     fun createTargetCallback(
         activity: ComponentActivity,
         onImageDropped: (Uri) -> Unit,
         onDropStarted: () -> Unit = {},
         onDropEnded: () -> Unit = {},
+    ): DragAndDropTarget
+}
+
+class DropBehaviourFactoryImpl @Inject constructor(val imageGenerationRepository: ImageGenerationRepository) :
+    DropBehaviourFactory {
+
+    override fun shouldStartDragAndDrop(event: DragAndDropEvent) : Boolean = event.mimeTypes().contains("image/")
+
+    override fun createTargetCallback(
+        activity: ComponentActivity,
+        onImageDropped: (Uri) -> Unit,
+        onDropStarted: () -> Unit,
+        onDropEnded: () -> Unit,
     ) =
         object : DragAndDropTarget {
             override fun onStarted(event: DragAndDropEvent) {
