@@ -274,8 +274,7 @@ fun EditScreen(
                 expandedCenterButtons = {
                     PromptTypeToolbar(
                         uiState.selectedPromptOption,
-                        modifier = Modifier
-                            .padding(start = 16.dp, end = 16.dp),
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
                         onOptionSelected = onPromptOptionSelected,
                     )
                 },
@@ -382,8 +381,7 @@ fun EditScreen(
                         },
                         uiState = uiState,
                         onStartClicked = onStartClicked,
-                        modifier = Modifier
-                            .align(Alignment.CenterHorizontally),
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
                     )
                 }
             }
@@ -474,7 +472,7 @@ private fun MainCreationPane(
                             modifier = Modifier
                                 .background(
                                     color = background,
-                                    shape = RoundedCornerShape(28.dp),
+                                    shape = MaterialTheme.shapes.large,
                                 )
                                 .dashedRoundedRectBorder(
                                     2.dp,
@@ -648,10 +646,7 @@ fun ImagePreview(
     with(sharedElementScope) {
         Box(modifier) {
             AsyncImage(
-                ImageRequest.Builder(LocalContext.current)
-                    .data(uri)
-                    .crossfade(false)
-                    .build(),
+                ImageRequest.Builder(LocalContext.current).data(uri).crossfade(false).build(),
                 placeholder = null,
                 contentDescription = stringResource(CreationR.string.cd_selected_image),
                 modifier = Modifier
@@ -875,16 +870,14 @@ fun PromptTypeToolbar(
 private fun UploadEmptyPreview() {
     AndroidifyTheme {
         UploadEmptyState(
-            {
-            },
+            {},
             {},
             modifier = Modifier
                 .height(300.dp)
                 .fillMaxWidth(),
         )
         UploadEmptyState(
-            {
-            },
+            {},
             {},
             modifier = Modifier
                 .height(400.dp)
