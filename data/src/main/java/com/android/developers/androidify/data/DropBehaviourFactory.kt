@@ -8,12 +8,14 @@ import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.mimeTypes
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
 import androidx.lifecycle.lifecycleScope
+import com.android.developers.androidify.util.LocalFileProvider
 import kotlinx.coroutines.launch
+import java.util.UUID
 import javax.inject.Inject
 
 
 interface DropBehaviourFactory {
-    fun shouldStartDragAndDrop(event: DragAndDropEvent) : Boolean
+    fun shouldStartDragAndDrop(event: DragAndDropEvent): Boolean
     fun createTargetCallback(
         activity: ComponentActivity,
         onImageDropped: (Uri) -> Unit,
@@ -22,10 +24,11 @@ interface DropBehaviourFactory {
     ): DragAndDropTarget
 }
 
-class DropBehaviourFactoryImpl @Inject constructor(val imageGenerationRepository: ImageGenerationRepository) :
+class DropBehaviourFactoryImpl @Inject constructor(val localFileProvider: LocalFileProvider) :
     DropBehaviourFactory {
 
-    override fun shouldStartDragAndDrop(event: DragAndDropEvent) : Boolean = event.mimeTypes().contains("image/")
+    override fun shouldStartDragAndDrop(event: DragAndDropEvent): Boolean =
+        event.mimeTypes().contains("image/jpeg")
 
     override fun createTargetCallback(
         activity: ComponentActivity,
@@ -53,7 +56,7 @@ class DropBehaviourFactoryImpl @Inject constructor(val imageGenerationRepository
             override fun onDrop(event: DragAndDropEvent): Boolean {
                 val targetEvent = event.toAndroidDragEvent()
 
-                if(targetEvent.clipData.itemCount == 0) {
+                if (targetEvent.clipData.itemCount == 0) {
                     return false
                 }
 
@@ -66,8 +69,10 @@ class DropBehaviourFactoryImpl @Inject constructor(val imageGenerationRepository
                                 val bitmap = BitmapFactory.decodeStream(inputStream)
 
                                 bitmap?.let {
-                                    val uri = imageGenerationRepository.saveImage(bitmap)
-                                    onImageDropped(uri)
+                                    val cacheFile =
+                                        localFileProvider.createCacheFile("dropped_image_${UUID.randomUUID()}.jpg")
+                                    localFileProvider.saveBitmapToFile(bitmap, cacheFile)
+                                    onImageDropped(localFileProvider.sharingUriForFile(cacheFile))
                                 }
                             }
                         } finally {

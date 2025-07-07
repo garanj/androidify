@@ -106,6 +106,6 @@ internal object DataModule {
     )
 
     @Provides
-    fun dropBehaviourFactory(imageGenerationRepository: ImageGenerationRepository): DropBehaviourFactory =
-        DropBehaviourFactoryImpl(imageGenerationRepository = imageGenerationRepository)
+    fun dropBehaviourFactory(localFileProvider: LocalFileProvider,): DropBehaviourFactory =
+        DropBehaviourFactoryImpl(localFileProvider = localFileProvider)
 }
