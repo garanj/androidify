@@ -21,6 +21,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -37,10 +38,12 @@ fun BackgroundTool(
     selectedOption: BackgroundOption,
     onBackgroundOptionSelected: (BackgroundOption) -> Unit,
     modifier: Modifier = Modifier,
+    singleLine: Boolean = false,
 ) {
     GenericTool(
-        modifier = modifier,
+        modifier = modifier.wrapContentSize(),
         tools = backgroundOptions,
+        singleLine = singleLine,
         selectedOption = selectedOption,
         onToolSelected = {
             onBackgroundOptionSelected(it)

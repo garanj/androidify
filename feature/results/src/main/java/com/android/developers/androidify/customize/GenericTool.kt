@@ -19,13 +19,17 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -47,10 +51,12 @@ fun <T : ToolOption> GenericTool(
     onToolSelected: (T) -> Unit,
     individualToolContent: @Composable (T) -> Unit,
     modifier: Modifier = Modifier,
+    singleLine: Boolean = true,
 ) {
-    LazyRow(modifier = modifier) {
+    val scrollModifier = if (singleLine) Modifier.horizontalScroll(rememberScrollState()) else Modifier
+    FlowRow(modifier = modifier.then(scrollModifier),
+        maxLines = if (singleLine) 1 else Int.MAX_VALUE) {
         tools.forEach { tool ->
-            item(key = tool.key) {
                 GenericToolButton(
                     isSelected = tool == selectedOption,
                     toolContent = {
@@ -59,7 +65,6 @@ fun <T : ToolOption> GenericTool(
                     onToolSelected = onToolSelected,
                     tool = tool,
                 )
-            }
         }
     }
 }
@@ -120,7 +125,48 @@ private fun GenericToolPreview() {
                 BackgroundOption.IO,
                 BackgroundOption.Create,
             ),
+            singleLine = false,
             selectedOption = BackgroundOption.Lightspeed,
+            onToolSelected = {
+            },
+            individualToolContent = { tool ->
+                Box(
+                    modifier = Modifier
+                        .aspectRatio(1f)
+                        .border(
+                            2.dp,
+                            color = MaterialTheme.colorScheme.primary,
+                            shape = MaterialTheme.shapes.medium,
+                        )
+                        .padding(6.dp),
+                ) {
+                    Image(
+                        rememberAsyncImagePainter(tool.drawableId),
+                        contentDescription = null, // described below
+                        contentScale = ContentScale.Crop,
+                        modifier = Modifier.aspectRatio(1f)
+                            .clip(MaterialTheme.shapes.small),
+                    )
+                }
+            },
+        )
+    }
+}
+
+
+@Preview(showBackground = true)
+@Composable
+private fun GenericToolPreviewSingleLine() {
+    AndroidifyTheme {
+        GenericTool(
+            tools = listOf(
+                BackgroundOption.None,
+                BackgroundOption.Lightspeed,
+                BackgroundOption.IO,
+                BackgroundOption.Create,
+            ),
+            selectedOption = BackgroundOption.Lightspeed,
+            singleLine = true,
             onToolSelected = {
             },
             individualToolContent = { tool ->

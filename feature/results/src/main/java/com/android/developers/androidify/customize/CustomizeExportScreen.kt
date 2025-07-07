@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
@@ -147,6 +148,8 @@ private fun CustomizeExportContents(
         topBar = {
             AndroidifyTopAppBar(
                 backEnabled = true,
+                titleText = stringResource(R.string.customize_and_export),
+                isMediumWindowSize = isMediumWindowSize,
                 onBackPressed = onBackPress,
                 onAboutClicked = onInfoPress,
             )
@@ -171,12 +174,13 @@ private fun CustomizeExportContents(
                 },
             )
         }
-        val toolDetail = @Composable { modifier: Modifier ->
+        val toolDetail = @Composable { modifier: Modifier, singleLine: Boolean ->
             SelectedToolDetail(
                 state,
                 onSelectedToolStateChanged = { toolState ->
                     onSelectedToolStateChanged(toolState)
                 },
+                singleLine = singleLine,
                 modifier = modifier,
             )
         }
@@ -217,9 +221,9 @@ private fun CustomizeExportContents(
                         horizontalArrangement = Arrangement.Center,
                         verticalAlignment = Alignment.CenterVertically,
                     ) {
-                        toolDetail(Modifier.weight(1f))
+                        toolDetail(Modifier, false)
                         Spacer(modifier = Modifier.size(16.dp))
-                        toolSelector(Modifier, false)
+                        toolSelector(Modifier.requiredSizeIn(minWidth = 56.dp), false)
                         Spacer(modifier = Modifier.size(16.dp))
                     }
                     Spacer(modifier = Modifier.size(16.dp))
@@ -243,7 +247,7 @@ private fun CustomizeExportContents(
                 Spacer(modifier = Modifier.height(16.dp))
                 toolSelector(Modifier, true)
                 Spacer(modifier = Modifier.height(16.dp))
-                toolDetail(Modifier)
+                toolDetail(Modifier, true)
                 Spacer(modifier = Modifier.height(16.dp))
                 actionButtons(Modifier)
                 Spacer(modifier = Modifier.height(24.dp))
@@ -255,6 +259,7 @@ private fun CustomizeExportContents(
 @Composable
 fun SelectedToolDetail(
     state: CustomizeExportState,
+    singleLine: Boolean,
     onSelectedToolStateChanged: (ToolState) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -275,7 +280,8 @@ fun SelectedToolDetail(
                 AspectRatioTool(
                     aspectRatioToolState.options,
                     aspectRatioToolState.selectedToolOption,
-                    {
+                    singleLine = singleLine,
+                    onSizeOptionSelected = {
                         onSelectedToolStateChanged(aspectRatioToolState.copy(selectedToolOption = it))
                     },
                 )
@@ -286,7 +292,8 @@ fun SelectedToolDetail(
                 BackgroundTool(
                     backgroundToolState.options,
                     backgroundToolState.selectedToolOption,
-                    {
+                    singleLine = singleLine,
+                    onBackgroundOptionSelected = {
                         onSelectedToolStateChanged(backgroundToolState.copy(selectedToolOption = it))
                     },
                 )
