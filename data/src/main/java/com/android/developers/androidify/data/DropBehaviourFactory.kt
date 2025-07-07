@@ -1,4 +1,4 @@
-package com.android.developers.androidify.creation
+package com.android.developers.androidify.data
 
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
@@ -8,12 +8,13 @@ import androidx.activity.ComponentActivity
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.draganddrop.toAndroidDragEvent
+import javax.inject.Inject
 import java.io.File
 import java.io.FileOutputStream
 
-class DropBehaviour(val activity: ComponentActivity) {
+class DropBehaviourFactory @Inject constructor() {
 
-    fun createTargetCallback(
+    fun createTargetCallback(activity: ComponentActivity,
         onImageDropped: (Uri) -> Unit,
         onDropStarted: () -> Unit = {},
         onDropEnded: () -> Unit = {},

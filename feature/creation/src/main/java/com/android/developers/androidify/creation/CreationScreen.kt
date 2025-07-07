@@ -128,6 +128,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.results.ResultsScreen
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LimeGreen
@@ -186,6 +187,7 @@ fun CreationScreen(
         ScreenState.EDIT -> {
             EditScreen(
                 snackbarHostState = snackbarHostState,
+                dropBehaviourFactory = creationViewModel.dropBehaviourFactory,
                 isExpanded = isMedium,
                 onCameraPressed = onCameraPressed,
                 onBackPressed = onBackPressed,
@@ -235,6 +237,7 @@ fun CreationScreen(
 @Composable
 fun EditScreen(
     snackbarHostState: SnackbarHostState,
+    dropBehaviourFactory: DropBehaviourFactory,
     isExpanded: Boolean,
     onCameraPressed: () -> Unit,
     onBackPressed: () -> Unit,
@@ -310,6 +313,7 @@ fun EditScreen(
                     ) {
                         MainCreationPane(
                             uiState,
+                            dropBehaviourFactory = dropBehaviourFactory,
                             modifier = Modifier.weight(.6f),
                             onCameraPressed = onCameraPressed,
                             onChooseImageClicked = {
@@ -346,6 +350,7 @@ fun EditScreen(
                 } else {
                     MainCreationPane(
                         uiState,
+                        dropBehaviourFactory = dropBehaviourFactory,
                         modifier = Modifier.weight(1f),
                         onCameraPressed = onCameraPressed,
                         onChooseImageClicked = {
@@ -401,6 +406,7 @@ fun EditScreen(
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 private fun MainCreationPane(
     uiState: CreationState,
+    dropBehaviourFactory: DropBehaviourFactory,
     modifier: Modifier = Modifier,
     onCameraPressed: () -> Unit,
     onChooseImageClicked: () -> Unit = {},
@@ -413,10 +419,10 @@ private fun MainCreationPane(
     val alternateDropAreaBackgroundColor = MaterialTheme.colorScheme.surfaceVariant
     var background by remember { mutableStateOf(defaultDropAreaBackgroundColor) }
 
-
     val activity = LocalContext.current as ComponentActivity
     val externalAppCallback = remember {
-        DropBehaviour(activity).createTargetCallback(
+        dropBehaviourFactory.createTargetCallback(
+            activity = activity,
             onImageDropped = { uri -> onDropCallback(uri) },
             onDropStarted = { background = alternateDropAreaBackgroundColor },
             onDropEnded = { background = defaultDropAreaBackgroundColor },
