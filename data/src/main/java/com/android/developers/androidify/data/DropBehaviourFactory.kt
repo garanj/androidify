@@ -29,6 +29,12 @@ class DropBehaviourFactory @Inject constructor(val imageGenerationRepository: Im
                 onDropEnded()
             }
 
+            /**
+             * Dropping an image requires the app to obtain the permission to use the image being
+             * dropped. This permission only lasts until the event is completed. The easiest way
+             * of being able to display the image being dropped is to temporarily copy it inside
+             * the app storage and use that copy for the processing.
+             */
             override fun onDrop(event: DragAndDropEvent): Boolean {
                 val targetEvent = event.toAndroidDragEvent()
                 activity.lifecycleScope.launch {
