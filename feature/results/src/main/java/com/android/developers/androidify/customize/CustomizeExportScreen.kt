@@ -27,13 +27,17 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -43,6 +47,7 @@ import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -63,6 +68,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import coil3.compose.AsyncImage
 import com.android.developers.androidify.results.PermissionRationaleDialog
 import com.android.developers.androidify.results.R
@@ -71,8 +77,10 @@ import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.theme.components.SecondaryOutlinedButton
-import com.android.developers.androidify.util.AdaptivePreview
+import com.android.developers.androidify.util.LargeScreensPreview
+import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.allowsFullContent
+import com.android.developers.androidify.util.isAtLeastMedium
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -86,6 +94,7 @@ fun CustomizeAndExportScreen(
     originalImageUri: Uri?,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
+    isMediumWindowSize: Boolean = isAtLeastMedium(),
     viewModel: CustomizeExportViewModel = hiltViewModel<CustomizeExportViewModel>(),
 ) {
     LaunchedEffect(resultImage, originalImageUri) {
@@ -109,6 +118,7 @@ fun CustomizeAndExportScreen(
         onShareClicked = viewModel::shareClicked,
         onDownloadClicked = viewModel::downloadClicked,
         onSelectedToolStateChanged = viewModel::selectedToolStateChanged,
+        isMediumWindowSize = isMediumWindowSize,
         snackbarHostState = viewModel.snackbarHostState.collectAsStateWithLifecycle().value,
     )
 }
@@ -122,6 +132,7 @@ private fun CustomizeExportContents(
     onDownloadClicked: () -> Unit,
     onToolSelected: (CustomizeTool) -> Unit,
     onSelectedToolStateChanged: (ToolState) -> Unit,
+    isMediumWindowSize: Boolean,
     snackbarHostState: SnackbarHostState,
 ) {
     Scaffold(
@@ -142,34 +153,34 @@ private fun CustomizeExportContents(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
+        val imageResult = @Composable { modifier: Modifier ->
             ImageResult(
                 state.resultImageBitmap,
                 state.selectedAspectRatio,
-                Modifier.weight(1f),
+                modifier,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+        val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
             ToolSelector(
                 tools = state.tools,
                 selectedOption = state.selectedTool,
+                modifier = modifier,
+                horizontal = horizontal,
                 onToolSelected = { tool ->
                     onToolSelected(tool)
                 },
             )
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+        val toolDetail = @Composable { modifier: Modifier ->
             SelectedToolDetail(
                 state,
                 onSelectedToolStateChanged = { toolState ->
                     onSelectedToolStateChanged(toolState)
                 },
+                modifier = modifier,
             )
-            Spacer(modifier = Modifier.height(16.dp))
+        }
+        val actionButtons = @Composable { modifier: Modifier ->
             BotActionsButtonRow(
                 onShareClicked = {
                     onShareClicked()
@@ -177,8 +188,66 @@ private fun CustomizeExportContents(
                 onDownloadClicked = {
                     onDownloadClicked()
                 },
+                modifier = modifier,
             )
-            Spacer(modifier = Modifier.height(24.dp))
+        }
+        if (isMediumWindowSize) {
+            Row(
+                Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                imageResult(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                )
+                Column(
+                    Modifier
+                        .weight(1f)
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.Center,
+                        verticalAlignment = Alignment.CenterVertically,
+                    ) {
+                        toolDetail(Modifier.weight(1f))
+                        Spacer(modifier = Modifier.size(16.dp))
+                        toolSelector(Modifier, false)
+                        Spacer(modifier = Modifier.size(16.dp))
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                    actionButtons(
+                        Modifier
+                            .align(Alignment.End)
+                            .padding(end = 16.dp),
+                    )
+                    Spacer(modifier = Modifier.size(24.dp))
+                }
+            }
+        } else {
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                imageResult(Modifier.weight(1f))
+                Spacer(modifier = Modifier.height(16.dp))
+                toolSelector(Modifier, true)
+                Spacer(modifier = Modifier.height(16.dp))
+                toolDetail(Modifier)
+                Spacer(modifier = Modifier.height(16.dp))
+                actionButtons(Modifier)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
     }
 }
@@ -192,6 +261,7 @@ fun SelectedToolDetail(
     AnimatedContent(
         state.selectedTool,
         modifier = modifier
+            .wrapContentSize()
             .padding(8.dp)
             .background(
                 MaterialTheme.colorScheme.surfaceContainerLowest,
@@ -256,7 +326,7 @@ private fun BotActionsButtonRow(
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = allowsFullContent(),
 ) {
-    Row(modifier) {
+    Row(modifier.height(IntrinsicSize.Min)) {
         PrimaryButton(
             onClick = {
                 onShareClicked()
@@ -305,6 +375,7 @@ private fun BotActionsButtonRow(
                     contentDescription = stringResource(R.string.download_bot),
                 )
             },
+            modifier = Modifier.fillMaxHeight(),
         )
         PermissionRationaleDialog(
             showRationaleDialog,
@@ -317,21 +388,55 @@ private fun BotActionsButtonRow(
 }
 
 @Preview(showBackground = true)
-@AdaptivePreview
+@PhonePreview
 @Composable
 fun CustomizeExportPreview() {
     AndroidifyTheme {
-        val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-        val state = CustomizeExportState(resultImageBitmap = bitmap.asAndroidBitmap())
-        CustomizeExportContents(
-            state = state,
-            onDownloadClicked = {},
-            onShareClicked = {},
-            onBackPress = {},
-            onInfoPress = {},
-            onToolSelected = {},
-            snackbarHostState = SnackbarHostState(),
-            onSelectedToolStateChanged = {},
-        )
+        AnimatedContent(true) { targetState ->
+            targetState
+            CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
+                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val state = CustomizeExportState(resultImageBitmap = bitmap.asAndroidBitmap())
+                CustomizeExportContents(
+                    state = state,
+                    onDownloadClicked = {},
+                    onShareClicked = {},
+                    onBackPress = {},
+                    onInfoPress = {},
+                    onToolSelected = {},
+                    snackbarHostState = SnackbarHostState(),
+                    isMediumWindowSize = false,
+                    onSelectedToolStateChanged = {},
+                )
+            }
+        }
+    }
+}
+
+@LargeScreensPreview
+@Composable
+fun CustomizeExportPreviewLarge() {
+    AndroidifyTheme {
+        AnimatedContent(true) { targetState ->
+            targetState
+            CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
+                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val state = CustomizeExportState(
+                    resultImageBitmap = bitmap.asAndroidBitmap(),
+                    selectedTool = CustomizeTool.Background,
+                )
+                CustomizeExportContents(
+                    state = state,
+                    onDownloadClicked = {},
+                    onShareClicked = {},
+                    onBackPress = {},
+                    onInfoPress = {},
+                    onToolSelected = {},
+                    snackbarHostState = SnackbarHostState(),
+                    isMediumWindowSize = true,
+                    onSelectedToolStateChanged = {},
+                )
+            }
+        }
     }
 }

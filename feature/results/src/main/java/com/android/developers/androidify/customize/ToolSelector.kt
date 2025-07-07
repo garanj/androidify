@@ -17,6 +17,7 @@ package com.android.developers.androidify.customize
 
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FloatingToolbarColors
@@ -25,6 +26,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
+import androidx.compose.material3.VerticalFloatingToolbar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
@@ -38,40 +40,79 @@ fun ToolSelector(
     tools: List<CustomizeTool>,
     selectedOption: CustomizeTool,
     onToolSelected: (CustomizeTool) -> Unit,
+    horizontal: Boolean,
     modifier: Modifier = Modifier,
 ) {
-    HorizontalFloatingToolbar(
-        modifier = modifier.border(
-            2.dp,
-            color = MaterialTheme.colorScheme.outline,
-            shape = MaterialTheme.shapes.large,
-        ),
-        colors = FloatingToolbarColors(
-            toolbarContainerColor = MaterialTheme.colorScheme.surface,
-            toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            fabContainerColor = MaterialTheme.colorScheme.tertiary,
-            fabContentColor = MaterialTheme.colorScheme.onTertiary,
-        ),
-        expanded = true,
-    ) {
-        tools.forEachIndexed { index, tool ->
-            ToggleButton(
-                modifier = Modifier,
-                checked = selectedOption == tool,
-                onCheckedChange = { onToolSelected(tool) },
-                shapes = ToggleButtonDefaults.shapes(checkedShape = MaterialTheme.shapes.large),
-                colors = ToggleButtonDefaults.toggleButtonColors(
-                    checkedContainerColor = MaterialTheme.colorScheme.onSurface,
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-            ) {
-                Icon(
-                    painterResource(tool.icon),
-                    contentDescription = tool.displayName,
-                )
+    if (horizontal) {
+        HorizontalFloatingToolbar(
+            modifier = modifier.border(
+                2.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = MaterialTheme.shapes.large,
+            ).padding(4.dp),
+            colors = FloatingToolbarColors(
+                toolbarContainerColor = MaterialTheme.colorScheme.surface,
+                toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                fabContainerColor = MaterialTheme.colorScheme.tertiary,
+                fabContentColor = MaterialTheme.colorScheme.onTertiary,
+            ),
+            expanded = true,
+        ) {
+            tools.forEachIndexed { index, tool ->
+                ToggleButton(
+                    modifier = Modifier,
+                    checked = selectedOption == tool,
+                    onCheckedChange = { onToolSelected(tool) },
+                    shapes = ToggleButtonDefaults.shapes(checkedShape = MaterialTheme.shapes.large),
+                    colors = ToggleButtonDefaults.toggleButtonColors(
+                        checkedContainerColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                ) {
+                    Icon(
+                        painterResource(tool.icon),
+                        contentDescription = tool.displayName,
+                    )
+                }
+                if (index != tools.size - 1) {
+                    Spacer(Modifier.width(8.dp))
+                }
             }
-            if (index != tools.size - 1) {
-                Spacer(Modifier.width(8.dp))
+        }
+    } else {
+        VerticalFloatingToolbar(
+            modifier = modifier.border(
+                2.dp,
+                color = MaterialTheme.colorScheme.outline,
+                shape = MaterialTheme.shapes.large,
+            ).padding(4.dp),
+            colors = FloatingToolbarColors(
+                toolbarContainerColor = MaterialTheme.colorScheme.surface,
+                toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
+                fabContainerColor = MaterialTheme.colorScheme.tertiary,
+                fabContentColor = MaterialTheme.colorScheme.onTertiary,
+            ),
+            expanded = true,
+        ) {
+            tools.forEachIndexed { index, tool ->
+                ToggleButton(
+                    modifier = Modifier,
+                    checked = selectedOption == tool,
+                    onCheckedChange = { onToolSelected(tool) },
+                    shapes = ToggleButtonDefaults.shapes(checkedShape = MaterialTheme.shapes.large),
+                    colors = ToggleButtonDefaults.toggleButtonColors(
+                        checkedContainerColor = MaterialTheme.colorScheme.onSurface,
+                        containerColor = MaterialTheme.colorScheme.surface,
+                    ),
+                ) {
+                    Icon(
+                        painterResource(tool.icon),
+                        contentDescription = tool.displayName,
+                    )
+                }
+                if (index != tools.size - 1) {
+                    Spacer(Modifier.width(8.dp))
+                }
             }
         }
     }
@@ -79,11 +120,25 @@ fun ToolSelector(
 
 @Preview
 @Composable
-private fun ToolsPreview() {
+private fun ToolsPreviewHorizontal() {
     AndroidifyTheme {
         ToolSelector(
             tools = listOf(CustomizeTool.Size, CustomizeTool.Background),
             selectedOption = CustomizeTool.Size,
+            horizontal = true,
+            onToolSelected = {},
+        )
+    }
+}
+
+@Preview
+@Composable
+private fun ToolsPreviewVertical() {
+    AndroidifyTheme {
+        ToolSelector(
+            tools = listOf(CustomizeTool.Size, CustomizeTool.Background),
+            selectedOption = CustomizeTool.Size,
+            horizontal = false,
             onToolSelected = {},
         )
     }
