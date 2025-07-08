@@ -146,7 +146,7 @@ fun CameraPreviewScreen(
                         shouldShowRearCameraFeature = viewModel::shouldShowRearDisplayFeature,
                         toggleRearCameraFeature = { viewModel.toggleRearDisplayFeature(activity) },
                         isRearCameraEnabled = uiState.isRearCameraActive,
-                        cameraSessionId = uiState.cameraSessionId
+                        cameraSessionId = uiState.cameraSessionId,
                     )
                 }
             } else {
@@ -304,13 +304,13 @@ private fun CameraPreviewContent(
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
 ) {
-  val scope = rememberCoroutineScope()
+    val scope = rememberCoroutineScope()
     val zoomState = remember(cameraSessionId) {
-      ZoomState(
-        initialZoomLevel = zoomLevel(),
-        onChangeZoomLevel = onChangeZoomLevel,
-        zoomRange = zoomRange,
-      )
+        ZoomState(
+            initialZoomLevel = zoomLevel(),
+            onChangeZoomLevel = onChangeZoomLevel,
+            zoomRange = zoomRange,
+        )
     }
     // Delegate the layout to the stateless version
     StatelessCameraPreviewContent(
@@ -321,7 +321,7 @@ private fun CameraPreviewContent(
                 surfaceRequest = surfaceRequest,
                 autofocusUiState = autofocusUiState,
                 tapToFocus = tapToFocus,
-                onScaleZoom = { scope.launch { zoomState.scaleZoom(it) }},
+                onScaleZoom = { scope.launch { zoomState.scaleZoom(it) } },
                 modifier = viewfinderModifier.onSizeChanged { size -> // Apply modifier from slot
                     if (size.height > 0) {
                         aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)

@@ -58,13 +58,13 @@
             tools:node="merge">
             <meta-data
                 android:name="com.android.developers.androidify.startup.FirebaseAppInitializer"
-                android:value="androidx.startup" />
+                android:value="@string/androidx_startup" />
             <meta-data
                 android:name="com.android.developers.androidify.startup.FirebaseAppCheckInitializer"
-                android:value="androidx.startup" />
+                android:value="@string/androidx_startup" />
             <meta-data
                 android:name="com.android.developers.androidify.startup.FirebaseRemoteConfigInitializer"
-                android:value="androidx.startup" />
+                android:value="@string/androidx_startup" />
         </provider>
         <activity
             android:name=".MainActivity"
@@ -78,6 +78,15 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <!-- need to use Theme.AppCompat -->
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesMenuActivity"
+            android:theme="@style/AppCompatAndroidify" />
+
+        <!-- needs to use Theme.AppCompat -->
+        <activity
+            android:name="com.google.android.gms.oss.licenses.OssLicensesActivity"
+            android:theme="@style/AppCompatAndroidify" />
     </application>
 
 </manifest>

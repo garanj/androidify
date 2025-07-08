@@ -14,9 +14,15 @@
      See the License for the specific language governing permissions and
      limitations under the License.
 -->
-<resources xmlns:android="http://schemas.android.com/apk/res/android">
-    <initializer
-        android:name="com.android.developers.androidify.startup.FirebaseAppCheckInitializer" />
-    <initializer
-        android:name="com.android.developers.androidify.startup.FirebaseRemoteConfigInitializer" />
+<resources>
+
+    <style name="AppCompatAndroidify" parent="Theme.AppCompat.DayNight">
+        <item name="android:windowTranslucentStatus">false</item>
+        <item name="android:windowDrawsSystemBarBackgrounds">true</item>
+        <item name="android:statusBarColor">@android:color/white</item>
+        <item name="android:fitsSystemWindows">true</item>
+        <!-- https://github.com/google/play-services-plugins/issues/296 -->
+        <item name="android:windowOptOutEdgeToEdgeEnforcement">true</item>
+        <item name="android:windowLightStatusBar">true</item>
+    </style>
 </resources>

@@ -59,6 +59,9 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui.compose)
+    implementation(libs.google.oss.licenses) {
+        exclude(group = "androidx.appcompat")
+    }
     ksp(libs.hilt.compiler)
 
     implementation(libs.ai.edge) {
@@ -68,12 +71,12 @@ dependencies {
     implementation(libs.androidx.ui.tooling)
     debugImplementation(libs.androidx.ui.tooling.preview)
 
-    implementation(project(":core:theme"))
-    implementation(project(":core:util"))
-    implementation(project(":data"))
+    implementation(projects.core.theme)
+    implementation(projects.core.util)
+    implementation(projects.data)
     testImplementation(libs.hilt.android.testing)
     testImplementation(libs.robolectric)
-    testImplementation(project(":core:testing"))
+    testImplementation(projects.core.testing)
 
     // Android Instrumented Tests
     androidTestImplementation(platform(libs.androidx.compose.bom))
@@ -81,7 +84,7 @@ dependencies {
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.hilt.android.testing)
-    androidTestImplementation(project(":core:testing"))
+    androidTestImplementation(projects.core.testing)
     kspAndroidTest(libs.hilt.compiler)
 
     debugImplementation(libs.androidx.ui.test.manifest)

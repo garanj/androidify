@@ -19,8 +19,6 @@ import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.test.assertIsDisplayed
-import androidx.compose.ui.test.assertIsEnabled
-import androidx.compose.ui.test.assertIsNotEnabled
 import androidx.compose.ui.test.assertIsOff
 import androidx.compose.ui.test.assertIsOn
 import androidx.compose.ui.test.junit4.createAndroidComposeRule
@@ -28,6 +26,7 @@ import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.android.developers.androidify.theme.SharedElementContextPreview
+import com.android.developers.testing.repository.FakeDropImageFactory
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -47,6 +46,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -75,6 +75,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -104,6 +105,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -138,6 +140,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -171,6 +174,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -205,6 +209,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -223,7 +228,6 @@ class CreationScreenTest {
             }
         }
 
-
         composeTestRule.onNodeWithText(headlineText).assertIsDisplayed()
         // TODO: Fails in pixel 5
         // composeTestRule.onNodeWithText(writingChipText).assertIsDisplayed().assertIsNotEnabled()
@@ -239,6 +243,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = false,
                     onCameraPressed = {},
                     onBackPressed = {},
@@ -268,6 +273,7 @@ class CreationScreenTest {
             SharedElementContextPreview {
                 EditScreen(
                     snackbarHostState = SnackbarHostState(),
+                    dropBehaviourFactory = FakeDropImageFactory(),
                     isExpanded = true, // Expanded mode
                     onCameraPressed = {},
                     onBackPressed = {},

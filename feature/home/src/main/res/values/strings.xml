@@ -36,4 +36,5 @@
     <string name="pause">Pause</string>
     <string name="terms">Terms</string>
     <string name="privacy">Privacy</string>
+    <string name="oss_license">Licenses</string>
 </resources>

@@ -68,4 +68,8 @@ internal abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindsImageGenerationRepository(impl: ImageGenerationRepositoryImpl): ImageGenerationRepository
+
+    @Binds
+    @Singleton
+    abstract fun bindsDropBehaviourFactory(impl: DropBehaviourFactoryImpl): DropBehaviourFactory
 }

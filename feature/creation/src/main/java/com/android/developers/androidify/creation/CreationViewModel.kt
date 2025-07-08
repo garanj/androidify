@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.data.ImageDescriptionFailedGenerationException
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.data.ImageValidationError
@@ -35,15 +36,12 @@ import com.android.developers.androidify.data.TextGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.cancel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class CreationViewModel @Inject constructor(
@@ -51,8 +49,7 @@ class CreationViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val textGenerationRepository: TextGenerationRepository,
     val fileProvider: LocalFileProvider,
-    @Named("IO")
-    val ioDispatcher: CoroutineDispatcher = Dispatchers.IO,
+    val dropBehaviourFactory: DropBehaviourFactory,
     @ApplicationContext
     val context: Context,
 ) : ViewModel() {
@@ -73,6 +70,9 @@ class CreationViewModel @Inject constructor(
 
     val snackbarHostState: StateFlow<SnackbarHostState>
         get() = _snackbarHostState
+
+    private var promptGenerationJob: Job? = null
+    private var imageGenerationJob: Job? = null
 
     fun onImageSelected(uri: Uri?) {
         _uiState.update {
@@ -96,7 +96,8 @@ class CreationViewModel @Inject constructor(
     }
 
     fun onPromptGenerationClicked() {
-        viewModelScope.launch(ioDispatcher) {
+        promptGenerationJob?.cancel()
+        promptGenerationJob = viewModelScope.launch {
             Log.d("CreationViewModel", "Generating prompt...")
             _uiState.update {
                 it.copy(promptGenerationInProgress = true)
@@ -122,7 +123,8 @@ class CreationViewModel @Inject constructor(
     }
 
     fun startClicked() {
-        viewModelScope.launch(ioDispatcher) {
+        imageGenerationJob?.cancel()
+        imageGenerationJob = viewModelScope.launch {
             if (internetConnectivityManager.isInternetAvailable()) {
                 try {
                     _uiState.update {
@@ -196,7 +198,8 @@ class CreationViewModel @Inject constructor(
     }
 
     fun cancelInProgressTask() {
-        ioDispatcher.cancel()
+        promptGenerationJob?.cancel()
+        imageGenerationJob?.cancel()
         _uiState.update {
             it.copy(screenState = ScreenState.EDIT)
         }
