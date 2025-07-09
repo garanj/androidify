@@ -16,21 +16,15 @@
 package com.android.developers.androidify.customize
 
 import android.app.Application
-import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
-import androidx.compose.ui.geometry.Size
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.ViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -41,7 +35,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
-    application: Application
+    application: Application,
 ) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(CustomizeExportState())
@@ -57,8 +51,10 @@ class CustomizeExportViewModel @Inject constructor(
         originalImageUrl: Uri?,
     ) {
         _state.update {
-            CustomizeExportState(originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl))
+            CustomizeExportState(
+                originalImageUrl,
+                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl),
+            )
         }
     }
 
@@ -76,32 +72,38 @@ class CustomizeExportViewModel @Inject constructor(
     }
     fun selectedToolStateChanged(toolState: ToolState) {
         _state.update {
-            it.copy(toolState = it.toolState + (it.selectedTool to toolState),
+            it.copy(
+                toolState = it.toolState + (it.selectedTool to toolState),
                 exportImageCanvas =
-                    when (toolState.selectedToolOption) {
-                        is BackgroundOption -> {
-                            val backgroundOption = toolState.selectedToolOption as BackgroundOption
-                            val backgroundDrawable = if (backgroundOption.drawableId == null)
-                                null else BitmapFactory.decodeResource(application.resources,
-                                    backgroundOption.drawableId)
-                            if (backgroundOption == BackgroundOption.None) {
-                                it.exportImageCanvas.copy(
-                                    selectedBackground = null,
-                                ).scaleImage(1f)
-                            } else {
-                                it.exportImageCanvas.copy(
-                                    selectedBackground = backgroundDrawable,
-                                ).scaleImage(0.75f)
-                            }
-                        }
-                        is SizeOption -> {
-                            it.exportImageCanvas.updateAspectRatio(
-                                newAspectRatio = (toolState.selectedToolOption as SizeOption).aspectRatio
+                when (toolState.selectedToolOption) {
+                    is BackgroundOption -> {
+                        val backgroundOption = toolState.selectedToolOption as BackgroundOption
+                        val backgroundDrawable = if (backgroundOption.drawableId == null) {
+                            null
+                        } else {
+                            BitmapFactory.decodeResource(
+                                application.resources,
+                                backgroundOption.drawableId,
                             )
                         }
-                        else -> throw IllegalArgumentException("Unknown tool option")
+                        if (backgroundOption == BackgroundOption.None) {
+                            it.exportImageCanvas.copy(
+                                selectedBackground = null,
+                            ).scaleImage(1f)
+                        } else {
+                            it.exportImageCanvas.copy(
+                                selectedBackground = backgroundDrawable,
+                            ).scaleImage(0.75f)
+                        }
                     }
-                )
+                    is SizeOption -> {
+                        it.exportImageCanvas.updateAspectRatio(
+                            newAspectRatio = (toolState.selectedToolOption as SizeOption).aspectRatio,
+                        )
+                    }
+                    else -> throw IllegalArgumentException("Unknown tool option")
+                },
+            )
         }
     }
     fun downloadClicked() {

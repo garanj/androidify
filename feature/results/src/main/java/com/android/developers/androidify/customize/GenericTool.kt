@@ -27,9 +27,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -54,17 +52,19 @@ fun <T : ToolOption> GenericTool(
     singleLine: Boolean = true,
 ) {
     val scrollModifier = if (singleLine) Modifier.horizontalScroll(rememberScrollState()) else Modifier
-    FlowRow(modifier = modifier.then(scrollModifier),
-        maxLines = if (singleLine) 1 else Int.MAX_VALUE) {
+    FlowRow(
+        modifier = modifier.then(scrollModifier),
+        maxLines = if (singleLine) 1 else Int.MAX_VALUE,
+    ) {
         tools.forEach { tool ->
-                GenericToolButton(
-                    isSelected = tool == selectedOption,
-                    toolContent = {
-                        individualToolContent(tool)
-                    },
-                    onToolSelected = onToolSelected,
-                    tool = tool,
-                )
+            GenericToolButton(
+                isSelected = tool == selectedOption,
+                toolContent = {
+                    individualToolContent(tool)
+                },
+                onToolSelected = onToolSelected,
+                tool = tool,
+            )
         }
     }
 }
@@ -152,7 +152,6 @@ private fun GenericToolPreview() {
         )
     }
 }
-
 
 @Preview(showBackground = true)
 @Composable
