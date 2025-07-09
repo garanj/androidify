@@ -90,26 +90,32 @@ data class ExportImageCanvas(
         if (newAspectRatio <= 0f) {
             return this.copy()
         }
-        val originalWidth = this.canvasSize.width
-        val originalHeight = this.canvasSize.height
+
+        val baseReferenceWidth = 1000f
+        val baseReferenceHeight = 1000f
+
         var newCanvasWidth: Float
         var newCanvasHeight: Float
 
-        if (newAspectRatio > this.aspectRatio) {
-            newCanvasHeight = originalHeight
-            newCanvasWidth = newCanvasHeight * newAspectRatio
+        if (newAspectRatio == 1f) {
+            newCanvasWidth = baseReferenceWidth
+            newCanvasHeight = baseReferenceHeight
+        } else if (newAspectRatio > 1f) {
+            newCanvasHeight = baseReferenceHeight
+            newCanvasWidth = baseReferenceHeight * newAspectRatio
         } else {
-            newCanvasWidth = originalWidth
-            newCanvasHeight = newCanvasWidth / newAspectRatio
+            newCanvasWidth = baseReferenceWidth
+            newCanvasHeight = baseReferenceWidth / newAspectRatio
         }
 
         val adjustedCanvasSize = Size(newCanvasWidth, newCanvasHeight)
-        var newImageRect = this.imageRect
-        if (imageOriginalBitmapSize != null) {
-            newImageRect = when (strategy) {
+        val newImageRect = if (imageOriginalBitmapSize != null) {
+            when (strategy) {
                 ImageScalingStrategy.FIT -> calculateImageRectToFit(imageOriginalBitmapSize!!, adjustedCanvasSize)
-                ImageScalingStrategy.FILL -> calculateImageRectToFill(imageOriginalBitmapSize!!, adjustedCanvasSize) // You'd need a robust calculateImageRectToFill
+                ImageScalingStrategy.FILL -> calculateImageRectToFill(imageOriginalBitmapSize!!, adjustedCanvasSize)
             }
+        } else {
+            Rect(Offset.Zero, adjustedCanvasSize)
         }
 
         return this.copy(

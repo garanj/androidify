@@ -22,6 +22,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -29,6 +30,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -49,14 +51,17 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentWithReceiverOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
@@ -119,6 +124,7 @@ fun CustomizeAndExportScreen(
     )
 }
 
+@OptIn(ExperimentalSharedTransitionApi::class)
 @Composable
 private fun CustomizeExportContents(
     state: CustomizeExportState,
@@ -152,7 +158,17 @@ private fun CustomizeExportContents(
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         val imageResult = @Composable { modifier: Modifier ->
-            CustomizedImageRenderer(state.exportImageCanvas, modifier = modifier)
+            ImageResult(
+                state.exportImageCanvas,
+                modifier = modifier
+                    .padding(16.dp)
+                    .clip(MaterialTheme.shapes.medium),
+            )
+        }
+        val imageMovable = remember {
+            movableContentWithReceiverOf<LookaheadScope> {
+                imageResult(Modifier)
+            }
         }
         val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
             ToolSelector(
@@ -192,10 +208,11 @@ private fun CustomizeExportContents(
                     .fillMaxSize()
                     .padding(paddingValues),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 imageResult(
                     Modifier
-                        .weight(1f, fill = false),
+                        .weight(1f, fill = true),
                 )
                 Column(
                     Modifier
@@ -236,7 +253,19 @@ private fun CustomizeExportContents(
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.SpaceBetween,
             ) {
-                imageResult(Modifier.weight(1f))
+                Box(
+                    modifier = Modifier
+                        .weight(1f, fill = true),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    ImageResult(
+                        state.exportImageCanvas,
+                        modifier = Modifier
+                            .padding(16.dp) // Apply padding first
+                            .aspectRatio(state.exportImageCanvas.aspectRatio, matchHeightConstraintsFirst = true)
+                            .clip(MaterialTheme.shapes.medium),
+                    )
+                }
                 Spacer(modifier = Modifier.height(16.dp))
                 toolSelector(Modifier, true)
                 Spacer(modifier = Modifier.height(16.dp))
@@ -400,7 +429,10 @@ fun CustomizeExportPreviewLarge() {
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
                 val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
                 val state = CustomizeExportState(
-                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
+                    exportImageCanvas = ExportImageCanvas(
+                        imageBitmap = bitmap.asAndroidBitmap(),
+                        aspectRatio = 9 / 16f,
+                    ),
                     selectedTool = CustomizeTool.Background,
                 )
                 CustomizeExportContents(
