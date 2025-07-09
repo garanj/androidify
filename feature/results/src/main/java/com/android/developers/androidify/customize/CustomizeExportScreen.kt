@@ -157,11 +157,7 @@ private fun CustomizeExportContents(
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         val imageResult = @Composable { modifier: Modifier ->
-            ImageResult(
-                state.resultImageBitmap,
-                state.selectedAspectRatio,
-                modifier,
-            )
+            CustomizedImageRenderer(state.exportImageCanvas, modifier = modifier)
         }
         val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
             ToolSelector(
@@ -304,29 +300,7 @@ fun SelectedToolDetail(
     }
 }
 
-@Composable
-private fun ImageResult(
-    bitmap: Bitmap?,
-    selectedAspectRatio: Float,
-    modifier: Modifier = Modifier,
-) {
-    Box(
-        modifier = modifier
-            .aspectRatio(1f)
-            .padding(32.dp)
-            .animateContentSize(),
-        contentAlignment = Alignment.Center,
-    ) {
-        AsyncImage(
-            model = bitmap,
-            contentDescription = stringResource(R.string.resultant_android_bot),
-            contentScale = ContentScale.Crop,
-            modifier = Modifier
-                .aspectRatio(selectedAspectRatio, matchHeightConstraintsFirst = true)
-                .clip(MaterialTheme.shapes.large),
-        )
-    }
-}
+
 
 @Composable
 private fun BotActionsButtonRow(
@@ -405,7 +379,8 @@ fun CustomizeExportPreview() {
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
                 val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-                val state = CustomizeExportState(resultImageBitmap = bitmap.asAndroidBitmap())
+                val state = CustomizeExportState(
+                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()))
                 CustomizeExportContents(
                     state = state,
                     onDownloadClicked = {},
@@ -431,7 +406,7 @@ fun CustomizeExportPreviewLarge() {
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
                 val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
                 val state = CustomizeExportState(
-                    resultImageBitmap = bitmap.asAndroidBitmap(),
+                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
                     selectedTool = CustomizeTool.Background,
                 )
                 CustomizeExportContents(

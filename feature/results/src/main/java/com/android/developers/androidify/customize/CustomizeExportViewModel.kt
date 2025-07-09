@@ -15,16 +15,22 @@
  */
 package com.android.developers.androidify.customize
 
+import android.app.Application
+import android.content.Context
 import android.graphics.Bitmap
+import android.graphics.BitmapFactory
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -35,7 +41,8 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
-) : ViewModel() {
+    application: Application
+) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state = _state.asStateFlow()
@@ -50,13 +57,14 @@ class CustomizeExportViewModel @Inject constructor(
         originalImageUrl: Uri?,
     ) {
         _state.update {
-            CustomizeExportState(resultImageUrl, originalImageUrl)
+            CustomizeExportState(originalImageUrl,
+                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl))
         }
     }
 
     fun shareClicked() {
         viewModelScope.launch {
-            val resultUrl = state.value.resultImageBitmap
+            val resultUrl = renderToBitmap(application, state.value.exportImageCanvas)
             if (resultUrl != null) {
                 val imageFileUri = imageGenerationRepository.saveImage(resultUrl)
 
@@ -68,12 +76,37 @@ class CustomizeExportViewModel @Inject constructor(
     }
     fun selectedToolStateChanged(toolState: ToolState) {
         _state.update {
-            it.copy(toolState = it.toolState + (it.selectedTool to toolState))
+            it.copy(toolState = it.toolState + (it.selectedTool to toolState),
+                exportImageCanvas =
+                    when (toolState.selectedToolOption) {
+                        is BackgroundOption -> {
+                            val backgroundOption = toolState.selectedToolOption as BackgroundOption
+                            val backgroundDrawable = if (backgroundOption.drawableId == null)
+                                null else BitmapFactory.decodeResource(application.resources,
+                                    backgroundOption.drawableId)
+                            if (backgroundOption == BackgroundOption.None) {
+                                it.exportImageCanvas.copy(
+                                    selectedBackground = null,
+                                ).scaleImage(1f)
+                            } else {
+                                it.exportImageCanvas.copy(
+                                    selectedBackground = backgroundDrawable,
+                                ).scaleImage(0.75f)
+                            }
+                        }
+                        is SizeOption -> {
+                            it.exportImageCanvas.updateAspectRatio(
+                                newAspectRatio = (toolState.selectedToolOption as SizeOption).aspectRatio
+                            )
+                        }
+                        else -> throw IllegalArgumentException("Unknown tool option")
+                    }
+                )
         }
     }
     fun downloadClicked() {
         viewModelScope.launch {
-            val resultBitmap = state.value.resultImageBitmap
+            val resultBitmap = renderToBitmap(application, state.value.exportImageCanvas)
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
                 val savedOriginalUri =
@@ -97,137 +130,4 @@ class CustomizeExportViewModel @Inject constructor(
             it.copy(selectedTool = tool)
         }
     }
-}
-
-data class CustomizeExportState(
-    val resultImageBitmap: Bitmap? = null,
-    val originalImageUrl: Uri? = null,
-    val savedUri: Uri? = null,
-    val externalSavedUri: Uri? = null,
-    val externalOriginalSavedUri: Uri? = null,
-    val selectedTool: CustomizeTool = CustomizeTool.Size,
-    val tools: List<CustomizeTool> = CustomizeTool.entries,
-    val toolState: Map<CustomizeTool, ToolState> = mapOf(
-        CustomizeTool.Size to AspectRatioToolState(),
-        CustomizeTool.Background to BackgroundToolState(),
-    ),
-) {
-    val selectedAspectRatio: Float
-        get() = (toolState[CustomizeTool.Size] as AspectRatioToolState).selectedToolOption.aspectRatio
-
-    val selectedBackground: BackgroundOption
-        get() = (toolState[CustomizeTool.Background] as BackgroundToolState).selectedToolOption
-}
-interface ToolState {
-    val selectedToolOption: ToolOption
-    val options: List<ToolOption>
-}
-data class AspectRatioToolState(
-    override val selectedToolOption: SizeOption = SizeOption.Square,
-    override val options: List<SizeOption> = listOf(
-        SizeOption.Square,
-        SizeOption.Banner,
-        SizeOption.Wallpaper,
-        SizeOption.Custom,
-    ),
-) : ToolState
-
-data class BackgroundToolState(
-    override val selectedToolOption: BackgroundOption = BackgroundOption.None,
-    override val options: List<BackgroundOption> = listOf(
-        BackgroundOption.None,
-        BackgroundOption.Lightspeed,
-        BackgroundOption.IO,
-        BackgroundOption.Create,
-    ),
-) : ToolState
-
-data class ExportImageCanvas(
-    var aspectRatio: Float = 1f,
-    var canvasSize: Size = Size(1000f, 1000f),
-    var imageRect: Rect = Rect(offset = Offset.Zero, size = Size(1000f, 1000f)),
-    var mainImageUri: Uri,
-    var imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
-) {
-    fun updateAspectRatio(newAspectRatio: Float, strategy: ImageScalingStrategy = ImageScalingStrategy.FILL): ExportImageCanvas {
-        if (newAspectRatio <= 0f) {
-            return this.copy()
-        }
-        val originalWidth = this.canvasSize.width
-        val originalHeight = this.canvasSize.height
-        var newCanvasWidth: Float
-        var newCanvasHeight: Float
-
-        if (newAspectRatio > this.aspectRatio) {
-            newCanvasHeight = originalHeight
-            newCanvasWidth = newCanvasHeight * newAspectRatio
-        } else {
-            newCanvasWidth = originalWidth
-            newCanvasHeight = newCanvasWidth / newAspectRatio
-        }
-
-        val adjustedCanvasSize = Size(newCanvasWidth, newCanvasHeight)
-        var newImageRect = this.imageRect
-        if (imageOriginalBitmapSize != null) {
-            newImageRect = when (strategy) {
-                ImageScalingStrategy.FIT -> calculateImageRectToFit(imageOriginalBitmapSize!!, adjustedCanvasSize)
-                ImageScalingStrategy.FILL -> calculateImageRectToFill(imageOriginalBitmapSize!!, adjustedCanvasSize) // You'd need a robust calculateImageRectToFill
-            }
-        }
-
-        return this.copy(
-            aspectRatio = newAspectRatio,
-            canvasSize = adjustedCanvasSize,
-            imageRect = newImageRect,
-        )
-    }
-
-    fun calculateImageRectToFit(imageOriginalSize: Size, newCanvasSize: Size): Rect {
-        val imageAspectRatio = imageOriginalSize.width / imageOriginalSize.height
-        val canvasAspectRatio = newCanvasSize.width / newCanvasSize.height
-
-        var rectWidth: Float
-        var rectHeight: Float
-        var offsetX: Float
-        var offsetY: Float
-
-        if (imageAspectRatio > canvasAspectRatio) {
-            rectWidth = newCanvasSize.width
-            rectHeight = rectWidth / imageAspectRatio
-            offsetX = 0f
-            offsetY = (newCanvasSize.height - rectHeight) / 2f
-        } else {
-            rectHeight = newCanvasSize.height
-            rectWidth = rectHeight * imageAspectRatio
-            offsetX = (newCanvasSize.width - rectWidth) / 2f
-            offsetY = 0f
-        }
-        return Rect(Offset(offsetX, offsetY), Size(rectWidth, rectHeight))
-    }
-
-    fun calculateImageRectToFill(imageOriginalSize: Size, newCanvasSize: Size): Rect {
-        val imageAspectRatio = imageOriginalSize.width / imageOriginalSize.height
-        val canvasAspectRatio = newCanvasSize.width / newCanvasSize.height
-
-        var rectWidth: Float
-        var rectHeight: Float
-        var offsetX = 0f
-        var offsetY = 0f
-        if (imageAspectRatio > canvasAspectRatio) {
-            rectHeight = newCanvasSize.height
-            rectWidth = rectHeight * imageAspectRatio
-            offsetX = (newCanvasSize.width - rectWidth) / 2f
-            offsetY = 0f
-        } else {
-            rectWidth = newCanvasSize.width
-            rectHeight = rectWidth / imageAspectRatio
-            offsetX = 0f
-            offsetY = (newCanvasSize.height - rectHeight) / 2f
-        }
-        return Rect(Offset(offsetX, offsetY), Size(rectWidth, rectHeight))
-    }
-}
-enum class ImageScalingStrategy {
-    FIT,
-    FILL,
 }
