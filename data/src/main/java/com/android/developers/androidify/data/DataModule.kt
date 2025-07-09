@@ -42,7 +42,10 @@ internal object DataModule {
 
     @Provides
     @Singleton
-    fun provideLocalFileProvider(@ApplicationContext appContext: Context, @Named("IO") ioDispatcher: CoroutineDispatcher): LocalFileProvider =
+    fun provideLocalFileProvider(
+        @ApplicationContext appContext: Context,
+        @Named("IO") ioDispatcher: CoroutineDispatcher,
+    ): LocalFileProvider =
         LocalFileProviderImpl(appContext, ioDispatcher)
 
     @Provides
@@ -103,6 +106,7 @@ internal object DataModule {
     )
 
     @Provides
+<<<<<<< HEAD
     @Singleton
     fun providesWearDeviceRepository(@ApplicationContext appContext: Context): WearDeviceRepository =
         WearDeviceRepositoryImpl(appContext)
@@ -111,4 +115,8 @@ internal object DataModule {
     @Singleton
     fun providesWearAssetTransmitter(@ApplicationContext appContext: Context): WearAssetTransmitter =
         WearAssetTransmitterImpl(appContext)
+=======
+    fun dropBehaviourFactory(localFileProvider: LocalFileProvider,): DropBehaviourFactory =
+        DropBehaviourFactoryImpl(localFileProvider = localFileProvider)
+>>>>>>> upstream/main
 }
