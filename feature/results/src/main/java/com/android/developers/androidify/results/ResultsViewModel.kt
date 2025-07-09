@@ -17,42 +17,58 @@ package com.android.developers.androidify.results
 
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.data.ConnectedDevice
 import com.android.developers.androidify.data.ImageGenerationRepository
+import com.android.developers.androidify.data.WearAssetTransmitter
 import com.android.developers.androidify.data.WearDeviceRepository
+import com.android.developers.androidify.wear.common.WatchFaceInstallError
+import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class ResultsViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val wearDeviceRepository: WearDeviceRepository,
+    val wearAssetTransmitter: WearAssetTransmitter,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(ResultState())
-    val state = _state.asStateFlow()
+    val state = combine(wearDeviceRepository.connectedDevice, _state) { device, state ->
+        state.copy(connectedDevice = device)
+    }.stateIn(
+        viewModelScope, SharingStarted.WhileSubscribed(5000), ResultState()
+    )
 
-    init {
-        viewModelScope.launch {
-            wearDeviceRepository.connectedDevice.collect { device ->
-                _state.update {
-                    it.copy(hasWearDevice = device != null)
-                }
-            }
-        }
-    }
+    private var transferJob : Job? = null
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
     val snackbarHostState: StateFlow<SnackbarHostState>
         get() = _snackbarHostState
+
+    init {
+        viewModelScope.launch {
+            wearAssetTransmitter.receiveInstallUpdate().collect {
+                _state.update { state ->
+                    state.copy(installationStatus = it)
+                }
+            }
+        }
+    }
 
     fun setArguments(
         resultImageUrl: Bitmap,
@@ -60,7 +76,13 @@ class ResultsViewModel @Inject constructor(
         promptText: String?,
     ) {
         _state.update {
-            ResultState(resultImageUrl, originalImageUrl, promptText = promptText, hasWearDevice = it.hasWearDevice)
+            ResultState(
+                resultImageUrl,
+                originalImageUrl,
+                promptText = promptText,
+                connectedDevice = it.connectedDevice,
+                installationStatus = it.installationStatus
+            )
         }
     }
 
@@ -76,6 +98,7 @@ class ResultsViewModel @Inject constructor(
             }
         }
     }
+
     fun downloadClicked() {
         viewModelScope.launch {
             val resultBitmap = state.value.resultImageBitmap
@@ -95,6 +118,40 @@ class ResultsViewModel @Inject constructor(
             }
         }
     }
+
+    fun installWatchFace() {
+        transferJob = viewModelScope.launch {
+            val nodeId = state.value.connectedDevice?.nodeId
+            val resultBitmap = state.value.resultImageBitmap
+            if (nodeId != null && resultBitmap != null) {
+                _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.Sending) }
+
+                val response = wearAssetTransmitter.doTransfer(nodeId, File(""), "")
+
+                if (response != WatchFaceInstallError.NO_ERROR) {
+                    _state.update {
+                        it.copy(installationStatus = WatchFaceInstallationStatus.Complete(
+                            success = false,
+                            installError = response,
+                            otherNodeId = nodeId,
+                        ))
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetWatchFaceSend() {
+        viewModelScope.launch {
+            val nodeId = state.value.connectedDevice?.nodeId
+            nodeId?.let {
+                wearAssetTransmitter.sendCancel(it)
+            }
+        }
+        transferJob?.cancel()
+        transferJob = null
+        _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.NotStarted) }
+    }
 }
 
 data class ResultState(
@@ -104,5 +161,6 @@ data class ResultState(
     val externalSavedUri: Uri? = null,
     val externalOriginalSavedUri: Uri? = null,
     val promptText: String? = null,
-    val hasWearDevice: Boolean = false,
+    val connectedDevice: ConnectedDevice? = null,
+    val installationStatus: WatchFaceInstallationStatus = WatchFaceInstallationStatus.NotStarted
 )

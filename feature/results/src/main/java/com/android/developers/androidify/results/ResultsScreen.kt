@@ -13,7 +13,11 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalPermissionsApi::class)
+@file:OptIn(
+    ExperimentalMaterial3ExpressiveApi::class,
+    ExperimentalPermissionsApi::class,
+    ExperimentalMaterial3Api::class
+)
 
 package com.android.developers.androidify.results
 
@@ -37,6 +41,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
+import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -45,6 +50,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -91,7 +97,6 @@ fun ResultsScreen(
     verboseLayout: Boolean = allowsFullContent(),
     onBackPress: () -> Unit,
     onAboutPress: () -> Unit,
-    onWearDevicePressed: () -> Unit,
     viewModel: ResultsViewModel = hiltViewModel<ResultsViewModel>(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
@@ -140,7 +145,12 @@ fun ResultsScreen(
             shareClicked = {
                 viewModel.shareClicked()
             },
-            wearDeviceclicked = onWearDevicePressed,
+            installWatchFaceClicked = {
+                viewModel.installWatchFace()
+            },
+            resetWatchFaceSend = {
+                viewModel.resetWatchFaceSend()
+            }
         )
     }
 }
@@ -166,7 +176,8 @@ private fun ResultsScreenPreview() {
             state = state,
             downloadClicked = {},
             shareClicked = {},
-            wearDeviceclicked = {},
+            installWatchFaceClicked = {},
+            resetWatchFaceSend = {},
         )
     }
 }
@@ -191,7 +202,8 @@ private fun ResultsScreenPreviewSmall() {
             verboseLayout = false,
             downloadClicked = {},
             shareClicked = {},
-            wearDeviceclicked = {},
+            installWatchFaceClicked = {},
+            resetWatchFaceSend = {},
         )
     }
 }
@@ -203,9 +215,13 @@ fun ResultsScreenContents(
     verboseLayout: Boolean = allowsFullContent(),
     downloadClicked: () -> Unit,
     shareClicked: () -> Unit,
-    wearDeviceclicked: () -> Unit,
+    installWatchFaceClicked: () -> Unit,
+    resetWatchFaceSend: () -> Unit,
     defaultSelectedResult: ResultOption = ResultOption.ResultImage,
 ) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
+
     ResultsBackground()
     val showResult = state.value.resultImageBitmap != null
     var selectedResultOption by remember {
@@ -259,11 +275,11 @@ fun ResultsScreenContents(
                 downloadClicked()
             },
             onWearDeviceClick = {
-                wearDeviceclicked()
+                showBottomSheet = true
             },
             modifier = modifier,
             verboseLayout = verboseLayout,
-            hasWearDevice = state.value.hasWearDevice,
+            hasWearDevice = state.value.connectedDevice != null,
         )
     }
     val backgroundQuotes = @Composable { modifier: Modifier ->
@@ -311,6 +327,23 @@ fun ResultsScreenContents(
                 Modifier
                     .padding(bottom = 16.dp, end = 16.dp)
                     .align(Alignment.BottomEnd),
+            )
+        }
+    }
+
+    state.value.connectedDevice?.let { device ->
+        if (showBottomSheet) {
+            WatchFaceModalSheet(
+                sheetState = sheetState,
+                onDismiss = {
+                    resetWatchFaceSend()
+                    showBottomSheet = false
+                },
+                connectedDevice = device,
+                installationStatus = state.value.installationStatus,
+                onWatchFaceInstallClick = { nodeId ->
+                    installWatchFaceClicked()
+                }
             )
         }
     }

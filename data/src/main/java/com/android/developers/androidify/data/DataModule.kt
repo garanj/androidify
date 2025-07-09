@@ -106,4 +106,9 @@ internal object DataModule {
     @Singleton
     fun providesWearDeviceRepository(@ApplicationContext appContext: Context): WearDeviceRepository =
         WearDeviceRepositoryImpl(appContext)
+
+    @Provides
+    @Singleton
+    fun providesWearAssetTransmitter(@ApplicationContext appContext: Context): WearAssetTransmitter =
+        WearAssetTransmitterImpl(appContext)
 }

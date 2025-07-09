@@ -121,7 +121,6 @@ dependencies {
     implementation(projects.feature.creation)
     implementation(projects.feature.home)
     implementation(projects.feature.results)
-    implementation(projects.feature.watchface)
 
     implementation(projects.core.theme)
 

@@ -42,9 +42,7 @@ import com.android.developers.androidify.creation.CreationScreen
 import com.android.developers.androidify.home.AboutScreen
 import com.android.developers.androidify.home.HomeScreen
 import com.android.developers.androidify.theme.transitions.ColorSplashTransitionScreen
-import com.google.android.gms.oss.licenses.OssLicensesActivity
 import com.google.android.gms.oss.licenses.OssLicensesMenuActivity
-import com.android.developers.androidify.watchface.WatchFaceScreen
 
 @ExperimentalMaterial3ExpressiveApi
 @Composable
@@ -112,22 +110,12 @@ fun MainNavigation() {
                     onAboutPressed = {
                         backStack.add(About)
                     },
-                    onWearDevicePressed = {
-                        backStack.add(WatchFace)
-                    },
                 )
             }
             entry<About> {
                 val context = LocalContext.current
                 AboutScreen(
                     onBackPressed = {
-                        backStack.removeLastOrNull()
-                    },
-                )
-            }
-            entry<WatchFace> {
-                WatchFaceScreen(
-                    onBackPress = {
                         backStack.removeLastOrNull()
                     },
                     onLicensesClicked = {

@@ -33,6 +33,3 @@ object Camera : NavigationRoute
 
 @Serializable
 object About : NavigationRoute
-
-@Serializable
-object WatchFace : NavigationRoute
