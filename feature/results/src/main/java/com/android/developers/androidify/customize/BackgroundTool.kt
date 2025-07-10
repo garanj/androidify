@@ -63,9 +63,9 @@ fun BackgroundTool(
                     )
                     .padding(6.dp),
             ) {
-                if (tool.drawableId != null) {
+                if (tool.previewDrawableInt != null) {
                     Image(
-                        rememberAsyncImagePainter(tool.drawableId),
+                        rememberAsyncImagePainter(tool.previewDrawableInt),
                         contentDescription = null, // described below
                         contentScale = ContentScale.Crop,
                         modifier = Modifier

@@ -78,27 +78,11 @@ class CustomizeExportViewModel @Inject constructor(
                 when (toolState.selectedToolOption) {
                     is BackgroundOption -> {
                         val backgroundOption = toolState.selectedToolOption as BackgroundOption
-                        val backgroundDrawable = if (backgroundOption.drawableId == null) {
-                            null
-                        } else {
-                            BitmapFactory.decodeResource(
-                                application.resources,
-                                backgroundOption.drawableId,
-                            )
-                        }
-                        if (backgroundOption == BackgroundOption.None) {
-                            it.exportImageCanvas.copy(
-                                selectedBackground = null,
-                            ).scaleImage(1f)
-                        } else {
-                            it.exportImageCanvas.copy(
-                                selectedBackground = backgroundDrawable,
-                            ).scaleImage(0.75f)
-                        }
+                        it.exportImageCanvas.copy(selectedBackgroundOption = backgroundOption)
                     }
                     is SizeOption -> {
-                        it.exportImageCanvas.updateAspectRatio(
-                            newAspectRatio = (toolState.selectedToolOption as SizeOption).aspectRatio,
+                        it.exportImageCanvas.copy(
+                            aspectRatioOption = (toolState.selectedToolOption as SizeOption),
                         )
                     }
                     else -> throw IllegalArgumentException("Unknown tool option")

@@ -23,6 +23,7 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -165,11 +166,6 @@ private fun CustomizeExportContents(
                     .clip(MaterialTheme.shapes.medium),
             )
         }
-        val imageMovable = remember {
-            movableContentWithReceiverOf<LookaheadScope> {
-                imageResult(Modifier)
-            }
-        }
         val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
             ToolSelector(
                 tools = state.tools,
@@ -262,7 +258,7 @@ private fun CustomizeExportContents(
                         state.exportImageCanvas,
                         modifier = Modifier
                             .padding(16.dp) // Apply padding first
-                            .aspectRatio(state.exportImageCanvas.aspectRatio, matchHeightConstraintsFirst = true)
+                            .aspectRatio(state.exportImageCanvas.aspectRatioOption.aspectRatio, matchHeightConstraintsFirst = true)
                             .clip(MaterialTheme.shapes.medium),
                     )
                 }
@@ -431,7 +427,7 @@ fun CustomizeExportPreviewLarge() {
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
                         imageBitmap = bitmap.asAndroidBitmap(),
-                        aspectRatio = 9 / 16f,
+                        aspectRatioOption = SizeOption.Square,
                     ),
                     selectedTool = CustomizeTool.Background,
                 )

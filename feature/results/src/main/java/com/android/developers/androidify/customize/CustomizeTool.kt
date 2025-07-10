@@ -34,7 +34,7 @@ sealed class SizeOption(
 ) : ToolOption {
 
     object Square : SizeOption(1f, "1:1", "square")
-    object Banner : SizeOption(16 / 9f, "Banner", "banner")
+    object Banner : SizeOption(4f, "Banner", "banner")
     object Wallpaper : SizeOption(9 / 16f, "Wallpaper", "wallpaper")
     // todo add custom ratio option to the UI
     /*object Custom : SizeOption(3 / 2f, "Custom", "custom")*/
@@ -43,11 +43,16 @@ sealed class SizeOption(
 sealed class BackgroundOption(
     override val displayName: String,
     override val key: String,
-    val drawableId: Int?,
+    val previewDrawableInt: Int?,
 ) : ToolOption {
     object None : BackgroundOption("None", "None", null)
-    object Lightspeed : BackgroundOption("Lightspeed", "Lightspeed", R.drawable.light_speed_dots)
-    object IO : BackgroundOption("I/O", "IO", R.drawable.background_option_io)
+    object Lightspeed : BackgroundOption("Lightspeed",
+        "Lightspeed",
+        R.drawable.light_speed_dots,
+        )
+    object IO : BackgroundOption("I/O", "IO",
+        R.drawable.background_option_io,
+        )
     // todo add Create with AI background option
    /* object Create : BackgroundOption("Create", "Create", R.drawable.background_create)*/
 }

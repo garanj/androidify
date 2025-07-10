@@ -140,7 +140,7 @@ private fun GenericToolPreview() {
                         .padding(6.dp),
                 ) {
                     Image(
-                        rememberAsyncImagePainter(tool.drawableId),
+                        rememberAsyncImagePainter(tool.previewDrawableInt),
                         contentDescription = null, // described below
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.aspectRatio(1f)
@@ -178,7 +178,7 @@ private fun GenericToolPreviewSingleLine() {
                         .padding(6.dp),
                 ) {
                     Image(
-                        rememberAsyncImagePainter(tool.drawableId),
+                        rememberAsyncImagePainter(tool.previewDrawableInt),
                         contentDescription = null, // described below
                         contentScale = ContentScale.Crop,
                         modifier = Modifier.aspectRatio(1f)
