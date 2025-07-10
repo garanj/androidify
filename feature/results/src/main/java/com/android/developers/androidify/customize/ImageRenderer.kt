@@ -135,12 +135,7 @@ fun BackgroundLayout(
                 whiteBoxHeightFraction = 0.55f
                 rotation = 0f
             }
-
-            SizeOption.Wallpaper -> {
-
-            }
         }
-
 
         Box(
             modifier = Modifier

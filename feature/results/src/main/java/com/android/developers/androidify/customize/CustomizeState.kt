@@ -41,7 +41,6 @@ data class AspectRatioToolState(
     override val options: List<SizeOption> = listOf(
         SizeOption.Square,
         SizeOption.Banner,
-        SizeOption.Wallpaper,
     ),
 ) : ToolState
 
