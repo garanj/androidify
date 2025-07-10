@@ -17,8 +17,6 @@ package com.android.developers.androidify.customize
 
 import android.graphics.Bitmap
 import android.net.Uri
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 
 data class CustomizeExportState(
@@ -33,13 +31,7 @@ data class CustomizeExportState(
         CustomizeTool.Background to BackgroundToolState(),
     ),
     val exportImageCanvas: ExportImageCanvas = ExportImageCanvas(),
-) {
-    val selectedAspectRatio: Float
-        get() = (toolState[CustomizeTool.Size] as AspectRatioToolState).selectedToolOption.aspectRatio
-
-    val selectedBackground: BackgroundOption
-        get() = (toolState[CustomizeTool.Background] as BackgroundToolState).selectedToolOption
-}
+)
 interface ToolState {
     val selectedToolOption: ToolOption
     val options: List<ToolOption>

@@ -39,6 +39,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.Density
+import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.util.LargeScreensPreview
@@ -118,7 +119,7 @@ fun BackgroundLayout(
 
             SizeOption.Square -> {
                 val image = when (backgroundOption) {
-                    BackgroundOption.IO -> R.drawable.background_square_shape
+                    BackgroundOption.IO -> R.drawable.background_square_blocks
                     BackgroundOption.Lightspeed -> R.drawable.background_square_lightspeed
                     BackgroundOption.None -> R.drawable.background_square_none
                 }
@@ -172,7 +173,7 @@ fun BackgroundLayout(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(32.dp)),
+                    .clip(RoundedCornerShape(percent = 8)),
                 contentAlignment = Alignment.Center,
             ) {
                 content()
@@ -187,15 +188,17 @@ suspend fun renderToBitmap(
     currentCanvasState: ExportImageCanvas,
 ): Bitmap? {
     return useVirtualDisplay(context) { display ->
-        val density = Density(2f)
-        val size = with(density) {
-            val newSize = currentCanvasState.canvasSize * density.density
-            newSize.toDpSize()
-        }
+        val outputDensity = Density(2f)
+
+        val logicalHeightDp = currentCanvasState.canvasSize.height.dp
+        val logicalWidthDp = (currentCanvasState.canvasSize.height * currentCanvasState.aspectRatioOption.aspectRatio).dp
+        
+        val captureDpSize = DpSize(width = logicalWidthDp, height = logicalHeightDp)
+
         captureComposable(
             context = context,
-            density = density,
-            size = size,
+            density = outputDensity,
+            size = captureDpSize,
             display = display,
         ) {
             LaunchedEffect(Unit) {
