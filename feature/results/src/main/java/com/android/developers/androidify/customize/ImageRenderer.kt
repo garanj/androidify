@@ -22,21 +22,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -45,12 +39,10 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
-import com.android.developers.androidify.util.dpToPx
 import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
@@ -66,31 +58,43 @@ fun ImageResult(
         Box(
             modifier = Modifier
                 .background(Color.White)
-                .aspectRatio(exportImageCanvas.aspectRatioOption.aspectRatio, matchHeightConstraintsFirst = true),
+                .aspectRatio(
+                    exportImageCanvas.aspectRatioOption.aspectRatio,
+                    matchHeightConstraintsFirst = true,
+                ),
         ) {
-            BackgroundLayout(exportImageCanvas.aspectRatioOption,
+            BackgroundLayout(
+                exportImageCanvas.aspectRatioOption,
                 exportImageCanvas.selectedBackgroundOption,
-                modifier = Modifier.fillMaxSize()) {
-                if (exportImageCanvas.imageBitmap  != null) {
-                    Image(bitmap = exportImageCanvas.imageBitmap.asImageBitmap(),
+                modifier = Modifier.fillMaxSize(),
+            ) {
+                if (exportImageCanvas.imageBitmap != null) {
+                    Image(
+                        bitmap = exportImageCanvas.imageBitmap.asImageBitmap(),
                         modifier = Modifier
                             .fillMaxSize(),
                         contentScale = ContentScale.Crop,
-                        contentDescription = null)
+                        contentDescription = null,
+                    )
                 }
             }
         }
     }
 }
+
 @Composable
 fun BackgroundLayout(
     sizeOption: SizeOption,
     backgroundOption: BackgroundOption,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
-){
+) {
     Box(modifier = modifier.fillMaxSize()) {
-
+        var whiteBoxXFraction = 0.51f
+        var whiteBoxYFraction = 0.31f
+        var whiteBoxWidthFraction = 0.23f
+        var whiteBoxHeightFraction = 0.35f
+        var rotation = 0f
         when (sizeOption) {
             SizeOption.Banner -> {
                 // Background image for the banner
@@ -103,89 +107,75 @@ fun BackgroundLayout(
                     bitmap = ImageBitmap.imageResource(id = image),
                     modifier = Modifier.fillMaxSize(),
                     contentScale = ContentScale.Crop,
-                    contentDescription = null
+                    contentDescription = null,
                 )
-                val whiteBoxXFraction = 0.51f
-                val whiteBoxYFraction = 0.31f
-                val whiteBoxWidthFraction = 0.23f
-                val whiteBoxHeightFraction = 0.35f
-
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .layout { measurable, constraints ->
-                            val fullWidth = constraints.maxWidth
-                            val fullHeight = constraints.maxHeight
-
-                            val whiteBoxWidth = (fullWidth * whiteBoxWidthFraction).roundToInt()
-                            val whiteBoxHeight = (fullHeight * whiteBoxHeightFraction).roundToInt()
-
-                            val whiteBoxX = (fullWidth * whiteBoxXFraction).roundToInt()
-                            val whiteBoxY = (fullHeight * whiteBoxYFraction).roundToInt()
-
-                            val placeable = measurable.measure(
-                                constraints.copy(
-                                    minWidth = whiteBoxWidth,
-                                    maxWidth = whiteBoxWidth,
-                                    minHeight = whiteBoxHeight,
-                                    maxHeight = whiteBoxHeight
-                                )
-                            )
-                            layout(fullWidth, fullHeight) {
-                                placeable.placeRelative(whiteBoxX, whiteBoxY)
-                            }
-                        }
-                        .aspectRatio(0.88f)
-                        .rotate(-11f)
-                ) {
-                    Box(
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .clip(RoundedCornerShape(32.dp)),
-                        contentAlignment = Alignment.Center
-                    ) {
-                        content()
-                    }
-                }
+                whiteBoxXFraction = 0.51f
+                whiteBoxYFraction = 0.31f
+                whiteBoxWidthFraction = 0.23f
+                whiteBoxHeightFraction = 0.35f
+                rotation = -11f
             }
+
             SizeOption.Square -> {
-                var botOffset by remember { mutableStateOf(IntOffset.Zero) }
-                botOffset = IntOffset(26.dp.dpToPx().roundToInt(), -28.dp.dpToPx().roundToInt())
                 val image = when (backgroundOption) {
-                    BackgroundOption.IO -> {
-                        R.drawable.background_square_shape
-                    }
-                    BackgroundOption.Lightspeed -> {
-                        R.drawable.background_square_lightspeed
-                    }
+                    BackgroundOption.IO -> R.drawable.background_square_shape
+                    BackgroundOption.Lightspeed -> R.drawable.background_square_lightspeed
                     BackgroundOption.None -> R.drawable.background_square_none
                 }
-                Image(ImageBitmap.imageResource(id = image),
+                Image(
+                    bitmap = ImageBitmap.imageResource(id = image),
                     contentScale = ContentScale.Crop,
                     modifier = Modifier.fillMaxSize(),
-                    contentDescription = null)
-                Box(modifier = Modifier
-                    .offset{ botOffset }
-                    .aspectRatio(0.88f)
-                    .fillMaxSize()
-                    .rotate(2f)
-                    .scale(0.7f)
-                    .clip(RoundedCornerShape(32.dp)),
-                    contentAlignment = Alignment.Center
-                ) {
-                    content()
-                }
+                    contentDescription = null,
+                )
+                whiteBoxXFraction = 0.2f
+                whiteBoxYFraction = 0.16f
+                whiteBoxWidthFraction = 0.60f
+                whiteBoxHeightFraction = 0.55f
+                rotation = 0f
             }
+
             SizeOption.Wallpaper -> {
-                var botOffset by remember { mutableStateOf(IntOffset.Zero) }
-                Box(modifier = Modifier
-                    .offset{ botOffset }
-                    .aspectRatio(0.88f)
-                    .fillMaxSize()
-                    .clip(RoundedCornerShape(32.dp))
-                ) {
-                    content()
+
+            }
+        }
+
+
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .layout { measurable, constraints ->
+                    val fullWidth = constraints.maxWidth
+                    val fullHeight = constraints.maxHeight
+
+                    val whiteBoxWidth = (fullWidth * whiteBoxWidthFraction).roundToInt()
+                    val whiteBoxHeight = (fullHeight * whiteBoxHeightFraction).roundToInt()
+
+                    val whiteBoxX = (fullWidth * whiteBoxXFraction).roundToInt()
+                    val whiteBoxY = (fullHeight * whiteBoxYFraction).roundToInt()
+
+                    val placeable = measurable.measure(
+                        constraints.copy(
+                            minWidth = whiteBoxWidth,
+                            maxWidth = whiteBoxWidth,
+                            minHeight = whiteBoxHeight,
+                            maxHeight = whiteBoxHeight,
+                        ),
+                    )
+                    layout(fullWidth, fullHeight) {
+                        placeable.placeRelative(whiteBoxX, whiteBoxY)
+                    }
                 }
+                .aspectRatio(0.88f)
+                .rotate(rotation),
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(RoundedCornerShape(32.dp)),
+                contentAlignment = Alignment.Center,
+            ) {
+                content()
             }
         }
 
@@ -233,10 +223,10 @@ private fun ImageRendererPreview() {
             selectedBackgroundOption = BackgroundOption.IO,
         ),
         modifier = Modifier
-            .fillMaxSize()
-           ,
+            .fillMaxSize(),
     )
 }
+
 @PhonePreview
 @LargeScreensPreview
 @Composable
@@ -252,8 +242,7 @@ private fun ImageRendererPreviewBanner() {
         ),
         modifier = Modifier
             .fillMaxSize()
-            .aspectRatio(SizeOption.Banner.aspectRatio)
-        ,
+            .aspectRatio(SizeOption.Banner.aspectRatio),
     )
 
 }
