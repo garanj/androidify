@@ -50,7 +50,6 @@ data class AspectRatioToolState(
         SizeOption.Square,
         SizeOption.Banner,
         SizeOption.Wallpaper,
-        SizeOption.Custom,
     ),
 ) : ToolState
 
@@ -60,7 +59,6 @@ data class BackgroundToolState(
         BackgroundOption.None,
         BackgroundOption.Lightspeed,
         BackgroundOption.IO,
-        BackgroundOption.Create,
     ),
 ) : ToolState
 

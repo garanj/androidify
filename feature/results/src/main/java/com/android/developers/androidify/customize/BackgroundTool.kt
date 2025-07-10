@@ -87,7 +87,6 @@ private fun BackgroundToolPreview() {
                 BackgroundOption.None,
                 BackgroundOption.Lightspeed,
                 BackgroundOption.IO,
-                BackgroundOption.Create,
             ),
             selectedOption = BackgroundOption.Lightspeed,
             onBackgroundOptionSelected = {},
