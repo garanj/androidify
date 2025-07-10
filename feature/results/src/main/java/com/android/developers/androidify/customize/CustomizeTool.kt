@@ -35,7 +35,7 @@ sealed class SizeOption(
 
     object Square : SizeOption(1f, "1:1", "square")
     object Banner : SizeOption(4f, "Banner", "banner")
-    object Wallpaper : SizeOption(9 / 16f, "Wallpaper", "wallpaper")
+    /*object Wallpaper : SizeOption(9 / 16f, "Wallpaper", "wallpaper")*/
     // todo add custom ratio option to the UI
     /*object Custom : SizeOption(3 / 2f, "Custom", "custom")*/
 }

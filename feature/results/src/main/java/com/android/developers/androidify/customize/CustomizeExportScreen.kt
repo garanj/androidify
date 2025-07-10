@@ -108,6 +108,7 @@ fun CustomizeAndExportScreen(
         val savedImageUri = state.value.savedUri
         if (savedImageUri != null) {
             shareImage(context, savedImageUri)
+            viewModel.onSavedUriConsumed()
         }
     }
     CustomizeExportContents(

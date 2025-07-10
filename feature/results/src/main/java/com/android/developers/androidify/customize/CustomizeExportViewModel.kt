@@ -70,6 +70,11 @@ class CustomizeExportViewModel @Inject constructor(
             }
         }
     }
+    fun onSavedUriConsumed() {
+        _state.update {
+            it.copy(savedUri = null)
+        }
+    }
     fun selectedToolStateChanged(toolState: ToolState) {
         _state.update {
             it.copy(
