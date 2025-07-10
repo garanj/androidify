@@ -241,13 +241,15 @@ fun CreationScreen(
             } else {
                 prompt
             }
-            CustomizeAndExportScreen(
-                resultImage = uiState.resultBitmap!!,
-                originalImageUri = uiState.imageUri,
-                onBackPress = onBackPressed,
-                onInfoPress = onAboutPressed,
-                viewModel = hiltViewModel<CustomizeExportViewModel>(key = key),
-            )
+            uiState.resultBitmap?.let { bitmap ->
+                CustomizeAndExportScreen(
+                    resultImage = bitmap,
+                    originalImageUri = uiState.imageUri,
+                    onBackPress = onBackPressed,
+                    onInfoPress = onAboutPressed,
+                    viewModel = hiltViewModel<CustomizeExportViewModel>(key = key),
+                )
+            }
         }
     }
 }

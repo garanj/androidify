@@ -56,10 +56,10 @@ data class BackgroundToolState(
 
 data class ExportImageCanvas(
     val imageBitmap: Bitmap? = null,
-    var aspectRatioOption: SizeOption = SizeOption.Square,
-    var canvasSize: Size = Size(1000f, 1000f),
-    var mainImageUri: Uri? = null,
-    var imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
-    var selectedBackgroundOption: BackgroundOption = BackgroundOption.None,
+    val aspectRatioOption: SizeOption = SizeOption.Square,
+    val canvasSize: Size = Size(1000f, 1000f),
+    val mainImageUri: Uri? = null,
+    val imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
+    val selectedBackgroundOption: BackgroundOption = BackgroundOption.None,
     val includeWatermark: Boolean = true
 )
