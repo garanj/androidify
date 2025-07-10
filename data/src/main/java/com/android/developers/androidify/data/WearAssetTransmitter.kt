@@ -12,6 +12,7 @@ import com.android.developers.androidify.wear.common.InitialResponse
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import com.android.developers.androidify.wear.common.WearableConstants
+import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_CANCELLED_BY_USER
 import com.android.developers.androidify.wear.common.WearableConstants.SETUP_TIMEOUT_MS
 import com.android.developers.androidify.wear.common.WearableConstants.TRANSFER_TIMEOUT_MS
 import com.google.android.gms.wearable.ChannelClient
@@ -43,8 +44,6 @@ interface WearAssetTransmitter {
         apkFile: File,
         validationToken: String,
     ): WatchFaceInstallError
-
-    suspend fun sendCancel(nodeId: String)
 }
 
 @Singleton
@@ -160,13 +159,6 @@ class WearAssetTransmitterImpl @Inject constructor(
                 val channel = channelClient.openChannel(nodeId, channelPath).await()
                 channelClient.sendFile(channel, Uri.fromFile(file)).await()
             }
-        }
-    }
-
-    override suspend fun sendCancel(nodeId: String) {
-        withContext(Dispatchers.IO) {
-            val path = WearableConstants.ANDROIDIFY_CANCEL_PATH_TEMPLATE.format(transferId)
-            messageClient.sendMessage(nodeId, path, byteArrayOf()).await()
         }
     }
 

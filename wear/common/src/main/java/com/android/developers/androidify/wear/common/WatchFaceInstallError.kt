@@ -7,6 +7,5 @@ enum class WatchFaceInstallError {
     SEND_SETUP_TIMEOUT,
     TRANSFER_ERROR,
     TRANSFER_TIMEOUT,
-    DISCONNECTED,
     WATCH_FACE_INSTALL_ERROR
 }

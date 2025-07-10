@@ -12,12 +12,10 @@ import com.android.developers.androidify.wear.common.WatchFaceActivationStrategy
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import com.android.developers.androidify.wear.common.WearableConstants
-import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_CANCEL_PATH
 import com.android.developers.androidify.wear.common.WearableConstants.TRANSFER_TIMEOUT_MS
 import com.google.android.gms.tasks.Task
 import com.google.android.gms.tasks.Tasks
 import com.google.android.gms.wearable.ChannelClient
-import com.google.android.gms.wearable.MessageEvent
 import com.google.android.gms.wearable.Wearable
 import com.google.android.gms.wearable.WearableListenerService
 import kotlinx.coroutines.CoroutineScope
@@ -71,25 +69,6 @@ class AndroidifyDataListenerService : WearableListenerService() {
             return doTransferReceiveSetup(nodeId, data)
         }
         return Tasks.forResult(null)
-    }
-
-    /**
-     * If the user on the phone navigates away from the bottom panel, the transfer is cancelled and
-     * a cancel request is sent to the watch. This stops the reception of the watch payload and
-     * resets the transfer state.
-     */
-    override fun onMessageReceived(messageEvent: MessageEvent) {
-        if (messageEvent.path.startsWith(ANDROIDIFY_CANCEL_PATH)) {
-            val cancelTransferId = messageEvent.path.removePrefix(ANDROIDIFY_CANCEL_PATH)
-            serviceScope.launch {
-                val transferState = storedStateManager.watchFaceInstallationStatus.first()
-                if (transferState is WatchFaceInstallationStatus.Receiving &&
-                    transferState.transferId == cancelTransferId) {
-                    receiverJob?.cancel()
-                    storedStateManager.setWatchFaceInstallationStatus(WatchFaceInstallationStatus.NotStarted)
-                }
-            }
-        }
     }
 
     /**

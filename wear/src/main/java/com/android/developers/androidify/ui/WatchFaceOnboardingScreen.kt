@@ -43,12 +43,10 @@ fun WatchFaceOnboardingScreen(
             }
             is WatchFaceInstallationStatus.Complete -> {
                 val completeStatus = state as WatchFaceInstallationStatus.Complete
+                Log.d("WatchFaceOnboardingScreen", "completeStatus: $completeStatus")
                 if (completeStatus.success) {
                     WatchFaceGuidance(
                         strategy = completeStatus.activationStrategy,
-                        onPermissionResult = { granted ->
-                            //viewModel.onPermissionResult(granted)
-                        },
                         onPermissionsChange = { granted, shouldShowRationale ->
                             viewModel.maybeSendUpdateOnPermissionsChange(granted, shouldShowRationale)
                         },
@@ -69,15 +67,12 @@ fun WatchFaceOnboardingScreen(
 @Composable
 fun WatchFaceGuidance(
     strategy: WatchFaceActivationStrategy,
-    onPermissionResult: (Boolean) -> Unit,
     onPermissionsChange: (Boolean, Boolean) -> Unit,
     onAllDoneClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val activePermission =
-        rememberPermissionState("com.google.wear.permission.SET_PUSHED_WATCH_FACE_AS_ACTIVE") { granted ->
-            onPermissionResult(granted)
-        }
+        rememberPermissionState("com.google.wear.permission.SET_PUSHED_WATCH_FACE_AS_ACTIVE") {  }
     var previousPermissionStatus by remember {
         mutableStateOf(activePermission.status)
     }

@@ -142,12 +142,6 @@ class ResultsViewModel @Inject constructor(
     }
 
     fun resetWatchFaceSend() {
-        viewModelScope.launch {
-            val nodeId = state.value.connectedDevice?.nodeId
-            nodeId?.let {
-                wearAssetTransmitter.sendCancel(it)
-            }
-        }
         transferJob?.cancel()
         transferJob = null
         _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.NotStarted) }

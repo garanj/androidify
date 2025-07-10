@@ -11,12 +11,11 @@ object WearableConstants {
 
     const val ANDROIDIFY_INITIATE_TRANSFER_PATH = "/initiate_transfer"
     const val ANDROIDIFY_FINALIZE_TRANSFER_TEMPLATE = "/finalize_transfer/%s"
-    const val ANDROIDIFY_CANCEL_PATH_TEMPLATE = "/cancel_transfer/%s"
-    const val ANDROIDIFY_CANCEL_PATH = "/cancel_transfer/"
 
     // CapabilityClient
     const val ANDROIDIFY_INSTALLED = "androidify"
     const val ANDROIDIFY_TRANSFER_PATH_TEMPLATE = "/transfer_apk/%s"
+    const val ANDROIDIFY_CANCELLED_BY_USER = 14142135
 
     const val SETUP_TIMEOUT_MS = 30_000L
     const val TRANSFER_TIMEOUT_MS = 30_000L
