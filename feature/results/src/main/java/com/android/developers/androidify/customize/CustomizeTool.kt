@@ -36,10 +36,10 @@ sealed class SizeOption(
 ) : ToolOption {
 
     object Square : SizeOption(1f, Size(1000f, 1000f), "1:1", "square")
-    object Banner : SizeOption(4f, Size(4000f, 1000f),"Banner", "banner")
-    object Wallpaper : SizeOption(9 / 16f, Size(900f, 1600f),"Wallpaper", "wallpaper")
-    object SocialHeader: SizeOption(3f, Size(3000f, 1000f),"3:1", "social_header")
-    object WallpaperTablet: SizeOption(1280/800f, Size(1280f, 800f),"Large wallpaper", "wallpaper_large")
+    object Banner : SizeOption(4f, Size(4000f, 1000f), "Banner", "banner")
+    object Wallpaper : SizeOption(9 / 16f, Size(900f, 1600f), "Wallpaper", "wallpaper")
+    object SocialHeader : SizeOption(3f, Size(3000f, 1000f), "3:1", "social_header")
+    object WallpaperTablet : SizeOption(1280 / 800f, Size(1280f, 800f), "Large wallpaper", "wallpaper_large")
 }
 
 sealed class BackgroundOption(
@@ -48,13 +48,16 @@ sealed class BackgroundOption(
     val previewDrawableInt: Int?,
 ) : ToolOption {
     object None : BackgroundOption("None", "None", null)
-    object Lightspeed : BackgroundOption("Lightspeed",
+    object Lightspeed : BackgroundOption(
+        "Lightspeed",
         "Lightspeed",
         R.drawable.light_speed_dots,
-        )
-    object IO : BackgroundOption("I/O", "IO",
+    )
+    object IO : BackgroundOption(
+        "I/O",
+        "IO",
         R.drawable.background_option_io,
-        )
+    )
     // todo add Create with AI background option
-   /* object Create : BackgroundOption("Create", "Create", R.drawable.background_create)*/
+    /* object Create : BackgroundOption("Create", "Create", R.drawable.background_create)*/
 }

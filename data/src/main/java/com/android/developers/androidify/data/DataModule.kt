@@ -106,6 +106,6 @@ internal object DataModule {
     )
 
     @Provides
-    fun dropBehaviourFactory(localFileProvider: LocalFileProvider,): DropBehaviourFactory =
+    fun dropBehaviourFactory(localFileProvider: LocalFileProvider): DropBehaviourFactory =
         DropBehaviourFactoryImpl(localFileProvider = localFileProvider)
 }

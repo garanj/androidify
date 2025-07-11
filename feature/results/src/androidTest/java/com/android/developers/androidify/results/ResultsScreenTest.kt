@@ -220,7 +220,7 @@ class ResultsScreenTest {
                     contentPadding = PaddingValues(0.dp),
                     state = state,
                     onCustomizeShareClicked = {
-                        shareClicked = true// Callback to test
+                        shareClicked = true // Callback to test
                     },
                 )
             }

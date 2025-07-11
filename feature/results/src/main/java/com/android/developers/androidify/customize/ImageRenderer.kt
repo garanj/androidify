@@ -97,7 +97,7 @@ fun BackgroundLayout(
                     val actualWidth = constraints.maxWidth
                     val actualHeight = constraints.maxHeight
 
-                     val scale = if (exportImageCanvas.canvasSize.width > 0f) {
+                    val scale = if (exportImageCanvas.canvasSize.width > 0f) {
                         actualWidth / exportImageCanvas.canvasSize.width
                     } else {
                         1f
@@ -114,7 +114,7 @@ fun BackgroundLayout(
                             maxWidth = scaledImageWidth.toInt(),
                             minHeight = scaledImageHeight.toInt(),
                             maxHeight = scaledImageHeight.toInt(),
-                        )
+                        ),
                     )
                     layout(actualWidth, actualHeight) {
                         placeable.placeRelative(scaledOffsetX.toInt(), scaledOffsetY.toInt())
@@ -131,7 +131,6 @@ fun BackgroundLayout(
                 content()
             }
         }
-
     }
 }
 
@@ -260,7 +259,7 @@ private fun ImageRendererPreviewWallpaperSocial() {
             canvasSize = Size(1600f, 900f),
             aspectRatioOption = SizeOption.SocialHeader,
             selectedBackgroundOption = BackgroundOption.Lightspeed,
-            ).updateAspectRatioAndBackground(
+        ).updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.Lightspeed,
             sizeOption = SizeOption.SocialHeader,
         ),
@@ -282,7 +281,7 @@ fun ImageRendererPreviewWallpaperIO() {
             aspectRatioOption = SizeOption.SocialHeader,
             selectedBackgroundOption = BackgroundOption.IO,
 
-            ).updateAspectRatioAndBackground(
+        ).updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.IO,
             sizeOption = SizeOption.SocialHeader,
         ),

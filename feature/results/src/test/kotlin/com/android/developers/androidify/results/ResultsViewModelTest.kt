@@ -19,14 +19,10 @@ package com.android.developers.androidify.results
 
 import android.graphics.Bitmap
 import android.net.Uri
-import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.launch
-import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Assert.assertNotNull
 import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
@@ -89,5 +85,4 @@ class ResultsViewModelTest {
             viewModel.state.value,
         )
     }
-
 }

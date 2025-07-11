@@ -54,7 +54,7 @@ class ResultsScreenScreenshotTest {
                     contentPadding = PaddingValues(0.dp),
                     state = state,
                     verboseLayout = true, // Replicates ResultsScreenPreview
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }
@@ -79,7 +79,7 @@ class ResultsScreenScreenshotTest {
                     contentPadding = PaddingValues(0.dp),
                     state = state,
                     verboseLayout = false, // Replicates ResultsScreenPreviewSmall
-                    onCustomizeShareClicked = {}
+                    onCustomizeShareClicked = {},
                 )
             }
         }

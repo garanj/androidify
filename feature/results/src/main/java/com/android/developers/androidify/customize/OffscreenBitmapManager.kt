@@ -53,7 +53,6 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
-import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
@@ -71,7 +70,6 @@ import javax.inject.Singleton
  *              ImageResult() // etc
  *              }
  */
-
 
 @Singleton
 class OffscreenBitmapManager @Inject constructor(val application: Application) {

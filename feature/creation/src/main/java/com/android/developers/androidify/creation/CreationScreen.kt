@@ -68,7 +68,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
@@ -127,9 +126,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
-import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.customize.CustomizeAndExportScreen
 import com.android.developers.androidify.customize.CustomizeExportViewModel
+import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.results.ResultsScreen
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LimeGreen
@@ -446,7 +445,6 @@ private fun MainCreationPane(
             onDropEnded = { background = defaultDropAreaBackgroundColor },
         )
     }
-
 
     Box(
         modifier = modifier,

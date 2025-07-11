@@ -17,8 +17,6 @@ package com.android.developers.androidify.customize
 
 import android.app.Application
 import android.graphics.Bitmap
-import android.graphics.BitmapFactory
-import android.graphics.Rect
 import android.net.Uri
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
@@ -98,18 +96,21 @@ class CustomizeExportViewModel @Inject constructor(
                     is BackgroundOption -> {
                         val backgroundOption = toolState.selectedToolOption as BackgroundOption
                         it.exportImageCanvas.updateAspectRatioAndBackground(
-                            backgroundOption, it.exportImageCanvas.aspectRatioOption)
+                            backgroundOption,
+                            it.exportImageCanvas.aspectRatioOption,
+                        )
                     }
                     is SizeOption -> {
                         it.exportImageCanvas.updateAspectRatioAndBackground(
-                            it.exportImageCanvas.selectedBackgroundOption, (toolState.selectedToolOption as SizeOption))
+                            it.exportImageCanvas.selectedBackgroundOption,
+                            (toolState.selectedToolOption as SizeOption),
+                        )
                     }
                     else -> throw IllegalArgumentException("Unknown tool option")
                 },
             )
         }
     }
-
 
     fun downloadClicked() {
         viewModelScope.launch {

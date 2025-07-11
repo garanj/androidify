@@ -21,7 +21,6 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.R
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 
 data class CustomizeExportState(
@@ -37,10 +36,7 @@ data class CustomizeExportState(
     ),
     val exportImageCanvas: ExportImageCanvas = ExportImageCanvas(),
 
-
-    ) {
-
-}
+)
 
 interface ToolState {
     val selectedToolOption: ToolOption
@@ -84,13 +80,13 @@ data class ExportImageCanvas(
     fun updateAspectRatioAndBackground(
         backgroundOption: BackgroundOption,
         sizeOption: SizeOption,
-    ) : ExportImageCanvas {
+    ): ExportImageCanvas {
         val newCanvasSize = sizeOption.dimensions
         var imageSize: Size
 
         var offset = Offset.Zero
-        var image : Int
-        var rotation : Float
+        var image: Int
+        var rotation: Float
         when (sizeOption) {
             SizeOption.Square -> {
                 image = when (backgroundOption) {
@@ -155,4 +151,3 @@ data class ExportImageCanvas(
         )
     }
 }
-
