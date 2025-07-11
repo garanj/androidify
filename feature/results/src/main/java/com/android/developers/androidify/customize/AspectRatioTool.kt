@@ -84,6 +84,9 @@ private fun AspectRatioToolPreview() {
             sizeOptions = listOf(
                 SizeOption.Square,
                 SizeOption.Banner,
+                SizeOption.SocialHeader,
+                SizeOption.Wallpaper,
+                SizeOption.WallpaperTablet,
             ),
             selectedOption = SizeOption.Square,
             onSizeOptionSelected = {},

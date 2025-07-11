@@ -15,6 +15,7 @@
  */
 package com.android.developers.androidify.customize
 
+import androidx.compose.ui.geometry.Size
 import com.android.developers.androidify.results.R
 
 enum class CustomizeTool(val icon: Int, val displayName: String) {
@@ -29,15 +30,16 @@ interface ToolOption {
 
 sealed class SizeOption(
     val aspectRatio: Float,
+    val dimensions: Size,
     override val displayName: String,
     override val key: String,
 ) : ToolOption {
 
-    object Square : SizeOption(1f, "1:1", "square")
-    object Banner : SizeOption(4f, "Banner", "banner")
-    /*object Wallpaper : SizeOption(9 / 16f, "Wallpaper", "wallpaper")*/
-    // todo add custom ratio option to the UI
-    /*object Custom : SizeOption(3 / 2f, "Custom", "custom")*/
+    object Square : SizeOption(1f, Size(1000f, 1000f), "1:1", "square")
+    object Banner : SizeOption(4f, Size(4000f, 1000f),"Banner", "banner")
+    object Wallpaper : SizeOption(9 / 16f, Size(900f, 1600f),"Wallpaper", "wallpaper")
+    object SocialHeader: SizeOption(3f, Size(3000f, 1000f),"3:1", "social_header")
+    object WallpaperTablet: SizeOption(1280/800f, Size(1280f, 800f),"Large wallpaper", "wallpaper_large")
 }
 
 sealed class BackgroundOption(

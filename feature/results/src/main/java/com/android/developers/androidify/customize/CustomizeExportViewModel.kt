@@ -18,8 +18,11 @@ package com.android.developers.androidify.customize
 import android.app.Application
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
+import android.graphics.Rect
 import android.net.Uri
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
@@ -35,6 +38,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
+    val offscreenBitmapManager: OffscreenBitmapManager,
     application: Application,
 ) : AndroidViewModel(application) {
 
@@ -46,6 +50,10 @@ class CustomizeExportViewModel @Inject constructor(
     val snackbarHostState: StateFlow<SnackbarHostState>
         get() = _snackbarHostState
 
+    override fun onCleared() {
+        super.onCleared()
+        offscreenBitmapManager.dispose()
+    }
     fun setArguments(
         resultImageUrl: Bitmap,
         originalImageUrl: Uri?,
@@ -60,9 +68,15 @@ class CustomizeExportViewModel @Inject constructor(
 
     fun shareClicked() {
         viewModelScope.launch {
-            val resultUrl = renderToBitmap(application, state.value.exportImageCanvas)
-            if (resultUrl != null) {
-                val imageFileUri = imageGenerationRepository.saveImage(resultUrl)
+            val exportImageCanvas = state.value.exportImageCanvas
+            val resultBitmap = offscreenBitmapManager.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+                ImageResult(
+                    exportImageCanvas = exportImageCanvas,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
+            if (resultBitmap != null) {
+                val imageFileUri = imageGenerationRepository.saveImage(resultBitmap)
 
                 _state.update {
                     it.copy(savedUri = imageFileUri)
@@ -83,21 +97,29 @@ class CustomizeExportViewModel @Inject constructor(
                 when (toolState.selectedToolOption) {
                     is BackgroundOption -> {
                         val backgroundOption = toolState.selectedToolOption as BackgroundOption
-                        it.exportImageCanvas.copy(selectedBackgroundOption = backgroundOption)
+                        it.exportImageCanvas.updateAspectRatioAndBackground(
+                            backgroundOption, it.exportImageCanvas.aspectRatioOption)
                     }
                     is SizeOption -> {
-                        it.exportImageCanvas.copy(
-                            aspectRatioOption = (toolState.selectedToolOption as SizeOption),
-                        )
+                        it.exportImageCanvas.updateAspectRatioAndBackground(
+                            it.exportImageCanvas.selectedBackgroundOption, (toolState.selectedToolOption as SizeOption))
                     }
                     else -> throw IllegalArgumentException("Unknown tool option")
                 },
             )
         }
     }
+
+
     fun downloadClicked() {
         viewModelScope.launch {
-            val resultBitmap = renderToBitmap(application, state.value.exportImageCanvas)
+            val exportImageCanvas = state.value.exportImageCanvas
+            val resultBitmap = offscreenBitmapManager.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+                ImageResult(
+                    exportImageCanvas = exportImageCanvas,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
                 val savedOriginalUri =

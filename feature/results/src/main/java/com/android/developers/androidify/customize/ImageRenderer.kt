@@ -15,8 +15,6 @@
  */
 package com.android.developers.androidify.customize
 
-import android.content.Context
-import android.graphics.Bitmap
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -25,12 +23,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
@@ -38,13 +36,8 @@ import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.imageResource
-import androidx.compose.ui.unit.Density
-import androidx.compose.ui.unit.DpSize
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.tooling.preview.Preview
 import com.android.developers.androidify.results.R
-import com.android.developers.androidify.util.LargeScreensPreview
-import com.android.developers.androidify.util.PhonePreview
-import kotlin.math.roundToInt
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class)
 @Composable
@@ -65,8 +58,7 @@ fun ImageResult(
                 ),
         ) {
             BackgroundLayout(
-                exportImageCanvas.aspectRatioOption,
-                exportImageCanvas.selectedBackgroundOption,
+                exportImageCanvas,
                 modifier = Modifier.fillMaxSize(),
             ) {
                 if (exportImageCanvas.imageBitmap != null) {
@@ -85,90 +77,55 @@ fun ImageResult(
 
 @Composable
 fun BackgroundLayout(
-    sizeOption: SizeOption,
-    backgroundOption: BackgroundOption,
+    exportImageCanvas: ExportImageCanvas,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        var whiteBoxXFraction = 0.51f
-        var whiteBoxYFraction = 0.31f
-        var whiteBoxWidthFraction = 0.23f
-        var whiteBoxHeightFraction = 0.35f
-        var rotation = 0f
-        when (sizeOption) {
-            SizeOption.Banner -> {
-                // Background image for the banner
-                val image = when (backgroundOption) {
-                    BackgroundOption.IO -> R.drawable.background_banner_square
-                    BackgroundOption.Lightspeed -> R.drawable.background_banner_lightspeed
-                    BackgroundOption.None -> R.drawable.background_banner_plain
-                }
-                Image(
-                    bitmap = ImageBitmap.imageResource(id = image),
-                    modifier = Modifier.fillMaxSize(),
-                    contentScale = ContentScale.Crop,
-                    contentDescription = null,
-                )
-                whiteBoxXFraction = 0.51f
-                whiteBoxYFraction = 0.31f
-                whiteBoxWidthFraction = 0.23f
-                whiteBoxHeightFraction = 0.35f
-                rotation = -11f
-            }
-
-            SizeOption.Square -> {
-                val image = when (backgroundOption) {
-                    BackgroundOption.IO -> R.drawable.background_square_blocks
-                    BackgroundOption.Lightspeed -> R.drawable.background_square_lightspeed
-                    BackgroundOption.None -> R.drawable.background_square_none
-                }
-                Image(
-                    bitmap = ImageBitmap.imageResource(id = image),
-                    contentScale = ContentScale.Crop,
-                    modifier = Modifier.fillMaxSize(),
-                    contentDescription = null,
-                )
-                whiteBoxXFraction = 0.2f
-                whiteBoxYFraction = 0.16f
-                whiteBoxWidthFraction = 0.60f
-                whiteBoxHeightFraction = 0.55f
-                rotation = 0f
-            }
+        if (exportImageCanvas.selectedBackgroundDrawable != null) {
+            Image(
+                bitmap = ImageBitmap.imageResource(id = exportImageCanvas.selectedBackgroundDrawable),
+                modifier = Modifier.fillMaxSize(),
+                contentScale = ContentScale.Crop,
+                contentDescription = null,
+            )
         }
-
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .layout { measurable, constraints ->
-                    val fullWidth = constraints.maxWidth
-                    val fullHeight = constraints.maxHeight
+                    val actualWidth = constraints.maxWidth
+                    val actualHeight = constraints.maxHeight
 
-                    val whiteBoxWidth = (fullWidth * whiteBoxWidthFraction).roundToInt()
-                    val whiteBoxHeight = (fullHeight * whiteBoxHeightFraction).roundToInt()
+                     val scale = if (exportImageCanvas.canvasSize.width > 0f) {
+                        actualWidth / exportImageCanvas.canvasSize.width
+                    } else {
+                        1f
+                    }
 
-                    val whiteBoxX = (fullWidth * whiteBoxXFraction).roundToInt()
-                    val whiteBoxY = (fullHeight * whiteBoxYFraction).roundToInt()
+                    val scaledImageWidth = exportImageCanvas.imageSize.width * scale
+                    val scaledImageHeight = exportImageCanvas.imageSize.height * scale
+                    val scaledOffsetX = exportImageCanvas.imageOffset.x * scale
+                    val scaledOffsetY = exportImageCanvas.imageOffset.y * scale
 
                     val placeable = measurable.measure(
                         constraints.copy(
-                            minWidth = whiteBoxWidth,
-                            maxWidth = whiteBoxWidth,
-                            minHeight = whiteBoxHeight,
-                            maxHeight = whiteBoxHeight,
-                        ),
+                            minWidth = scaledImageWidth.toInt(),
+                            maxWidth = scaledImageWidth.toInt(),
+                            minHeight = scaledImageHeight.toInt(),
+                            maxHeight = scaledImageHeight.toInt(),
+                        )
                     )
-                    layout(fullWidth, fullHeight) {
-                        placeable.placeRelative(whiteBoxX, whiteBoxY)
+                    layout(actualWidth, actualHeight) {
+                        placeable.placeRelative(scaledOffsetX.toInt(), scaledOffsetY.toInt())
                     }
                 }
-                .aspectRatio(0.88f)
-                .rotate(rotation),
+                .rotate(exportImageCanvas.imageRotation),
         ) {
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(percent = 8)),
+                    .clip(RoundedCornerShape(percent = 7)),
                 contentAlignment = Alignment.Center,
             ) {
                 content()
@@ -178,16 +135,17 @@ fun BackgroundLayout(
     }
 }
 
-suspend fun renderToBitmap(
+/*suspend fun renderToBitmap(
     context: Context,
     currentCanvasState: ExportImageCanvas,
 ): Bitmap? {
     return useVirtualDisplay(context) { display ->
-        val outputDensity = Density(2f)
+        val outputDensity = Density(1f)
 
         val logicalHeightDp = currentCanvasState.canvasSize.height.dp
-        val logicalWidthDp = (currentCanvasState.canvasSize.height * currentCanvasState.aspectRatioOption.aspectRatio).dp
-        
+        val logicalWidthDp =
+            (currentCanvasState.canvasSize.height * currentCanvasState.aspectRatioOption.aspectRatio).dp
+
         val captureDpSize = DpSize(width = logicalWidthDp, height = logicalHeightDp)
 
         captureComposable(
@@ -205,28 +163,30 @@ suspend fun renderToBitmap(
             )
         }
     }
-}
+}*/
 
-@PhonePreview
-@LargeScreensPreview
+@Preview
 @Composable
-private fun ImageRendererPreview() {
+private fun ImageRendererPreviewSquare() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
 
     ImageResult(
         ExportImageCanvas(
             imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = androidx.compose.ui.geometry.Size(1000f, 1000f),
+            canvasSize = Size(1000f, 1000f),
             aspectRatioOption = SizeOption.Square,
             selectedBackgroundOption = BackgroundOption.IO,
-        ),
+        )
+            .updateAspectRatioAndBackground(
+                backgroundOption = BackgroundOption.IO,
+                sizeOption = SizeOption.Square,
+            ),
         modifier = Modifier
             .fillMaxSize(),
     )
 }
 
-@PhonePreview
-@LargeScreensPreview
+@Preview
 @Composable
 private fun ImageRendererPreviewBanner() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
@@ -234,13 +194,100 @@ private fun ImageRendererPreviewBanner() {
     ImageResult(
         ExportImageCanvas(
             imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = androidx.compose.ui.geometry.Size(1000f, 1000f),
+            canvasSize = Size(1000f, 1000f),
             aspectRatioOption = SizeOption.Banner,
             selectedBackgroundOption = BackgroundOption.Lightspeed,
+        ).updateAspectRatioAndBackground(
+            backgroundOption = BackgroundOption.Lightspeed,
+            sizeOption = SizeOption.Banner,
         ),
         modifier = Modifier
             .fillMaxSize()
             .aspectRatio(SizeOption.Banner.aspectRatio),
     )
+}
 
+@Preview
+@Composable
+private fun ImageRendererPreviewWallpaper() {
+    val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+
+    ImageResult(
+        ExportImageCanvas(
+            imageBitmap = bitmap.asAndroidBitmap(),
+            canvasSize = Size(1000f, 1000f),
+            aspectRatioOption = SizeOption.Wallpaper,
+            selectedBackgroundOption = BackgroundOption.Lightspeed,
+        ).updateAspectRatioAndBackground(
+            backgroundOption = BackgroundOption.Lightspeed,
+            sizeOption = SizeOption.Wallpaper,
+        ),
+        modifier = Modifier
+            .fillMaxSize()
+            .aspectRatio(SizeOption.Wallpaper.aspectRatio),
+    )
+}
+
+@Preview(widthDp = 1280, heightDp = 800)
+@Composable
+private fun ImageRendererPreviewWallpaperTablet() {
+    val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+
+    ImageResult(
+        ExportImageCanvas(
+            imageBitmap = bitmap.asAndroidBitmap(),
+            canvasSize = Size(1280f, 800f),
+            aspectRatioOption = SizeOption.WallpaperTablet,
+            selectedBackgroundOption = BackgroundOption.Lightspeed,
+        ).updateAspectRatioAndBackground(
+            backgroundOption = BackgroundOption.Lightspeed,
+            sizeOption = SizeOption.WallpaperTablet,
+        ),
+        modifier = Modifier
+            .fillMaxSize()
+            .aspectRatio(SizeOption.WallpaperTablet.aspectRatio),
+    )
+}
+
+@Preview
+@Composable
+private fun ImageRendererPreviewWallpaperSocial() {
+    val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+
+    ImageResult(
+        ExportImageCanvas(
+            imageBitmap = bitmap.asAndroidBitmap(),
+            canvasSize = Size(1600f, 900f),
+            aspectRatioOption = SizeOption.SocialHeader,
+            selectedBackgroundOption = BackgroundOption.Lightspeed,
+            ).updateAspectRatioAndBackground(
+            backgroundOption = BackgroundOption.Lightspeed,
+            sizeOption = SizeOption.SocialHeader,
+        ),
+        modifier = Modifier
+            .fillMaxSize()
+            .aspectRatio(SizeOption.SocialHeader.aspectRatio),
+    )
+}
+
+@Preview
+@Composable
+fun ImageRendererPreviewWallpaperIO() {
+    val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+
+    ImageResult(
+        ExportImageCanvas(
+            imageBitmap = bitmap.asAndroidBitmap(),
+            canvasSize = Size(1600f, 900f),
+            aspectRatioOption = SizeOption.SocialHeader,
+            selectedBackgroundOption = BackgroundOption.IO,
+
+            ).updateAspectRatioAndBackground(
+            backgroundOption = BackgroundOption.IO,
+            sizeOption = SizeOption.SocialHeader,
+        ),
+        modifier = Modifier
+            .fillMaxSize()
+            .aspectRatio(SizeOption.SocialHeader.aspectRatio),
+    )
 }
