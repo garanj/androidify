@@ -58,7 +58,7 @@ interface LocalFileProvider {
 @Singleton
 class LocalFileProviderImpl @Inject constructor(
     private val application: Application,
-    @Named("IO") private val ioDispatcher: CoroutineDispatcher
+    @Named("IO") private val ioDispatcher: CoroutineDispatcher,
 ) : LocalFileProvider {
 
     override suspend fun saveBitmapToFile(bitmap: Bitmap, file: File) = withContext(ioDispatcher) {

@@ -148,7 +148,7 @@ data class ExportImageCanvas(
             imageOffset = offset,
             canvasSize = newCanvasSize,
             aspectRatioOption = sizeOption,
-            selectedBackgroundOption = backgroundOption
+            selectedBackgroundOption = backgroundOption,
         )
     }
 }
