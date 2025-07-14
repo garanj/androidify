@@ -134,36 +134,6 @@ fun BackgroundLayout(
     }
 }
 
-/*suspend fun renderToBitmap(
-    context: Context,
-    currentCanvasState: ExportImageCanvas,
-): Bitmap? {
-    return useVirtualDisplay(context) { display ->
-        val outputDensity = Density(1f)
-
-        val logicalHeightDp = currentCanvasState.canvasSize.height.dp
-        val logicalWidthDp =
-            (currentCanvasState.canvasSize.height * currentCanvasState.aspectRatioOption.aspectRatio).dp
-
-        val captureDpSize = DpSize(width = logicalWidthDp, height = logicalHeightDp)
-
-        captureComposable(
-            context = context,
-            density = outputDensity,
-            size = captureDpSize,
-            display = display,
-        ) {
-            LaunchedEffect(Unit) {
-                capture()
-            }
-            ImageResult(
-                exportImageCanvas = currentCanvasState,
-                modifier = Modifier.fillMaxSize(),
-            )
-        }
-    }
-}*/
-
 @Preview
 @Composable
 private fun ImageRendererPreviewSquare() {

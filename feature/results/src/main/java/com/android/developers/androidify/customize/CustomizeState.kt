@@ -68,13 +68,13 @@ data class ExportImageCanvas(
     val aspectRatioOption: SizeOption = SizeOption.Square,
     val canvasSize: Size = Size(1000f, 1000f),
     val mainImageUri: Uri? = null,
-    val imageSize: Size = Size(1000f, 1000f),
-    val imageOffset: Offset = Offset.Zero,
+    val imageSize: Size = Size(600f, 600f),
+    val imageOffset: Offset = Offset(canvasSize.width * 0.2f, canvasSize.height * 0.16f),
     val imageRotation: Float = 0f,
     val imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
     val selectedBackgroundOption: BackgroundOption = BackgroundOption.None,
     @param:DrawableRes
-    val selectedBackgroundDrawable: Int? = null,
+    val selectedBackgroundDrawable: Int? = com.android.developers.androidify.results.R.drawable.background_square_none,
     val includeWatermark: Boolean = true,
 ) {
     fun updateAspectRatioAndBackground(
@@ -148,6 +148,7 @@ data class ExportImageCanvas(
             imageOffset = offset,
             canvasSize = newCanvasSize,
             aspectRatioOption = sizeOption,
+            selectedBackgroundOption = backgroundOption
         )
     }
 }
