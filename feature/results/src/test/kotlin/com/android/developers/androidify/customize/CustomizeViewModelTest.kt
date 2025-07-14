@@ -21,8 +21,12 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.repository.FakeImageGenerationRepository
+import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Before
@@ -30,6 +34,8 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
+import kotlin.test.DefaultAsserter.assertNotNull
+import kotlin.test.assertNotNull
 
 @RunWith(RobolectricTestRunner::class)
 class CustomizeViewModelTest {
@@ -45,6 +51,7 @@ class CustomizeViewModelTest {
     fun setup() {
         viewModel = CustomizeExportViewModel(
             FakeImageGenerationRepository(),
+            composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
         )
     }
@@ -87,7 +94,7 @@ class CustomizeViewModelTest {
         )
     }
 
-  /*  @Test
+    @Test
     fun downloadClicked() = runTest {
         val values = mutableListOf<CustomizeExportState>()
         backgroundScope.launch(UnconfinedTestDispatcher()) {
@@ -113,7 +120,7 @@ class CustomizeViewModelTest {
     fun shareClicked() = runTest {
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
-        backgroundScope.launch {
+        backgroundScope.launch(UnconfinedTestDispatcher()) {
             viewModel.state.collect {
                 values.add(it)
             }
@@ -127,5 +134,5 @@ class CustomizeViewModelTest {
         // Ensure all coroutines on the test scheduler complete
         advanceUntilIdle()
         assertNotNull(values.last().savedUri)
-    }*/
+    }
 }

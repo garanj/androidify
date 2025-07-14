@@ -22,7 +22,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +35,7 @@ import javax.inject.Inject
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
-    val offscreenBitmapManager: OffscreenBitmapManager,
+    val composableBitmapRenderer: ComposableBitmapRenderer,
     application: Application,
 ) : AndroidViewModel(application) {
 
@@ -50,7 +49,7 @@ class CustomizeExportViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        offscreenBitmapManager.dispose()
+        composableBitmapRenderer.dispose()
     }
     fun setArguments(
         resultImageUrl: Bitmap,
@@ -67,7 +66,7 @@ class CustomizeExportViewModel @Inject constructor(
     fun shareClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas
-            val resultBitmap = offscreenBitmapManager.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+            val resultBitmap = composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
                 ImageResult(
                     exportImageCanvas = exportImageCanvas,
                     modifier = Modifier.fillMaxSize(),
@@ -115,7 +114,7 @@ class CustomizeExportViewModel @Inject constructor(
     fun downloadClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas
-            val resultBitmap = offscreenBitmapManager.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+            val resultBitmap = composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
                 ImageResult(
                     exportImageCanvas = exportImageCanvas,
                     modifier = Modifier.fillMaxSize(),

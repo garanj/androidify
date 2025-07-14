@@ -43,7 +43,6 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.unit.dp
-import androidx.core.content.ContextCompat.getSystemService
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleObserver
 import androidx.lifecycle.LifecycleOwner
@@ -58,6 +57,14 @@ import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import javax.inject.Singleton
 
+interface ComposableBitmapRenderer {
+    fun initialize()
+
+    fun dispose()
+
+    suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap?
+}
+
 /**
  * Use a virtual display to capture composable content thats on a display.
  * This is necessary because Compose doesn't yet support offscreen bitmap creation (https://issuetracker.google.com/298037598)
@@ -70,14 +77,13 @@ import javax.inject.Singleton
  *              ImageResult() // etc
  *              }
  */
-
 @Singleton
-class OffscreenBitmapManager @Inject constructor(val application: Application) {
-    val texture = SurfaceTexture(false)
-    val surface = Surface(texture)
-    var virtualDisplay: VirtualDisplay? = null
+class ComposableBitmapRendererImpl @Inject constructor(private val application: Application) : ComposableBitmapRenderer {
+    private val texture = SurfaceTexture(false)
+    private val surface = Surface(texture)
+    private var virtualDisplay: VirtualDisplay? = null
 
-    fun initialize() {
+    override fun initialize() {
         virtualDisplay =
             (application.getSystemService(DISPLAY_SERVICE) as DisplayManager).createVirtualDisplay(
                 "virtualDisplay",
@@ -89,7 +95,7 @@ class OffscreenBitmapManager @Inject constructor(val application: Application) {
             )
     }
 
-    fun dispose() {
+    override fun dispose() {
         virtualDisplay?.release()
         surface.release()
         texture.release()
@@ -103,7 +109,7 @@ class OffscreenBitmapManager @Inject constructor(val application: Application) {
         return callback(virtualDisplay!!.display)
     }
 
-    suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap? {
+    override suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap? {
         val bitmap = useVirtualDisplay { display ->
             val outputDensity = Density(1f)
 
@@ -128,7 +134,7 @@ class OffscreenBitmapManager @Inject constructor(val application: Application) {
     }
     private data class CaptureComposableScope(val capture: () -> Unit)
 
-    private fun androidx.compose.ui.geometry.Size.roundedToIntSize(): IntSize =
+    private fun Size.roundedToIntSize(): IntSize =
         IntSize(width.toInt(), height.toInt())
 
     private class EmptySavedStateRegistryOwner : SavedStateRegistryOwner {
