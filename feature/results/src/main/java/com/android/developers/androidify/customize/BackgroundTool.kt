@@ -85,6 +85,7 @@ private fun BackgroundToolPreview() {
         BackgroundTool(
             backgroundOptions = listOf(
                 BackgroundOption.None,
+                BackgroundOption.Plain,
                 BackgroundOption.Lightspeed,
                 BackgroundOption.IO,
             ),

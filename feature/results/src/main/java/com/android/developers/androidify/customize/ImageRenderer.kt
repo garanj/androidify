@@ -125,7 +125,9 @@ fun BackgroundLayout(
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(RoundedCornerShape(percent = 7)),
+                    .clip(RoundedCornerShape(percent =
+                        if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None)
+                            0 else 6)),
                 contentAlignment = Alignment.Center,
             ) {
                 content()

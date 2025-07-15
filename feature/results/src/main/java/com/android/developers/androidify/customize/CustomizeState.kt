@@ -47,10 +47,10 @@ data class AspectRatioToolState(
     override val selectedToolOption: SizeOption = SizeOption.Square,
     override val options: List<SizeOption> = listOf(
         SizeOption.Square,
-        SizeOption.Banner,
-        SizeOption.SocialHeader,
         SizeOption.Wallpaper,
         SizeOption.WallpaperTablet,
+        SizeOption.Banner,
+        SizeOption.SocialHeader,
     ),
 ) : ToolState
 
@@ -58,6 +58,7 @@ data class BackgroundToolState(
     override val selectedToolOption: BackgroundOption = BackgroundOption.None,
     override val options: List<BackgroundOption> = listOf(
         BackgroundOption.None,
+        BackgroundOption.Plain,
         BackgroundOption.Lightspeed,
         BackgroundOption.IO,
     ),
@@ -68,8 +69,8 @@ data class ExportImageCanvas(
     val aspectRatioOption: SizeOption = SizeOption.Square,
     val canvasSize: Size = Size(1000f, 1000f),
     val mainImageUri: Uri? = null,
-    val imageSize: Size = Size(600f, 600f),
-    val imageOffset: Offset = Offset(canvasSize.width * 0.2f, canvasSize.height * 0.16f),
+    val imageSize: Size = Size(1000f, 1000f),
+    val imageOffset: Offset = Offset.Zero,
     val imageRotation: Float = 0f,
     val imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
     val selectedBackgroundOption: BackgroundOption = BackgroundOption.None,
@@ -85,60 +86,94 @@ data class ExportImageCanvas(
         var imageSize: Size
 
         var offset = Offset.Zero
-        var image: Int
+        var image: Int?
         var rotation: Float
         when (sizeOption) {
             SizeOption.Square -> {
-                image = when (backgroundOption) {
-                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_square_blocks
-                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_square_lightspeed
-                    BackgroundOption.None -> com.android.developers.androidify.results.R.drawable.background_square_none
-                }
                 offset = Offset(newCanvasSize.width * 0.2f, newCanvasSize.height * 0.16f)
                 imageSize = Size(newCanvasSize.width * 0.6f, newCanvasSize.width * 0.6f)
                 rotation = 0f
+                image = when (backgroundOption) {
+                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_square_blocks
+                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_square_lightspeed
+                    BackgroundOption.None -> {
+                        offset = Offset(0f, 0f)
+                        imageSize = Size(newCanvasSize.width, newCanvasSize.height)
+                        null
+                    }
+                    BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_square_none
+                }
             }
             SizeOption.Banner -> {
-                image = when (backgroundOption) {
-                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_banner_square
-                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_banner_lightspeed
-                    BackgroundOption.None -> com.android.developers.androidify.results.R.drawable.background_banner_plain
-                }
                 offset = Offset(newCanvasSize.width * 0.51f, newCanvasSize.height * -0.03f)
                 imageSize = Size(newCanvasSize.width * 0.26f, newCanvasSize.width * 0.26f)
                 rotation = -11f
+                image = when (backgroundOption) {
+                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_banner_square
+                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_banner_lightspeed
+                    BackgroundOption.None -> {
+                        offset = Offset(0f, 0f)
+                        imageSize = Size(newCanvasSize.width, newCanvasSize.height)
+
+                        rotation = 0f
+                        null
+                    }
+                    BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_banner_plain
+                }
+
             }
             SizeOption.SocialHeader -> {
-                image = when (backgroundOption) {
-                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_social_header_shape
-                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_social_header_lightspeed
-                    BackgroundOption.None -> com.android.developers.androidify.results.R.drawable.background_social_header_plain
-                }
                 offset = Offset(newCanvasSize.width * 0.49f, newCanvasSize.height * 0.01f)
                 imageSize = Size(newCanvasSize.width * 0.26f, newCanvasSize.width * 0.3f)
                 rotation = -9f
+                image = when (backgroundOption) {
+                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_social_header_shape
+                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_social_header_lightspeed
+                    BackgroundOption.None -> {
+                        offset = Offset(0f, 0f)
+                        imageSize = Size(newCanvasSize.width, newCanvasSize.height)
+                        rotation = 0f
+                        null
+                    }
+                    BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_social_header_plain
+                }
+
             }
 
             SizeOption.Wallpaper -> {
-                image = when (backgroundOption) {
-                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_wallpaper_shapes
-                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_wallpaper_lightspeed
-                    BackgroundOption.None -> com.android.developers.androidify.results.R.drawable.background_wallpaper_plain
-                }
                 offset = Offset(newCanvasSize.width * -0.02f, newCanvasSize.height * 0.1f)
                 imageSize = Size(newCanvasSize.width * 1.1f, newCanvasSize.width * 1.3f)
                 rotation = -9f
+                image = when (backgroundOption) {
+                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_wallpaper_shapes
+                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_wallpaper_lightspeed
+                    BackgroundOption.None -> {
+                        offset = Offset(0f, 0f)
+                        imageSize = Size(newCanvasSize.width, newCanvasSize.height)
+                        rotation = 0f
+                        null
+                    }
+                    BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_plain
+                }
+
             }
 
             SizeOption.WallpaperTablet -> {
-                image = when (backgroundOption) {
-                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_shapes
-                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_lightspeed
-                    BackgroundOption.None -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_light
-                }
                 offset = Offset(newCanvasSize.width * 0.24f, newCanvasSize.height * 0.06f)
                 imageSize = Size(newCanvasSize.width * 0.52f, newCanvasSize.width * 0.52f)
                 rotation = -10f
+                image = when (backgroundOption) {
+                    BackgroundOption.IO -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_shapes
+                    BackgroundOption.Lightspeed -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_lightspeed
+                    BackgroundOption.None -> {
+                        offset = Offset(0f, 0f)
+                        imageSize = Size(newCanvasSize.width, newCanvasSize.height)
+                        rotation = 0f
+                        null
+                    }
+                    BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_light
+                }
+
             }
         }
         return copy(

@@ -39,6 +39,7 @@ import androidx.compose.foundation.layout.requiredSizeIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
@@ -161,7 +162,6 @@ private fun CustomizeExportContents(
                 state.exportImageCanvas,
                 modifier = modifier
                     .padding(16.dp)
-                    .clip(MaterialTheme.shapes.medium),
             )
         }
         val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
@@ -255,6 +255,7 @@ private fun CustomizeExportContents(
                     imageResult(
                         Modifier
                             .aspectRatio(state.exportImageCanvas.aspectRatioOption.aspectRatio, matchHeightConstraintsFirst = true)
+
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
