@@ -25,6 +25,7 @@ package com.android.developers.androidify.creation
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
@@ -436,7 +437,7 @@ private fun MainCreationPane(
     val alternateDropAreaBackgroundColor = MaterialTheme.colorScheme.surfaceVariant
     var background by remember { mutableStateOf(defaultDropAreaBackgroundColor) }
 
-    val activity = LocalContext.current as ComponentActivity
+    val activity = LocalActivity.current as ComponentActivity
     val externalAppCallback = remember {
         dropBehaviourFactory.createTargetCallback(
             activity = activity,
