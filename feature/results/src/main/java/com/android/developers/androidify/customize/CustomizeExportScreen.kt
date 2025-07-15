@@ -252,12 +252,9 @@ private fun CustomizeExportContents(
                         .weight(1f, fill = true),
                     contentAlignment = Alignment.Center,
                 ) {
-                    ImageResult(
-                        state.exportImageCanvas,
-                        modifier = Modifier
-                            .padding(16.dp) // Apply padding first
+                    imageResult(
+                        Modifier
                             .aspectRatio(state.exportImageCanvas.aspectRatioOption.aspectRatio, matchHeightConstraintsFirst = true)
-                            .clip(MaterialTheme.shapes.medium),
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
