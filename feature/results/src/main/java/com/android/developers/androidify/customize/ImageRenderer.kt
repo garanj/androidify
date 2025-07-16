@@ -15,6 +15,8 @@
  */
 package com.android.developers.androidify.customize
 
+import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.animateBounds
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.core.animateOffsetAsState
@@ -47,25 +49,29 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Constraints
 import androidx.compose.ui.unit.IntOffset
 import com.android.developers.androidify.results.R
+import com.android.developers.androidify.theme.LocalSharedTransitionScope
 
-@OptIn(ExperimentalMaterial3ExpressiveApi::class)
+@OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun ImageResult(
     exportImageCanvas: ExportImageCanvas,
     modifier: Modifier = Modifier,
+    uiDisplayModifier: Modifier = Modifier,
 ) {
     Box(
-        modifier = modifier.clipToBounds(),
+        modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
+
         Box(
             modifier = Modifier
-                .background(Color.White)
-                .layoutAspectRatio(exportImageCanvas.aspectRatioOption.aspectRatio)
-            /*.aspectRatio(
+                .aspectRatio(
                     exportImageCanvas.aspectRatioOption.aspectRatio,
                     matchHeightConstraintsFirst = true,
-                ),*/
+                )
+                .then(uiDisplayModifier)
+                .background(Color.White)
+                .clipToBounds(),
         ) {
             BackgroundLayout(
                 exportImageCanvas,
@@ -118,11 +124,11 @@ fun BackgroundLayout(
             modifier = Modifier
                 .fillMaxSize()
                 .layout { measurable, constraints ->
-                    val offsetValue = if (!isLookingAhead) exportImageCanvas.imageOffset else offset
+                    val offsetValue = if (isLookingAhead) exportImageCanvas.imageOffset else offset
                     val imageSizeValue =
-                        if (!isLookingAhead) exportImageCanvas.imageSize else animatedImageSize
+                        if (isLookingAhead) exportImageCanvas.imageSize else animatedImageSize
                     val exportCanvasSizeAnimation =
-                        if (!isLookingAhead) exportImageCanvas.canvasSize else exportCanvasSizeAnimation
+                        if (isLookingAhead) exportImageCanvas.canvasSize else exportCanvasSizeAnimation
 
                     val actualWidth = constraints.maxWidth
                     val actualHeight = constraints.maxHeight
@@ -296,90 +302,3 @@ fun ImageRendererPreviewWallpaperIO() {
             .aspectRatio(SizeOption.SocialHeader.aspectRatio),
     )
 }
-
-
-fun Modifier.layoutAspectRatio(targetAspectRatio: Float)  = // Assume 'targetAspectRatio' is a Float value available in your scope (e.g., width / height)
-
-    this.layout { measurable, constraints ->
-        // Determine the ideal size for this layout based on the targetAspectRatio and incoming constraints.
-        // This logic prioritizes fitting the width constraints first.
-        var idealWidth: Int
-        var idealHeight: Int
-
-        if (targetAspectRatio <= 0f) {
-            // Invalid aspect ratio, fallback to min constraints or 0,0
-            idealWidth = constraints.minWidth
-            idealHeight = constraints.minHeight
-        } else {
-            // Try to determine size based on width constraints
-            if (constraints.hasFixedWidth) {
-                idealWidth = constraints.maxWidth
-                idealHeight = (idealWidth / targetAspectRatio).toInt()
-            } else if (constraints.hasFixedHeight) { // Width is not fixed, but height is
-                idealHeight = constraints.maxHeight
-                idealWidth = (idealHeight * targetAspectRatio).toInt()
-            } else {
-                // Neither width nor height is fixed. Try to use maxWidth if bounded.
-                if (constraints.maxWidth != Constraints.Infinity) {
-                    idealWidth = constraints.maxWidth
-                    idealHeight = (idealWidth / targetAspectRatio).toInt()
-
-                    // If calculated height violates maxHeight (and maxHeight is bounded),
-                    // then recalculate based on maxHeight.
-                    if (constraints.maxHeight != Constraints.Infinity && idealHeight > constraints.maxHeight) {
-                        idealHeight = constraints.maxHeight
-                        idealWidth = (idealHeight * targetAspectRatio).toInt()
-                    } else if (idealHeight < constraints.minHeight && constraints.minHeight != 0) {
-                        // If calculated height is less than minHeight, recalculate based on minHeight.
-                        idealHeight = constraints.minHeight
-                        idealWidth = (idealHeight * targetAspectRatio).toInt()
-                    }
-                } else if (constraints.maxHeight != Constraints.Infinity) {
-                    // Width is unbounded (Infinity), but maxHeight is bounded.
-                    idealHeight = constraints.maxHeight
-                    idealWidth = (idealHeight * targetAspectRatio).toInt()
-                } else {
-                    // Both width and height are unbounded (Infinity). Fallback to minConstraints.
-                    // This case is ambiguous without further rules.
-                    idealWidth = constraints.minWidth
-                    idealHeight = (idealWidth / targetAspectRatio).toInt()
-                    if (idealHeight < constraints.minHeight && constraints.minHeight != 0) {
-                        idealHeight = constraints.minHeight
-                        idealWidth = (idealHeight * targetAspectRatio).toInt()
-                    }
-
-                }
-            }
-        }
-
-        // Coerce the ideal dimensions to ensure they fit within the provided constraints.
-        // The layout itself will take this size.
-        val layoutWidth = idealWidth.coerceIn(constraints.minWidth, constraints.maxWidth)
-
-        // Recalculate layoutHeight based on the (potentially coerced) layoutWidth to maintain aspect ratio,
-        // then coerce layoutHeight.
-        var layoutHeight = if (targetAspectRatio > 0f) (layoutWidth / targetAspectRatio).toInt() else idealHeight
-        layoutHeight = layoutHeight.coerceIn(constraints.minHeight, constraints.maxHeight)
-
-        // Final adjustment: if layoutHeight was coerced, layoutWidth might need to be re-calculated
-        // to maintain aspect ratio again, and then re-coerced. This iterative refinement helps
-        // find the largest size that fits constraints AND maintains the aspect ratio.
-        val adjustedLayoutWidth = if (targetAspectRatio > 0f) (layoutHeight * targetAspectRatio).toInt() else layoutWidth
-        val finalLayoutWidth = adjustedLayoutWidth.coerceIn(constraints.minWidth, constraints.maxWidth)
-
-        // Calculate the final height based on the truly final width.
-        val finalLayoutHeight = if (targetAspectRatio > 0f) (finalLayoutWidth / targetAspectRatio).toInt() else layoutHeight
-        // Coerce this final height one last time.
-        val finalLayoutHeightCoerced = finalLayoutHeight.coerceIn(constraints.minHeight, constraints.maxHeight)
-
-        // Measure the child composable (if any) to fill the dimensions determined for this layout.
-        val placeable = measurable.measure(
-            Constraints.fixed(finalLayoutWidth, finalLayoutHeightCoerced),
-        )
-
-        // Set the size of this custom layout to the calculated final dimensions
-        // and place the child within it.
-        layout(finalLayoutWidth, finalLayoutHeightCoerced) {
-            placeable.placeRelative(0, 0)
-        }
-    }

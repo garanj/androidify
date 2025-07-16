@@ -172,15 +172,13 @@ private fun CustomizeExportContents(
                 ImageResult(
                     this,
                     modifier = Modifier
-                        .padding(16.dp)
-                        .then(animateBoundsModifier)
-                        .dropShadow(
-                            RoundedCornerShape(6),
-                            shadow = Shadow(radius = 26.dp,
-                                spread = 10.dp,
-                                color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f))
-                        )
-
+                        .padding(16.dp),
+                    uiDisplayModifier = animateBoundsModifier.dropShadow(
+                        RoundedCornerShape(6),
+                        shadow = Shadow(radius = 26.dp,
+                            spread = 10.dp,
+                            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f))
+                    ),
                 )
             }
         }
