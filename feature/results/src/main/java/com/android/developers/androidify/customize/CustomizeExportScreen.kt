@@ -23,6 +23,8 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.animateBounds
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -52,15 +54,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.movableContentWithReceiverOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
+import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
@@ -74,6 +81,7 @@ import com.android.developers.androidify.results.PermissionRationaleDialog
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.results.shareImage
 import com.android.developers.androidify.theme.AndroidifyTheme
+import com.android.developers.androidify.theme.LocalSharedTransitionScope
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.theme.components.SecondaryOutlinedButton
@@ -157,12 +165,24 @@ private fun CustomizeExportContents(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
-        val imageResult = @Composable { modifier: Modifier ->
-            ImageResult(
-                state.exportImageCanvas,
-                modifier = modifier
-                    .padding(16.dp)
-            )
+        val animateBoundsModifier = Modifier.animateBounds(
+            lookaheadScope = LocalSharedTransitionScope.current)
+        val imageResult = remember {
+            movableContentWithReceiverOf<ExportImageCanvas> {
+                ImageResult(
+                    this,
+                    modifier = Modifier
+                        .padding(16.dp)
+                        .then(animateBoundsModifier)
+                        .dropShadow(
+                            RoundedCornerShape(6),
+                            shadow = Shadow(radius = 26.dp,
+                                spread = 10.dp,
+                                color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f))
+                        )
+
+                )
+            }
         }
         val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
             ToolSelector(
@@ -205,8 +225,7 @@ private fun CustomizeExportContents(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 imageResult(
-                    Modifier
-                        .weight(1f, fill = true),
+                    state.exportImageCanvas
                 )
                 Column(
                     Modifier
@@ -253,9 +272,7 @@ private fun CustomizeExportContents(
                     contentAlignment = Alignment.Center,
                 ) {
                     imageResult(
-                        Modifier
-                            .aspectRatio(state.exportImageCanvas.aspectRatioOption.aspectRatio, matchHeightConstraintsFirst = true)
-
+                        state.exportImageCanvas
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))
