@@ -20,12 +20,9 @@ package com.android.developers.androidify.customize
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateOffsetAsState
-import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -57,7 +54,7 @@ import com.android.developers.androidify.theme.LocalAnimateBoundsScope
 fun ImageResult(
     exportImageCanvas: ExportImageCanvas,
     modifier: Modifier = Modifier,
-    outerChromeModifier: Modifier = Modifier
+    outerChromeModifier: Modifier = Modifier,
 ) {
     Box(
         modifier = modifier,
@@ -97,8 +94,10 @@ fun BackgroundLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Box(modifier = modifier.fillMaxSize()
-        .background(Color.White)) {
+    Box(
+        modifier = modifier.fillMaxSize()
+            .background(Color.White),
+    ) {
         if (exportImageCanvas.selectedBackgroundDrawable != null) {
             Image(
                 bitmap = ImageBitmap.imageResource(id = exportImageCanvas.selectedBackgroundDrawable),
@@ -111,15 +110,15 @@ fun BackgroundLayout(
         val rotationAnimation by animateFloatAsState(
             targetValue = exportImageCanvas.imageRotation,
             label = "rotation",
-            animationSpec = MaterialTheme.motionScheme.slowEffectsSpec()
+            animationSpec = MaterialTheme.motionScheme.slowEffectsSpec(),
         )
         val safeAnimateBounds = Modifier.safeAnimateBounds()
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .layout { measurable, constraints ->
-                    val offsetValue =  exportImageCanvas.imageOffset
-                    val imageSizeValue =exportImageCanvas.imageSize
+                    val offsetValue = exportImageCanvas.imageOffset
+                    val imageSizeValue = exportImageCanvas.imageSize
                     val exportCanvasSizeAnimation = exportImageCanvas.canvasSize
 
                     val actualWidth = constraints.maxWidth
@@ -171,13 +170,16 @@ fun BackgroundLayout(
 @Composable
 private fun Modifier.safeAnimateBounds(): Modifier {
     val spec = MaterialTheme.motionScheme.slowEffectsSpec<Rect>()
-    return if (LocalAnimateBoundsScope.current != null)
+    return if (LocalAnimateBoundsScope.current != null) {
         this.animateBounds(
             LocalAnimateBoundsScope.current!!,
             boundsTransform = { _, _ ->
                 spec
             },
-        ) else this
+        )
+    } else {
+        this
+    }
 }
 
 @Preview
@@ -303,7 +305,7 @@ fun ImageRendererPreviewWallpaperIO() {
                 aspectRatioOption = SizeOption.SocialHeader,
                 selectedBackgroundOption = BackgroundOption.IO,
 
-                ).updateAspectRatioAndBackground(
+            ).updateAspectRatioAndBackground(
                 backgroundOption = BackgroundOption.IO,
                 sizeOption = SizeOption.SocialHeader,
             ),

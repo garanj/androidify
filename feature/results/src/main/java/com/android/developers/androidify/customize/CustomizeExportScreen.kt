@@ -23,7 +23,6 @@ import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.animateBounds
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -61,7 +60,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.shadow.Shadow
@@ -81,7 +79,6 @@ import com.android.developers.androidify.results.R
 import com.android.developers.androidify.results.shareImage
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LocalAnimateBoundsScope
-import com.android.developers.androidify.theme.LocalSharedTransitionScope
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.theme.components.SecondaryOutlinedButton
@@ -243,7 +240,7 @@ private fun CustomizeExportContents(
                                 horizontalArrangement = Arrangement.SpaceAround,
                                 verticalAlignment = Alignment.CenterVertically,
 
-                                ) {
+                            ) {
                                 Box(modifier = Modifier.weight(1f)) {
                                     toolDetail(Modifier.align(Alignment.CenterEnd), false)
                                 }
@@ -288,7 +285,6 @@ private fun CustomizeExportContents(
                 }
             }
         }
-
     }
 }
 
