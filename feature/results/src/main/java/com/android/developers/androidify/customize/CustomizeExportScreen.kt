@@ -223,7 +223,7 @@ private fun CustomizeExportContents(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Box(modifier = Modifier.weight(1f),
+                        Box(modifier = Modifier.weight(0.6f),
                             contentAlignment = Alignment.Center) {
                             imageResult(
                                 state.exportImageCanvas,
@@ -231,7 +231,7 @@ private fun CustomizeExportContents(
                         }
                         Column(
                             Modifier
-                                .weight(1f)
+                                .weight(0.4f)
                                 .fillMaxHeight(),
                             horizontalAlignment = Alignment.CenterHorizontally,
                             verticalArrangement = Arrangement.SpaceBetween,

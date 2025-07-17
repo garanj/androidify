@@ -61,7 +61,7 @@ class CustomizeStateTest {
     @Test
     fun backgroundToolState_defaultValues() {
         val state = BackgroundToolState()
-        Assert.assertEquals(BackgroundOption.None, state.selectedToolOption)
+        Assert.assertEquals(BackgroundOption.IO, state.selectedToolOption)
         Assert.assertEquals(
             listOf(
                 BackgroundOption.None,
@@ -80,7 +80,7 @@ class CustomizeStateTest {
         Assert.assertEquals(SizeOption.Square, canvas.aspectRatioOption)
         Assert.assertEquals(Size(1000f, 1000f), canvas.canvasSize)
         Assert.assertNull(canvas.mainImageUri)
-        Assert.assertEquals(Size(1000f, 1000f), canvas.imageSize)
+        Assert.assertEquals(Size(600f, 600f), canvas.imageSize)
         Assert.assertEquals(Offset.Companion.Zero, canvas.imageOffset)
         Assert.assertEquals(0f, canvas.imageRotation)
         Assert.assertEquals(Size(1024f, 1024f), canvas.imageOriginalBitmapSize)
