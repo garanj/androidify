@@ -13,19 +13,24 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+@file:OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
+
 package com.android.developers.androidify.customize
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
+import androidx.compose.animation.animateBounds
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -33,6 +38,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
@@ -42,15 +48,16 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.util.fastRoundToInt
 import com.android.developers.androidify.results.R
-
+import com.android.developers.androidify.theme.AndroidifyTheme
+import com.android.developers.androidify.theme.LocalAnimateBoundsScope
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
 fun ImageResult(
     exportImageCanvas: ExportImageCanvas,
     modifier: Modifier = Modifier,
-    // Modifier only for display not end render
-    uiDisplayModifier: Modifier = Modifier,
+    outerChromeModifier: Modifier = Modifier
 ) {
     Box(
         modifier = modifier,
@@ -62,8 +69,8 @@ fun ImageResult(
                     exportImageCanvas.aspectRatioOption.aspectRatio,
                     matchHeightConstraintsFirst = true,
                 )
-                .then(uiDisplayModifier)
-                .background(Color.White)
+                .then(Modifier.safeAnimateBounds())
+                .then(outerChromeModifier)
                 .clipToBounds(),
         ) {
             BackgroundLayout(
@@ -90,7 +97,8 @@ fun BackgroundLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
+    Box(modifier = modifier.fillMaxSize()
+        .background(Color.White)) {
         if (exportImageCanvas.selectedBackgroundDrawable != null) {
             Image(
                 bitmap = ImageBitmap.imageResource(id = exportImageCanvas.selectedBackgroundDrawable),
@@ -100,32 +108,19 @@ fun BackgroundLayout(
             )
         }
 
-        val offset by animateOffsetAsState(
-            targetValue = exportImageCanvas.imageOffset,
-            label = "offset",
-        )
-        val animatedImageSize by animateSizeAsState(
-            targetValue = exportImageCanvas.imageSize,
-            label = "imageSize",
-        )
         val rotationAnimation by animateFloatAsState(
             targetValue = exportImageCanvas.imageRotation,
             label = "rotation",
+            animationSpec = MaterialTheme.motionScheme.slowEffectsSpec()
         )
-        val exportCanvasSizeAnimation by animateSizeAsState(
-            targetValue = exportImageCanvas.canvasSize,
-            label = "canvas size",
-        )
-
+        val safeAnimateBounds = Modifier.safeAnimateBounds()
         Box(
             modifier = Modifier
                 .fillMaxSize()
                 .layout { measurable, constraints ->
-                    val offsetValue = if (isLookingAhead) exportImageCanvas.imageOffset else offset
-                    val imageSizeValue =
-                        if (isLookingAhead) exportImageCanvas.imageSize else animatedImageSize
-                    val exportCanvasSizeAnimation =
-                        if (isLookingAhead) exportImageCanvas.canvasSize else exportCanvasSizeAnimation
+                    val offsetValue =  exportImageCanvas.imageOffset
+                    val imageSizeValue =exportImageCanvas.imageSize
+                    val exportCanvasSizeAnimation = exportImageCanvas.canvasSize
 
                     val actualWidth = constraints.maxWidth
                     val actualHeight = constraints.maxHeight
@@ -143,16 +138,17 @@ fun BackgroundLayout(
 
                     val placeable = measurable.measure(
                         constraints.copy(
-                            minWidth = scaledImageWidth.toInt(),
-                            maxWidth = scaledImageWidth.toInt(),
-                            minHeight = scaledImageHeight.toInt(),
-                            maxHeight = scaledImageHeight.toInt(),
+                            minWidth = scaledImageWidth.fastRoundToInt(),
+                            maxWidth = scaledImageWidth.fastRoundToInt(),
+                            minHeight = scaledImageHeight.fastRoundToInt(),
+                            maxHeight = scaledImageHeight.fastRoundToInt(),
                         ),
                     )
                     layout(actualWidth, actualHeight) {
-                        placeable.placeRelative(scaledOffsetX.toInt(), scaledOffsetY.toInt())
+                        placeable.placeRelative(scaledOffsetX.fastRoundToInt(), scaledOffsetY.fastRoundToInt())
                     }
                 }
+                .then(safeAnimateBounds)
                 .rotate(rotationAnimation),
         ) {
             val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None) {
@@ -172,129 +168,148 @@ fun BackgroundLayout(
     }
 }
 
+@Composable
+private fun Modifier.safeAnimateBounds(): Modifier {
+    val spec = MaterialTheme.motionScheme.slowEffectsSpec<Rect>()
+    return if (LocalAnimateBoundsScope.current != null)
+        this.animateBounds(
+            LocalAnimateBoundsScope.current!!,
+            boundsTransform = { _, _ ->
+                spec
+            },
+        ) else this
+}
+
 @Preview
 @Composable
 private fun ImageRendererPreviewSquare() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
 
-    ImageResult(
-        ExportImageCanvas(
-            imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = Size(1000f, 1000f),
-            aspectRatioOption = SizeOption.Square,
-            selectedBackgroundOption = BackgroundOption.IO,
+    AndroidifyTheme {
+        ImageResult(
+            ExportImageCanvas(
+                imageBitmap = bitmap.asAndroidBitmap(),
+                canvasSize = Size(1000f, 1000f),
+                aspectRatioOption = SizeOption.Square,
+                selectedBackgroundOption = BackgroundOption.IO,
+            )
+                .updateAspectRatioAndBackground(
+                    backgroundOption = BackgroundOption.IO,
+                    sizeOption = SizeOption.Square,
+                ),
+            modifier = Modifier
+                .fillMaxSize(),
         )
-            .updateAspectRatioAndBackground(
-                backgroundOption = BackgroundOption.IO,
-                sizeOption = SizeOption.Square,
-            ),
-        modifier = Modifier
-            .fillMaxSize(),
-    )
+    }
 }
 
 @Preview
 @Composable
 private fun ImageRendererPreviewBanner() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-
-    ImageResult(
-        ExportImageCanvas(
-            imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = Size(1000f, 1000f),
-            aspectRatioOption = SizeOption.Banner,
-            selectedBackgroundOption = BackgroundOption.Lightspeed,
-        ).updateAspectRatioAndBackground(
-            backgroundOption = BackgroundOption.Lightspeed,
-            sizeOption = SizeOption.Banner,
-        ),
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(SizeOption.Banner.aspectRatio),
-    )
+    AndroidifyTheme {
+        ImageResult(
+            ExportImageCanvas(
+                imageBitmap = bitmap.asAndroidBitmap(),
+                canvasSize = Size(1000f, 1000f),
+                aspectRatioOption = SizeOption.Banner,
+                selectedBackgroundOption = BackgroundOption.Lightspeed,
+            ).updateAspectRatioAndBackground(
+                backgroundOption = BackgroundOption.Lightspeed,
+                sizeOption = SizeOption.Banner,
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(SizeOption.Banner.aspectRatio),
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun ImageRendererPreviewWallpaper() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-
-    ImageResult(
-        ExportImageCanvas(
-            imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = Size(1000f, 1000f),
-            aspectRatioOption = SizeOption.Wallpaper,
-            selectedBackgroundOption = BackgroundOption.Lightspeed,
-        ).updateAspectRatioAndBackground(
-            backgroundOption = BackgroundOption.Lightspeed,
-            sizeOption = SizeOption.Wallpaper,
-        ),
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(SizeOption.Wallpaper.aspectRatio),
-    )
+    AndroidifyTheme {
+        ImageResult(
+            ExportImageCanvas(
+                imageBitmap = bitmap.asAndroidBitmap(),
+                canvasSize = Size(1000f, 1000f),
+                aspectRatioOption = SizeOption.Wallpaper,
+                selectedBackgroundOption = BackgroundOption.Lightspeed,
+            ).updateAspectRatioAndBackground(
+                backgroundOption = BackgroundOption.Lightspeed,
+                sizeOption = SizeOption.Wallpaper,
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(SizeOption.Wallpaper.aspectRatio),
+        )
+    }
 }
 
 @Preview(widthDp = 1280, heightDp = 800)
 @Composable
 private fun ImageRendererPreviewWallpaperTablet() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-
-    ImageResult(
-        ExportImageCanvas(
-            imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = Size(1280f, 800f),
-            aspectRatioOption = SizeOption.WallpaperTablet,
-            selectedBackgroundOption = BackgroundOption.Lightspeed,
-        ).updateAspectRatioAndBackground(
-            backgroundOption = BackgroundOption.Lightspeed,
-            sizeOption = SizeOption.WallpaperTablet,
-        ),
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(SizeOption.WallpaperTablet.aspectRatio),
-    )
+    AndroidifyTheme {
+        ImageResult(
+            ExportImageCanvas(
+                imageBitmap = bitmap.asAndroidBitmap(),
+                canvasSize = Size(1280f, 800f),
+                aspectRatioOption = SizeOption.WallpaperTablet,
+                selectedBackgroundOption = BackgroundOption.Lightspeed,
+            ).updateAspectRatioAndBackground(
+                backgroundOption = BackgroundOption.Lightspeed,
+                sizeOption = SizeOption.WallpaperTablet,
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(SizeOption.WallpaperTablet.aspectRatio),
+        )
+    }
 }
 
 @Preview
 @Composable
 private fun ImageRendererPreviewWallpaperSocial() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-
-    ImageResult(
-        ExportImageCanvas(
-            imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = Size(1600f, 900f),
-            aspectRatioOption = SizeOption.SocialHeader,
-            selectedBackgroundOption = BackgroundOption.Lightspeed,
-        ).updateAspectRatioAndBackground(
-            backgroundOption = BackgroundOption.Lightspeed,
-            sizeOption = SizeOption.SocialHeader,
-        ),
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(SizeOption.SocialHeader.aspectRatio),
-    )
+    AndroidifyTheme {
+        ImageResult(
+            ExportImageCanvas(
+                imageBitmap = bitmap.asAndroidBitmap(),
+                canvasSize = Size(1600f, 900f),
+                aspectRatioOption = SizeOption.SocialHeader,
+                selectedBackgroundOption = BackgroundOption.Lightspeed,
+            ).updateAspectRatioAndBackground(
+                backgroundOption = BackgroundOption.Lightspeed,
+                sizeOption = SizeOption.SocialHeader,
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(SizeOption.SocialHeader.aspectRatio),
+        )
+    }
 }
 
 @Preview
 @Composable
 fun ImageRendererPreviewWallpaperIO() {
     val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+    AndroidifyTheme {
+        ImageResult(
+            ExportImageCanvas(
+                imageBitmap = bitmap.asAndroidBitmap(),
+                canvasSize = Size(1600f, 900f),
+                aspectRatioOption = SizeOption.SocialHeader,
+                selectedBackgroundOption = BackgroundOption.IO,
 
-    ImageResult(
-        ExportImageCanvas(
-            imageBitmap = bitmap.asAndroidBitmap(),
-            canvasSize = Size(1600f, 900f),
-            aspectRatioOption = SizeOption.SocialHeader,
-            selectedBackgroundOption = BackgroundOption.IO,
-
-        ).updateAspectRatioAndBackground(
-            backgroundOption = BackgroundOption.IO,
-            sizeOption = SizeOption.SocialHeader,
-        ),
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(SizeOption.SocialHeader.aspectRatio),
-    )
+                ).updateAspectRatioAndBackground(
+                backgroundOption = BackgroundOption.IO,
+                sizeOption = SizeOption.SocialHeader,
+            ),
+            modifier = Modifier
+                .fillMaxSize()
+                .aspectRatio(SizeOption.SocialHeader.aspectRatio),
+        )
+    }
 }
