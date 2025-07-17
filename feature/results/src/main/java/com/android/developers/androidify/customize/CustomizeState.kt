@@ -55,7 +55,7 @@ data class AspectRatioToolState(
 ) : ToolState
 
 data class BackgroundToolState(
-    override val selectedToolOption: BackgroundOption = BackgroundOption.None,
+    override val selectedToolOption: BackgroundOption = BackgroundOption.IO,
     override val options: List<BackgroundOption> = listOf(
         BackgroundOption.None,
         BackgroundOption.Plain,
@@ -75,7 +75,7 @@ data class ExportImageCanvas(
     val imageOriginalBitmapSize: Size? = Size(1024f, 1024f),
     val selectedBackgroundOption: BackgroundOption = BackgroundOption.IO,
     @param:DrawableRes
-    val selectedBackgroundDrawable: Int? = com.android.developers.androidify.results.R.drawable.background_square_none,
+    val selectedBackgroundDrawable: Int? = com.android.developers.androidify.results.R.drawable.background_square_blocks,
     val includeWatermark: Boolean = true,
 ) {
     fun updateAspectRatioAndBackground(

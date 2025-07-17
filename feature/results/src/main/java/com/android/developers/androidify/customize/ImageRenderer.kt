@@ -30,6 +30,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
+import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -56,6 +57,7 @@ import com.android.developers.androidify.theme.LocalSharedTransitionScope
 fun ImageResult(
     exportImageCanvas: ExportImageCanvas,
     modifier: Modifier = Modifier,
+    // Modifier only for display not end render
     uiDisplayModifier: Modifier = Modifier,
 ) {
     Box(
@@ -158,16 +160,12 @@ fun BackgroundLayout(
                 }
                 .rotate(rotationAnimation),
         ) {
+            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None)
+                Modifier else  Modifier.clip(RoundedCornerShape(6))
             Box(
                 modifier = Modifier
                     .fillMaxSize()
-                    .clip(
-                        RoundedCornerShape(
-                            percent =
-                                if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None)
-                                    0 else 6,
-                        ),
-                    ),
+                    .then(clip),
                 contentAlignment = Alignment.Center,
             ) {
                 content()

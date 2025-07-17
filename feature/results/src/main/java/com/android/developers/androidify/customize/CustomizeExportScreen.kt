@@ -43,6 +43,7 @@ import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
@@ -85,6 +86,7 @@ import com.android.developers.androidify.theme.LocalSharedTransitionScope
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.theme.components.SecondaryOutlinedButton
+import com.android.developers.androidify.theme.sharedElementTransitionBounds
 import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.allowsFullContent
@@ -132,7 +134,7 @@ fun CustomizeAndExportScreen(
     )
 }
 
-@OptIn(ExperimentalSharedTransitionApi::class)
+@OptIn(ExperimentalSharedTransitionApi::class, ExperimentalMaterial3ExpressiveApi::class)
 @Composable
 private fun CustomizeExportContents(
     state: CustomizeExportState,
@@ -166,7 +168,8 @@ private fun CustomizeExportContents(
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         val animateBoundsModifier = Modifier.animateBounds(
-            lookaheadScope = LocalSharedTransitionScope.current)
+            lookaheadScope = LocalSharedTransitionScope.current,
+            boundsTransform = MaterialTheme.motionScheme.sharedElementTransitionBounds)
         val imageResult = remember {
             movableContentWithReceiverOf<ExportImageCanvas> {
                 ImageResult(
