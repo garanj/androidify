@@ -81,11 +81,11 @@ class CustomizeStateTest {
         Assert.assertEquals(Size(1000f, 1000f), canvas.canvasSize)
         Assert.assertNull(canvas.mainImageUri)
         Assert.assertEquals(Size(600f, 600f), canvas.imageSize)
-        Assert.assertEquals(Offset.Companion.Zero, canvas.imageOffset)
+        Assert.assertEquals(Offset(200f, 160f), canvas.imageOffset)
         Assert.assertEquals(0f, canvas.imageRotation)
         Assert.assertEquals(Size(1024f, 1024f), canvas.imageOriginalBitmapSize)
-        Assert.assertEquals(BackgroundOption.None, canvas.selectedBackgroundOption)
-        Assert.assertEquals(R.drawable.background_square_none, canvas.selectedBackgroundDrawable)
+        Assert.assertEquals(BackgroundOption.IO, canvas.selectedBackgroundOption)
+        Assert.assertEquals(com.android.developers.androidify.results.R.drawable.background_square_blocks, canvas.selectedBackgroundDrawable)
         Assert.assertTrue(canvas.includeWatermark)
     }
 
