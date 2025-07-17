@@ -48,7 +48,7 @@ sealed class BackgroundOption(
     val previewDrawableInt: Int?,
 ) : ToolOption {
     object None : BackgroundOption("None", "None", null)
-    object Plain: BackgroundOption("Plain", "Plain", null)
+    object Plain : BackgroundOption("Plain", "Plain", null)
     object Lightspeed : BackgroundOption(
         "Lightspeed",
         "Lightspeed",

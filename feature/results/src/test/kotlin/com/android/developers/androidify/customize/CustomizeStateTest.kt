@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.android.developers.androidify.customize
 
 import androidx.compose.ui.geometry.Offset
@@ -7,7 +22,6 @@ import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import org.robolectric.annotation.Config
 
 @RunWith(RobolectricTestRunner::class)
 class CustomizeStateTest {
@@ -40,7 +54,7 @@ class CustomizeStateTest {
                 SizeOption.Banner,
                 SizeOption.SocialHeader,
             ),
-            state.options
+            state.options,
         )
     }
 
@@ -55,7 +69,7 @@ class CustomizeStateTest {
                 BackgroundOption.Lightspeed,
                 BackgroundOption.IO,
             ),
-            state.options
+            state.options,
         )
     }
 
@@ -80,7 +94,7 @@ class CustomizeStateTest {
         val initialCanvas = ExportImageCanvas()
         val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.None,
-            sizeOption = SizeOption.Square
+            sizeOption = SizeOption.Square,
         )
 
         Assert.assertEquals(SizeOption.Square, updatedCanvas.aspectRatioOption)
@@ -99,7 +113,7 @@ class CustomizeStateTest {
         val initialCanvas = ExportImageCanvas()
         val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.IO,
-            sizeOption = SizeOption.Square
+            sizeOption = SizeOption.Square,
         )
         val newCanvasSize = SizeOption.Square.dimensions
 
@@ -108,16 +122,16 @@ class CustomizeStateTest {
         Assert.assertEquals(newCanvasSize, updatedCanvas.canvasSize)
         Assert.assertEquals(
             R.drawable.background_square_blocks,
-            updatedCanvas.selectedBackgroundDrawable
+            updatedCanvas.selectedBackgroundDrawable,
         )
         Assert.assertEquals(0f, updatedCanvas.imageRotation)
         Assert.assertEquals(
             Size(newCanvasSize.width * 0.6f, newCanvasSize.width * 0.6f),
-            updatedCanvas.imageSize
+            updatedCanvas.imageSize,
         )
         Assert.assertEquals(
             Offset(newCanvasSize.width * 0.2f, newCanvasSize.height * 0.16f),
-            updatedCanvas.imageOffset
+            updatedCanvas.imageOffset,
         )
     }
 
@@ -126,7 +140,7 @@ class CustomizeStateTest {
         val initialCanvas = ExportImageCanvas()
         val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.Lightspeed,
-            sizeOption = SizeOption.Banner
+            sizeOption = SizeOption.Banner,
         )
         val newCanvasSize = SizeOption.Banner.dimensions
 
@@ -135,16 +149,16 @@ class CustomizeStateTest {
         Assert.assertEquals(newCanvasSize, updatedCanvas.canvasSize)
         Assert.assertEquals(
             R.drawable.background_banner_lightspeed,
-            updatedCanvas.selectedBackgroundDrawable
+            updatedCanvas.selectedBackgroundDrawable,
         )
         Assert.assertEquals(-11f, updatedCanvas.imageRotation)
         Assert.assertEquals(
             Size(newCanvasSize.width * 0.26f, newCanvasSize.width * 0.26f),
-            updatedCanvas.imageSize
+            updatedCanvas.imageSize,
         )
         Assert.assertEquals(
             Offset(newCanvasSize.width * 0.51f, newCanvasSize.height * -0.03f),
-            updatedCanvas.imageOffset
+            updatedCanvas.imageOffset,
         )
     }
 
@@ -153,7 +167,7 @@ class CustomizeStateTest {
         val initialCanvas = ExportImageCanvas()
         val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.Plain,
-            sizeOption = SizeOption.SocialHeader
+            sizeOption = SizeOption.SocialHeader,
         )
         val newCanvasSize = SizeOption.SocialHeader.dimensions
 
@@ -162,16 +176,16 @@ class CustomizeStateTest {
         Assert.assertEquals(newCanvasSize, updatedCanvas.canvasSize)
         Assert.assertEquals(
             R.drawable.background_social_header_plain,
-            updatedCanvas.selectedBackgroundDrawable
+            updatedCanvas.selectedBackgroundDrawable,
         )
         Assert.assertEquals(-9f, updatedCanvas.imageRotation)
         Assert.assertEquals(
             Size(newCanvasSize.width * 0.26f, newCanvasSize.width * 0.3f),
-            updatedCanvas.imageSize
+            updatedCanvas.imageSize,
         )
         Assert.assertEquals(
             Offset(newCanvasSize.width * 0.49f, newCanvasSize.height * 0.01f),
-            updatedCanvas.imageOffset
+            updatedCanvas.imageOffset,
         )
     }
 
@@ -180,7 +194,7 @@ class CustomizeStateTest {
         val initialCanvas = ExportImageCanvas()
         val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.IO,
-            sizeOption = SizeOption.Wallpaper
+            sizeOption = SizeOption.Wallpaper,
         )
         val newCanvasSize = SizeOption.Wallpaper.dimensions
 
@@ -189,16 +203,16 @@ class CustomizeStateTest {
         Assert.assertEquals(newCanvasSize, updatedCanvas.canvasSize)
         Assert.assertEquals(
             R.drawable.background_wallpaper_shapes,
-            updatedCanvas.selectedBackgroundDrawable
+            updatedCanvas.selectedBackgroundDrawable,
         )
         Assert.assertEquals(-9f, updatedCanvas.imageRotation)
         Assert.assertEquals(
             Size(newCanvasSize.width * 1.1f, newCanvasSize.width * 1.3f),
-            updatedCanvas.imageSize
+            updatedCanvas.imageSize,
         )
         Assert.assertEquals(
             Offset(newCanvasSize.width * -0.02f, newCanvasSize.height * 0.1f),
-            updatedCanvas.imageOffset
+            updatedCanvas.imageOffset,
         )
     }
 
@@ -207,7 +221,7 @@ class CustomizeStateTest {
         val initialCanvas = ExportImageCanvas()
         val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
             backgroundOption = BackgroundOption.None,
-            sizeOption = SizeOption.WallpaperTablet
+            sizeOption = SizeOption.WallpaperTablet,
         )
         val newCanvasSize = SizeOption.WallpaperTablet.dimensions
 

@@ -24,7 +24,6 @@ import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.animateBounds
-import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -32,7 +31,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -61,14 +59,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
@@ -169,7 +164,8 @@ private fun CustomizeExportContents(
     ) { paddingValues ->
         val animateBoundsModifier = Modifier.animateBounds(
             lookaheadScope = LocalSharedTransitionScope.current,
-            boundsTransform = MaterialTheme.motionScheme.sharedElementTransitionBounds)
+            boundsTransform = MaterialTheme.motionScheme.sharedElementTransitionBounds,
+        )
         val imageResult = remember {
             movableContentWithReceiverOf<ExportImageCanvas> {
                 ImageResult(
@@ -178,9 +174,11 @@ private fun CustomizeExportContents(
                         .padding(16.dp),
                     uiDisplayModifier = animateBoundsModifier.dropShadow(
                         RoundedCornerShape(6),
-                        shadow = Shadow(radius = 26.dp,
+                        shadow = Shadow(
+                            radius = 26.dp,
                             spread = 10.dp,
-                            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f))
+                            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f),
+                        ),
                     ),
                 )
             }
@@ -226,7 +224,7 @@ private fun CustomizeExportContents(
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 imageResult(
-                    state.exportImageCanvas
+                    state.exportImageCanvas,
                 )
                 Column(
                     Modifier
@@ -273,7 +271,7 @@ private fun CustomizeExportContents(
                     contentAlignment = Alignment.Center,
                 ) {
                     imageResult(
-                        state.exportImageCanvas
+                        state.exportImageCanvas,
                     )
                 }
                 Spacer(modifier = Modifier.height(16.dp))

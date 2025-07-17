@@ -120,7 +120,6 @@ data class ExportImageCanvas(
                     }
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_banner_plain
                 }
-
             }
             SizeOption.SocialHeader -> {
                 offset = Offset(newCanvasSize.width * 0.49f, newCanvasSize.height * 0.01f)
@@ -137,7 +136,6 @@ data class ExportImageCanvas(
                     }
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_social_header_plain
                 }
-
             }
 
             SizeOption.Wallpaper -> {
@@ -155,7 +153,6 @@ data class ExportImageCanvas(
                     }
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_plain
                 }
-
             }
 
             SizeOption.WallpaperTablet -> {
@@ -173,7 +170,6 @@ data class ExportImageCanvas(
                     }
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_light
                 }
-
             }
         }
         return copy(

@@ -16,9 +16,7 @@
 package com.android.developers.androidify.customize
 
 import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.animateBounds
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.animateIntOffsetAsState
 import androidx.compose.animation.core.animateOffsetAsState
 import androidx.compose.animation.core.animateSizeAsState
 import androidx.compose.foundation.Image
@@ -26,11 +24,8 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.SmallFloatingActionButton
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
@@ -47,10 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.Constraints
-import androidx.compose.ui.unit.IntOffset
 import com.android.developers.androidify.results.R
-import com.android.developers.androidify.theme.LocalSharedTransitionScope
 
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
 @Composable
@@ -64,7 +56,6 @@ fun ImageResult(
         modifier = modifier,
         contentAlignment = Alignment.Center,
     ) {
-
         Box(
             modifier = Modifier
                 .aspectRatio(
@@ -110,16 +101,20 @@ fun BackgroundLayout(
         }
 
         val offset by animateOffsetAsState(
-            targetValue = exportImageCanvas.imageOffset, label = "offset",
+            targetValue = exportImageCanvas.imageOffset,
+            label = "offset",
         )
         val animatedImageSize by animateSizeAsState(
-            targetValue = exportImageCanvas.imageSize, label = "imageSize",
+            targetValue = exportImageCanvas.imageSize,
+            label = "imageSize",
         )
         val rotationAnimation by animateFloatAsState(
-            targetValue = exportImageCanvas.imageRotation, label = "rotation",
+            targetValue = exportImageCanvas.imageRotation,
+            label = "rotation",
         )
         val exportCanvasSizeAnimation by animateSizeAsState(
-            targetValue = exportImageCanvas.canvasSize, label = "canvas size",
+            targetValue = exportImageCanvas.canvasSize,
+            label = "canvas size",
         )
 
         Box(
@@ -160,8 +155,11 @@ fun BackgroundLayout(
                 }
                 .rotate(rotationAnimation),
         ) {
-            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None)
-                Modifier else  Modifier.clip(RoundedCornerShape(6))
+            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None) {
+                Modifier
+            } else {
+                Modifier.clip(RoundedCornerShape(6))
+            }
             Box(
                 modifier = Modifier
                     .fillMaxSize()
