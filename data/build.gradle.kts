@@ -47,6 +47,7 @@ androidComponents {
 dependencies {
     implementation(projects.core.network)
     implementation(projects.core.util)
+    implementation(projects.wear.common)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
@@ -59,5 +60,9 @@ dependencies {
     implementation(libs.ai.edge) {
         exclude(group = "com.google.guava")
     }
+
+    implementation(libs.play.services.wearable)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.serialization.protobuf)
     ksp(libs.hilt.compiler)
 }

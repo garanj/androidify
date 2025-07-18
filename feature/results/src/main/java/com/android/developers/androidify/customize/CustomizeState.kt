@@ -22,6 +22,8 @@ import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.R
 import androidx.compose.ui.geometry.Size
+import com.android.developers.androidify.data.ConnectedDevice
+import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 
 data class CustomizeExportState(
     val originalImageUrl: Uri? = null,
@@ -35,7 +37,7 @@ data class CustomizeExportState(
         CustomizeTool.Background to BackgroundToolState(),
     ),
     val exportImageCanvas: ExportImageCanvas = ExportImageCanvas(),
-
+    val installationStatus: WatchFaceInstallationStatus = WatchFaceInstallationStatus.NotStarted
 )
 
 interface ToolState {

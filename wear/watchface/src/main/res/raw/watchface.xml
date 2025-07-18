@@ -1,0 +1,54 @@
+<?xml version="1.0"?>
+<WatchFace
+    clipShape="CIRCLE"
+    height="450"
+    width="450">
+    <Metadata
+        key="CLOCK_TYPE"
+        value="DIGITAL" />
+    <Scene>
+        <PartImage
+            height="200"
+            width="200"
+            x="125"
+            y="50">
+            <Image resource="logo" />
+        </PartImage>
+        <Group
+            name="setup"
+            height="100"
+            width="250"
+            x="100"
+            y="275">
+            <Launch target="com.android.developers.androidify/com.android.developers.androidify.LaunchOnPhoneActivity" />
+            <PartDraw
+                height="100"
+                width="250"
+                x="0"
+                y="0">
+                <RoundRectangle
+                    cornerRadiusX="50"
+                    cornerRadiusY="50"
+                    height="100"
+                    width="250"
+                    x="0"
+                    y="0">
+                    <Fill color="#FFFFFF" />
+                </RoundRectangle>
+            </PartDraw>
+            <PartText
+                height="100"
+                width="250"
+                x="0"
+                y="0">
+                <Text>
+                    <Font
+                        color="#000000"
+                        family="SYNC_TO_DEVICE"
+                        size="40">cta
+                    </Font>
+                </Text>
+            </PartText>
+        </Group>
+    </Scene>
+</WatchFace>

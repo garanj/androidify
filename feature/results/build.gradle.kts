@@ -71,6 +71,7 @@ dependencies {
     implementation(projects.core.theme)
     implementation(projects.core.util)
     implementation(projects.data)
+    implementation(projects.wear.common)
     testImplementation(kotlin("test"))
 
     // Android Instrumented Tests

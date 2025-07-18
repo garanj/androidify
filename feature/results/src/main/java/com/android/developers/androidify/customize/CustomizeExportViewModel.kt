@@ -24,23 +24,51 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
+import com.android.developers.androidify.data.WearAssetTransmitter
+import com.android.developers.androidify.data.WearDeviceRepository
+import com.android.developers.androidify.wear.common.WatchFaceInstallError
+import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import java.io.File
 import javax.inject.Inject
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
+    val wearDeviceRepository: WearDeviceRepository,
+    val wearAssetTransmitter: WearAssetTransmitter,
     application: Application,
 ) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state = _state.asStateFlow()
+
+    private var transferJob : Job? = null
+
+    val connectedDevice = wearDeviceRepository.connectedDevice.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5000),
+        initialValue = null
+    )
+
+    init {
+        viewModelScope.launch {
+            wearAssetTransmitter.receiveInstallUpdate().collect {
+                _state.update { state ->
+                    state.copy(installationStatus = it)
+                }
+            }
+        }
+    }
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -142,5 +170,32 @@ class CustomizeExportViewModel @Inject constructor(
         _state.update {
             it.copy(selectedTool = tool)
         }
+    }
+    fun installWatchFace() {
+        transferJob = viewModelScope.launch {
+            val nodeId = connectedDevice.value?.nodeId
+            val resultBitmap = state.value.exportImageCanvas.imageBitmap
+            if (nodeId != null && resultBitmap != null) {
+                _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.Sending) }
+
+                val response = wearAssetTransmitter.doTransfer(nodeId, File(""), "")
+
+                if (response != WatchFaceInstallError.NO_ERROR) {
+                    _state.update {
+                        it.copy(installationStatus = WatchFaceInstallationStatus.Complete(
+                            success = false,
+                            installError = response,
+                            otherNodeId = nodeId,
+                        ))
+                    }
+                }
+            }
+        }
+    }
+
+    fun resetWatchFaceSend() {
+        transferJob?.cancel()
+        transferJob = null
+        _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.NotStarted) }
     }
 }

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalPermissionsApi::class)
+@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 
 package com.android.developers.androidify.customize
 
@@ -48,6 +48,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -74,8 +75,10 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.android.developers.androidify.data.ConnectedDevice
 import com.android.developers.androidify.results.PermissionRationaleDialog
 import com.android.developers.androidify.results.R
+import com.android.developers.androidify.results.WatchFaceModalSheet
 import com.android.developers.androidify.results.shareImage
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LocalAnimateBoundsScope
@@ -106,6 +109,8 @@ fun CustomizeAndExportScreen(
         viewModel.setArguments(resultImage, originalImageUri)
     }
     val state = viewModel.state.collectAsStateWithLifecycle()
+    val connectedDevice by viewModel.connectedDevice.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
     LaunchedEffect(state.value.savedUri) {
         val savedImageUri = state.value.savedUri
@@ -116,6 +121,7 @@ fun CustomizeAndExportScreen(
     }
     CustomizeExportContents(
         state.value,
+        connectedDevice,
         onBackPress,
         onInfoPress,
         onToolSelected = { tool ->
@@ -124,6 +130,12 @@ fun CustomizeAndExportScreen(
         onShareClicked = viewModel::shareClicked,
         onDownloadClicked = viewModel::downloadClicked,
         onSelectedToolStateChanged = viewModel::selectedToolStateChanged,
+        onInstallWatchFaceClicked = {
+            viewModel.installWatchFace()
+        },
+        onResetWatchFaceSend = {
+            viewModel.resetWatchFaceSend()
+        },
         isMediumWindowSize = isMediumWindowSize,
         snackbarHostState = viewModel.snackbarHostState.collectAsStateWithLifecycle().value,
     )
@@ -133,15 +145,20 @@ fun CustomizeAndExportScreen(
 @Composable
 private fun CustomizeExportContents(
     state: CustomizeExportState,
+    connectedDevice: ConnectedDevice?,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
     onShareClicked: () -> Unit,
     onDownloadClicked: () -> Unit,
     onToolSelected: (CustomizeTool) -> Unit,
     onSelectedToolStateChanged: (ToolState) -> Unit,
+    onInstallWatchFaceClicked: () -> Unit,
+    onResetWatchFaceSend: () -> Unit,
     isMediumWindowSize: Boolean,
     snackbarHostState: SnackbarHostState,
 ) {
+    var showBottomSheet by remember { mutableStateOf(false) }
+    val sheetState = rememberModalBottomSheetState()
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -210,8 +227,28 @@ private fun CustomizeExportContents(
                 onDownloadClicked = {
                     onDownloadClicked()
                 },
+                onWearDeviceClick = {
+                    showBottomSheet = true
+                },
+                hasWearDevice = connectedDevice != null,
                 modifier = modifier,
             )
+        }
+        connectedDevice?.let { device ->
+            if (showBottomSheet) {
+                WatchFaceModalSheet(
+                    sheetState = sheetState,
+                    onDismiss = {
+                        onResetWatchFaceSend()
+                        showBottomSheet = false
+                    },
+                    connectedDevice = device,
+                    installationStatus = state.installationStatus,
+                    onWatchFaceInstallClick = {
+                        onInstallWatchFaceClicked()
+                    }
+                )
+            }
         }
         LookaheadScope {
             CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
@@ -339,8 +376,10 @@ fun SelectedToolDetail(
 
 @Composable
 private fun BotActionsButtonRow(
+    onWearDeviceClick: () -> Unit,
     onShareClicked: () -> Unit,
     onDownloadClicked: () -> Unit,
+    hasWearDevice: Boolean,
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = allowsFullContent(),
 ) {
@@ -395,6 +434,20 @@ private fun BotActionsButtonRow(
             },
             modifier = Modifier.fillMaxHeight(),
         )
+        if (hasWearDevice) {
+            Spacer(Modifier.width(8.dp))
+            SecondaryOutlinedButton(
+                onClick = onWearDeviceClick,
+                leadingIcon = {
+                    Icon(
+                        ImageVector
+                            .vectorResource(R.drawable.watch_24),
+                        contentDescription = stringResource(R.string.send_to_watch),
+                    )
+                },
+                modifier = Modifier.fillMaxHeight(),
+            )
+        }
         PermissionRationaleDialog(
             showRationaleDialog,
             onDismiss = {
@@ -417,6 +470,10 @@ fun CustomizeExportPreview() {
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
                 )
+                val connectedDevice = ConnectedDevice(
+                    nodeId = "1234",
+                    displayName = "Pixel Watch 3",
+                    hasAndroidify = true)
                 CustomizeExportContents(
                     state = state,
                     onDownloadClicked = {},
@@ -427,6 +484,9 @@ fun CustomizeExportPreview() {
                     snackbarHostState = SnackbarHostState(),
                     isMediumWindowSize = false,
                     onSelectedToolStateChanged = {},
+                    connectedDevice = connectedDevice,
+                    onInstallWatchFaceClicked = {},
+                    onResetWatchFaceSend = {}
                 )
             }
         }
@@ -448,6 +508,10 @@ fun CustomizeExportPreviewLarge() {
                     ),
                     selectedTool = CustomizeTool.Background,
                 )
+                val connectedDevice = ConnectedDevice(
+                    nodeId = "1234",
+                    displayName = "Pixel Watch 3",
+                    hasAndroidify = true)
                 CustomizeExportContents(
                     state = state,
                     onDownloadClicked = {},
@@ -458,6 +522,9 @@ fun CustomizeExportPreviewLarge() {
                     snackbarHostState = SnackbarHostState(),
                     isMediumWindowSize = true,
                     onSelectedToolStateChanged = {},
+                    connectedDevice = connectedDevice,
+                    onInstallWatchFaceClicked = {},
+                    onResetWatchFaceSend = {}
                 )
             }
         }
