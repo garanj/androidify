@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
+import com.android.developers.androidify.segmentation.SubjectSegmentationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -36,11 +37,13 @@ import javax.inject.Inject
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
+    private val subjectSegmentationHelper: SubjectSegmentationHelper,
     application: Application,
 ) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state = _state.asStateFlow()
+
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -51,6 +54,7 @@ class CustomizeExportViewModel @Inject constructor(
         super.onCleared()
         composableBitmapRenderer.dispose()
     }
+
     fun setArguments(
         resultImageUrl: Bitmap,
         originalImageUrl: Uri?,
@@ -66,12 +70,13 @@ class CustomizeExportViewModel @Inject constructor(
     fun shareClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas
-            val resultBitmap = composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
-                ImageResult(
-                    exportImageCanvas = exportImageCanvas,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+            val resultBitmap =
+                composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+                    ImageResult(
+                        exportImageCanvas = exportImageCanvas,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             if (resultBitmap != null) {
                 val imageFileUri = imageGenerationRepository.saveImage(resultBitmap)
 
@@ -81,45 +86,78 @@ class CustomizeExportViewModel @Inject constructor(
             }
         }
     }
+
     fun onSavedUriConsumed() {
         _state.update {
             it.copy(savedUri = null)
         }
     }
+
     fun selectedToolStateChanged(toolState: ToolState) {
-        _state.update {
-            it.copy(
-                toolState = it.toolState + (it.selectedTool to toolState),
-                exportImageCanvas =
-                when (toolState.selectedToolOption) {
-                    is BackgroundOption -> {
-                        val backgroundOption = toolState.selectedToolOption as BackgroundOption
-                        it.exportImageCanvas.updateAspectRatioAndBackground(
-                            backgroundOption,
-                            it.exportImageCanvas.aspectRatioOption,
-                        )
-                    }
-                    is SizeOption -> {
-                        it.exportImageCanvas.updateAspectRatioAndBackground(
-                            it.exportImageCanvas.selectedBackgroundOption,
-                            (toolState.selectedToolOption as SizeOption),
-                        )
-                    }
-                    else -> throw IllegalArgumentException("Unknown tool option")
-                },
-            )
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    toolState = it.toolState + (it.selectedTool to toolState),
+                    exportImageCanvas =
+                        when (toolState.selectedToolOption) {
+                            is BackgroundOption -> {
+                                val backgroundOption =
+                                    toolState.selectedToolOption as BackgroundOption
+                                it.exportImageCanvas.updateAspectRatioAndBackground(
+                                    backgroundOption,
+                                    it.exportImageCanvas.aspectRatioOption,
+                                )
+                            }
+
+                            is SizeOption -> {
+                                if (toolState.selectedToolOption is SizeOption.Sticker) {
+                                    // TODO kick this off to a background thread and return the
+                                    //  state immediately with loading to ensure that the UI is updated
+                                    val bitmap = state.value.exportImageCanvas.imageBitmap
+                                    if (bitmap != null) {
+                                        val stickerBitmap =
+                                            if (state.value.exportImageCanvas.imageBitmapRemovedBackground == null)
+                                                subjectSegmentationHelper.removeBackground(
+                                                    bitmap,
+                                                )
+                                            else state.value.exportImageCanvas.imageBitmapRemovedBackground
+
+                                        it.exportImageCanvas.copy(imageBitmapRemovedBackground = stickerBitmap)
+                                            .updateAspectRatioAndBackground(
+                                                it.exportImageCanvas.selectedBackgroundOption,
+                                                (toolState.selectedToolOption as SizeOption),
+                                            )
+                                    } else {
+                                        it.exportImageCanvas.updateAspectRatioAndBackground(
+                                            it.exportImageCanvas.selectedBackgroundOption,
+                                            (toolState.selectedToolOption as SizeOption),
+                                        )
+                                    }
+                                } else {
+                                    it.exportImageCanvas.updateAspectRatioAndBackground(
+                                        it.exportImageCanvas.selectedBackgroundOption,
+                                        (toolState.selectedToolOption as SizeOption),
+                                    )
+                                }
+                            }
+
+                            else -> throw IllegalArgumentException("Unknown tool option")
+                        },
+                )
+            }
         }
     }
 
     fun downloadClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas
-            val resultBitmap = composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
-                ImageResult(
-                    exportImageCanvas = exportImageCanvas,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+            val resultBitmap =
+                composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+                    ImageResult(
+                        exportImageCanvas = exportImageCanvas,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
                 val savedOriginalUri =

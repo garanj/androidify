@@ -35,11 +35,13 @@ sealed class SizeOption(
     override val key: String,
 ) : ToolOption {
 
-    object Square : SizeOption(1f, Size(1000f, 1000f), "1:1", "square")
+    object Square : SizeOption(1f, Size(2000f, 2000f), "1:1", "square")
     object Banner : SizeOption(4f, Size(4000f, 1000f), "Banner", "banner")
     object Wallpaper : SizeOption(9 / 16f, Size(900f, 1600f), "Wallpaper", "wallpaper")
     object SocialHeader : SizeOption(3f, Size(3000f, 1000f), "3:1", "social_header")
     object WallpaperTablet : SizeOption(1280 / 800f, Size(1280f, 800f), "Large wallpaper", "wallpaper_large")
+
+    object Sticker: SizeOption(1f, Size(2000f, 2000f), "Sticker", "sticker")
 }
 
 sealed class BackgroundOption(

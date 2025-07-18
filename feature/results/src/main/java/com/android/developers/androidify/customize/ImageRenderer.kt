@@ -74,7 +74,16 @@ fun ImageResult(
                 exportImageCanvas,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                if (exportImageCanvas.imageBitmap != null) {
+                if (exportImageCanvas.showSticker &&
+                    exportImageCanvas.imageBitmapRemovedBackground != null) {
+                    Image(
+                        bitmap = exportImageCanvas.imageBitmapRemovedBackground.asImageBitmap(),
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                    )
+                } else if (exportImageCanvas.imageBitmap != null) {
                     Image(
                         bitmap = exportImageCanvas.imageBitmap.asImageBitmap(),
                         modifier = Modifier
@@ -94,9 +103,14 @@ fun BackgroundLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    val backgroundModifier = if (exportImageCanvas.backgroundColor != null) {
+        Modifier.background(exportImageCanvas.backgroundColor)
+    } else {
+        Modifier
+    }
     Box(
         modifier = modifier.fillMaxSize()
-            .background(Color.White),
+            .then(backgroundModifier),
     ) {
         if (exportImageCanvas.selectedBackgroundDrawable != null) {
             Image(

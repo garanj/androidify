@@ -15,6 +15,7 @@
  */
 package com.android.developers.androidify.customize
 
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
@@ -28,8 +29,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 
 @Composable
@@ -54,23 +57,36 @@ fun AspectRatioTool(
                     .size(70.dp),
                 contentAlignment = Alignment.Center,
             ) {
-                Box(
-                    modifier = Modifier
-                        .aspectRatio(tool.aspectRatio)
-                        .border(
-                            2.dp,
-                            color = MaterialTheme.colorScheme.primary,
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .background(
-                            MaterialTheme.colorScheme.background,
-                            shape = MaterialTheme.shapes.medium,
-                        )
-                        .padding(6.dp)
-                        .fillMaxSize()
-                        .clip(MaterialTheme.shapes.small)
-                        .background(MaterialTheme.colorScheme.surfaceBright),
-                )
+                if (tool == SizeOption.Sticker) {
+                    Box(
+                        modifier = Modifier
+                            .aspectRatio(tool.aspectRatio)
+                            .padding(6.dp)
+                            .fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Image(painterResource(R.drawable.sticker_size), contentDescription = null)
+                    }
+                } else {
+                    Box(
+                        modifier = Modifier
+                            .aspectRatio(tool.aspectRatio)
+                            .border(
+                                2.dp,
+                                color = MaterialTheme.colorScheme.primary,
+                                shape = MaterialTheme.shapes.medium,
+                            )
+                            .background(
+                                MaterialTheme.colorScheme.background,
+                                shape = MaterialTheme.shapes.medium,
+                            )
+                            .padding(6.dp)
+                            .fillMaxSize()
+                            .clip(MaterialTheme.shapes.small)
+                            .background(MaterialTheme.colorScheme.surfaceBright),
+                    )
+                }
+
             }
         },
     )
@@ -87,6 +103,7 @@ private fun AspectRatioToolPreview() {
                 SizeOption.SocialHeader,
                 SizeOption.Wallpaper,
                 SizeOption.WallpaperTablet,
+                SizeOption.Sticker
             ),
             selectedOption = SizeOption.Square,
             onSizeOptionSelected = {},

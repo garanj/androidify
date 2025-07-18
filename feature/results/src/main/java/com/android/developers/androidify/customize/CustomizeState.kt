@@ -15,13 +15,12 @@
  */
 package com.android.developers.androidify.customize
 
-import android.R.attr.rotation
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.R
 import androidx.compose.ui.geometry.Size
+import androidx.compose.ui.graphics.Color
 
 data class CustomizeExportState(
     val originalImageUrl: Uri? = null,
@@ -51,6 +50,7 @@ data class AspectRatioToolState(
         SizeOption.WallpaperTablet,
         SizeOption.Banner,
         SizeOption.SocialHeader,
+        SizeOption.Sticker,
     ),
 ) : ToolState
 
@@ -66,6 +66,7 @@ data class BackgroundToolState(
 
 data class ExportImageCanvas(
     val imageBitmap: Bitmap? = null,
+    val imageBitmapRemovedBackground: Bitmap? = null,
     val aspectRatioOption: SizeOption = SizeOption.Square,
     val canvasSize: Size = Size(1000f, 1000f),
     val mainImageUri: Uri? = null,
@@ -77,6 +78,8 @@ data class ExportImageCanvas(
     @param:DrawableRes
     val selectedBackgroundDrawable: Int? = com.android.developers.androidify.results.R.drawable.background_square_blocks,
     val includeWatermark: Boolean = true,
+    val backgroundColor: Color? = Color.White,
+    val showSticker: Boolean = false,
 ) {
     fun updateAspectRatioAndBackground(
         backgroundOption: BackgroundOption,
@@ -88,6 +91,8 @@ data class ExportImageCanvas(
         var offset = Offset.Zero
         var image: Int?
         var rotation: Float
+        var backgroundColor: Color? = Color.White
+        var showSticker = false
         when (sizeOption) {
             SizeOption.Square -> {
                 offset = Offset(newCanvasSize.width * 0.2f, newCanvasSize.height * 0.16f)
@@ -171,6 +176,14 @@ data class ExportImageCanvas(
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_light
                 }
             }
+            SizeOption.Sticker -> {
+                offset = Offset(0f, 0f)
+                imageSize = Size(newCanvasSize.width, newCanvasSize.height)
+                image = null
+                rotation = 0f
+                backgroundColor = null
+                showSticker = true
+            }
         }
         return copy(
             selectedBackgroundDrawable = image,
@@ -179,7 +192,9 @@ data class ExportImageCanvas(
             imageOffset = offset,
             canvasSize = newCanvasSize,
             aspectRatioOption = sizeOption,
-            selectedBackgroundOption = backgroundOption,
+            selectedBackgroundOption = if (SizeOption.Sticker == sizeOption) BackgroundOption.None else backgroundOption,
+            backgroundColor = backgroundColor,
+            showSticker = showSticker
         )
     }
 }
