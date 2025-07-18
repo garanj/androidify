@@ -25,6 +25,7 @@ package com.android.developers.androidify.creation
 import android.net.Uri
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts.PickVisualMedia
@@ -68,7 +69,6 @@ import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.ButtonDefaults
@@ -127,6 +127,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.android.developers.androidify.customize.CustomizeAndExportScreen
+import com.android.developers.androidify.customize.CustomizeExportViewModel
 import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.results.ResultsScreen
 import com.android.developers.androidify.theme.AndroidifyTheme
@@ -228,7 +230,26 @@ fun CreationScreen(
                 viewModel = hiltViewModel(key = key),
                 onAboutPress = onAboutPressed,
                 onBackPress = onBackPressed,
+                onNextPress = creationViewModel::customizeExportClicked,
             )
+        }
+
+        ScreenState.CUSTOMIZE -> {
+            val prompt = uiState.descriptionText.text.toString()
+            val key = if (uiState.descriptionText.text.isBlank()) {
+                uiState.imageUri.toString()
+            } else {
+                prompt
+            }
+            uiState.resultBitmap?.let { bitmap ->
+                CustomizeAndExportScreen(
+                    resultImage = bitmap,
+                    originalImageUri = uiState.imageUri,
+                    onBackPress = onBackPressed,
+                    onInfoPress = onAboutPressed,
+                    viewModel = hiltViewModel<CustomizeExportViewModel>(key = key),
+                )
+            }
         }
     }
 }
@@ -416,7 +437,7 @@ private fun MainCreationPane(
     val alternateDropAreaBackgroundColor = MaterialTheme.colorScheme.surfaceVariant
     var background by remember { mutableStateOf(defaultDropAreaBackgroundColor) }
 
-    val activity = LocalContext.current as ComponentActivity
+    val activity = LocalActivity.current as ComponentActivity
     val externalAppCallback = remember {
         dropBehaviourFactory.createTargetCallback(
             activity = activity,
@@ -425,7 +446,6 @@ private fun MainCreationPane(
             onDropEnded = { background = defaultDropAreaBackgroundColor },
         )
     }
-
 
     Box(
         modifier = modifier,

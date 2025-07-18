@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -75,6 +76,10 @@ sealed interface SharedElementKey {
 @OptIn(ExperimentalSharedTransitionApi::class)
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
     throw IllegalStateException("No SharedTransitionScope provided")
+}
+
+val LocalAnimateBoundsScope = compositionLocalOf<LookaheadScope?> {
+    null
 }
 
 @OptIn(

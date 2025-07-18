@@ -17,7 +17,6 @@ package com.android.developers.androidify
 
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.WindowManager
 import android.window.TrustedPresentationThresholds
 import androidx.activity.ComponentActivity
@@ -73,7 +72,9 @@ class MainActivity : ComponentActivity() {
             val minFractionRendered = 0.25f
             val stabilityRequirements = 500
             val presentationThreshold = TrustedPresentationThresholds(
-                minAlpha, minFractionRendered, stabilityRequirements
+                minAlpha,
+                minFractionRendered,
+                stabilityRequirements,
             )
 
             val windowManager = getSystemService(WINDOW_SERVICE) as WindowManager
@@ -81,7 +82,7 @@ class MainActivity : ComponentActivity() {
                 window.decorView.windowToken,
                 presentationThreshold,
                 mainExecutor,
-                presentationListener
+                presentationListener,
             )
         }
     }
@@ -93,5 +94,4 @@ class MainActivity : ComponentActivity() {
             windowManager.unregisterTrustedPresentationListener(presentationListener)
         }
     }
-
 }
