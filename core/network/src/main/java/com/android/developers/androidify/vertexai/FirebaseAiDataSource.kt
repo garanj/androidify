@@ -164,9 +164,10 @@ class FirebaseAiDataSourceImpl @Inject constructor(
                 imageGenerationPrompt,
             )
         } else {
-            val finedTunedModel = createFineTunedModel()
-            val response = finedTunedModel.generateContent(imageGenerationPrompt)
-            return response.candidates[0].content.parts[0].asImageOrNull()!!
+            val fineTunedModel = createFineTunedModel()
+            val response = fineTunedModel.generateContent(imageGenerationPrompt)
+            return response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.asImageOrNull()
+                ?: throw IllegalStateException("Could not extract image from fine-tuned model response")
         }
     }
 

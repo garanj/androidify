@@ -65,6 +65,6 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
     }
 
     override fun getFineTunedModelName(): String {
-        TODO("Not yet implemented")
+        return "test-fine-tuned-model"
     }
 }
