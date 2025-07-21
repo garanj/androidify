@@ -59,4 +59,12 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
     override fun getDancingDroidLink(): String {
         TODO("Not yet implemented")
     }
+
+    override fun useImagen(): Boolean {
+        return true
+    }
+
+    override fun getFineTunedModelName(): String {
+        TODO("Not yet implemented")
+    }
 }
