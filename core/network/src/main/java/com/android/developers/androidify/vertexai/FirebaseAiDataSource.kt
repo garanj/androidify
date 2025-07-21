@@ -34,6 +34,7 @@ import com.google.firebase.ai.type.ImagenSafetySettings
 import com.google.firebase.ai.type.PublicPreviewAPI
 import com.google.firebase.ai.type.SafetySetting
 import com.google.firebase.ai.type.Schema
+import com.google.firebase.ai.type.asImageOrNull
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
 import kotlinx.serialization.json.Json
@@ -138,21 +139,36 @@ class FirebaseAiDataSourceImpl @Inject constructor(
             image,
         )
     }
+    private fun createFineTunedModel(): GenerativeModel {
+        return Firebase.ai.generativeModel(
+            remoteConfigDataSource.getFineTunedModelName(),
+            safetySettings = listOf(
+                SafetySetting(HarmCategory.HARASSMENT, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.HATE_SPEECH, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.DANGEROUS_CONTENT, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.CIVIC_INTEGRITY, HarmBlockThreshold.LOW_AND_ABOVE),
+            ),
+        )
+    }
 
     override suspend fun generateImageFromPromptAndSkinTone(prompt: String, skinTone: String): Bitmap {
-        val generativeModel = createGenerativeImageModel()
-        // Retrieve the base prompt template from Remote Config
         val basePromptTemplate = remoteConfigDataSource.promptImageGenerationWithSkinTone()
-
-        // Perform the substitution
         val imageGenerationPrompt = basePromptTemplate
             .replace("{prompt}", prompt)
             .replace("{skinTone}", skinTone)
-
-        return executeImageGeneration(
-            generativeModel,
-            imageGenerationPrompt,
-        )
+        if (remoteConfigDataSource.useImagen()) {
+            val generativeModel = createGenerativeImageModel()
+            return executeImageGeneration(
+                generativeModel,
+                imageGenerationPrompt,
+            )
+        } else {
+            val fineTunedModel = createFineTunedModel()
+            val response = fineTunedModel.generateContent(imageGenerationPrompt)
+            return response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.asImageOrNull()
+                ?: throw IllegalStateException("Could not extract image from fine-tuned model response")
+        }
     }
 
     private suspend fun executeTextValidation(
