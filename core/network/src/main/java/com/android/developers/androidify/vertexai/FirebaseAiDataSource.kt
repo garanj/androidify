@@ -139,7 +139,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
             image,
         )
     }
-    private fun createFineTunedModel() : GenerativeModel {
+    private fun createFineTunedModel(): GenerativeModel {
         return Firebase.ai.generativeModel(
             remoteConfigDataSource.getFineTunedModelName(),
             safetySettings = listOf(

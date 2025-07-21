@@ -37,7 +37,7 @@ interface RemoteConfigDataSource {
 
     fun useImagen(): Boolean
 
-    fun getFineTunedModelName() : String
+    fun getFineTunedModelName(): String
 }
 
 @Singleton
@@ -91,7 +91,7 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
     override fun useImagen(): Boolean {
         return remoteConfig.getBoolean("use_imagen")
     }
-    override fun getFineTunedModelName() : String {
+    override fun getFineTunedModelName(): String {
         return remoteConfig.getString("fine_tuned_model_name")
     }
 }

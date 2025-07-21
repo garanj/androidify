@@ -63,7 +63,7 @@ fun <T : ToolOption> GenericTool(
                     individualToolContent(tool)
                 },
                 onToolSelected = onToolSelected,
-                tool = tool
+                tool = tool,
             )
         }
     }
