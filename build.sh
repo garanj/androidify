@@ -41,8 +41,10 @@ echo "INFO: Setting up Java 17..."
 sudo apt-get update
 sudo apt-get install -y openjdk-17-jdk
 sudo update-alternatives --set java /usr/lib/jvm/java-17-openjdk-amd64/bin/java
-echo "INFO: Verifying Java version..."
 java -version
+
+# Also clear JAVA_HOME variable so java -version is used instead
+export JAVA_HOME=
 
 
 # Add the local SDK and emulator tools to the PATH for this session.
