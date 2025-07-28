@@ -83,12 +83,12 @@ echo "INFO: Accepting SDK licenses..."
 # The 'yes' command automatically pipes "y" to the license agreement prompts.
 
 echo "Installing build-tools..."
-echo y | sdkmanager "build-tools;$ANDROID_BUILD_TOOLS_VERSION" > /dev/null
-echo y | sdkmanager "platforms;android-$ANDROID_SDK_VERSION" > /dev/null
-echo y | sdkmanager --licenses > /dev/null
+yes | sdkmanager "build-tools;35.0.0" > /dev/null
+yes | sdkmanager "platforms;android-36" > /dev/null
+yes | sdkmanager --licenses > /dev/null
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
-echo y | sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
+sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
 
 
 # --- Build Process ---
