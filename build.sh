@@ -84,7 +84,7 @@ fi
 # Step 4: Accept licenses and install required SDK packages.
 echo "INFO: Accepting SDK licenses..."
 # The 'yes' command automatically pipes "y" to the license agreement prompts.
-yes | sdkmanager --licenses > /dev/null
+echo y | ${ANDROID_HOME}/tools/bin/sdkmanager --licenses
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
 sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
