@@ -19,7 +19,7 @@ EMULATOR_IMAGE="system-images;android-34;google_atd;x86_64"
 
 # Define installation paths for local tools.
 # These will be created within the project directory.
-export ANDROID_HOME="$DIR/android_sdk"
+export ANDROID_HOME=/opt/android-sdk/current
 
 
 # --- Environment Setup ---
@@ -81,7 +81,7 @@ fi
 
 echo "INFO: Accepting SDK licenses..."
 # The 'yes' command automatically pipes "y" to the license agreement prompts.
-export ANDROID_HOME=/opt/android-sdk/current
+
 echo "Installing build-tools..."
 echo y | sdkmanager "build-tools;$ANDROID_BUILD_TOOLS_VERSION" > /dev/null
 echo y | sdkmanager --licenses > /dev/null
@@ -98,11 +98,11 @@ chmod +x ./gradlew
 
 # Clean the project (optional, but good for a fresh release build)
 echo "INFO: Cleaning the project..."
-./gradlew clean
+./gradlew clean -Pandroid.sdk.path=/opt/android-sdk/current
 
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
-./gradlew app:bundleRelease -x test -Pandroid.baselineProfile.automaticGenerationDuringBuild=false
+./gradlew app:bundleRelease -x test -Pandroid.sdk.path=/opt/android-sdk/current
 
 # Check if the build was successful
 if [ $? -eq 0 ]; then
