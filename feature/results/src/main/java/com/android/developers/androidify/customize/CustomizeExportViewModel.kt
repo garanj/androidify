@@ -25,6 +25,7 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -87,27 +88,72 @@ class CustomizeExportViewModel @Inject constructor(
         }
     }
     fun selectedToolStateChanged(toolState: ToolState) {
-        _state.update {
-            it.copy(
-                toolState = it.toolState + (it.selectedTool to toolState),
-                exportImageCanvas =
-                when (toolState.selectedToolOption) {
-                    is BackgroundOption -> {
-                        val backgroundOption = toolState.selectedToolOption as BackgroundOption
-                        it.exportImageCanvas.updateAspectRatioAndBackground(
+        when (toolState.selectedToolOption) {
+            is BackgroundOption -> {
+                val backgroundOption = toolState.selectedToolOption as BackgroundOption
+                _state.update {
+                    it.copy(
+                        toolState = it.toolState + (it.selectedTool to toolState),
+                        exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
                             backgroundOption,
                             it.exportImageCanvas.aspectRatioOption,
-                        )
-                    }
-                    is SizeOption -> {
-                        it.exportImageCanvas.updateAspectRatioAndBackground(
+                        ),
+                    )
+                }
+            }
+            is SizeOption -> {
+                _state.update {
+                    it.copy(
+                        toolState = it.toolState + (it.selectedTool to toolState),
+                        exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
                             it.exportImageCanvas.selectedBackgroundOption,
                             (toolState.selectedToolOption as SizeOption),
+                        ),
+                    )
+                }
+            }
+            is VibeOption -> {
+                val vibeOption = toolState.selectedToolOption as VibeOption
+                if (vibeOption != state.value.exportImageCanvas.vibe) {
+                    _state.update {
+                        it.copy(
+                            toolState = it.toolState + (it.selectedTool to toolState),
+                            exportImageCanvas = it.exportImageCanvas.copy(vibe = vibeOption),
                         )
                     }
-                    else -> throw IllegalArgumentException("Unknown tool option")
-                },
-            )
+                    // invoke background work
+                    changeImageVibe(vibeOption)
+                }
+            }
+            else -> throw IllegalArgumentException("Unknown tool option")
+        }
+    }
+
+    private fun changeImageVibe(vibeOption: VibeOption) {
+        viewModelScope.launch(Dispatchers.IO) {
+            if (vibeOption.prompt == null) {
+                _state.update {
+                    it.copy(
+                        showImageEditProgress = false,
+                        exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = null),
+                    )
+                }
+            } else {
+                _state.update {
+                    it.copy(showImageEditProgress = true)
+                }
+                val bitmap = imageGenerationRepository
+                    .generateImageWithEdit(
+                        state.value.exportImageCanvas.imageBitmap!!,
+                        vibeOption.prompt,
+                    )
+                _state.update {
+                    it.copy(
+                        showImageEditProgress = false,
+                        exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = bitmap),
+                    )
+                }
+            }
         }
     }
 

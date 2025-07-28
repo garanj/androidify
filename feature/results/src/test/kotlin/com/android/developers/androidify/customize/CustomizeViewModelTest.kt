@@ -34,8 +34,9 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.test.DefaultAsserter.assertNotNull
 import kotlin.test.assertNotNull
+import kotlin.test.assertNull
+import kotlin.test.assertTrue
 
 @RunWith(RobolectricTestRunner::class)
 class CustomizeViewModelTest {
@@ -134,5 +135,66 @@ class CustomizeViewModelTest {
         // Ensure all coroutines on the test scheduler complete
         advanceUntilIdle()
         assertNotNull(values.last().savedUri)
+    }
+
+    @Test
+    fun changeVibe_NotNull() = runTest {
+        val values = mutableListOf<CustomizeExportState>()
+        // Launch collector on the backgroundScope directly to use runTest's scheduler
+        backgroundScope.launch(UnconfinedTestDispatcher()) {
+            viewModel.state.collect {
+                values.add(it)
+            }
+        }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
+        advanceUntilIdle()
+        viewModel.selectedToolStateChanged(
+            VibesToolState(
+                selectedToolOption = VibeOption.Yeehaw,
+                options = listOf(
+                    VibeOption.None,
+                    VibeOption.Yeehaw,
+                    VibeOption.Intergalactic,
+                    VibeOption.Island,
+                ),
+            ),
+        )
+        advanceUntilIdle()
+        assertTrue { !values[values.lastIndex].showImageEditProgress }
+        assertTrue { values[values.lastIndex - 1].showImageEditProgress }
+        assertNotNull(values.last().exportImageCanvas.imageWithEdit)
+    }
+
+    @Test
+    fun changeVibe_None() = runTest {
+        val values = mutableListOf<CustomizeExportState>()
+        // Launch collector on the backgroundScope directly to use runTest's scheduler
+        backgroundScope.launch(UnconfinedTestDispatcher()) {
+            viewModel.state.collect {
+                values.add(it)
+            }
+        }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
+        advanceUntilIdle()
+        viewModel.selectedToolStateChanged(
+            VibesToolState(
+                selectedToolOption = VibeOption.None,
+                options = listOf(
+                    VibeOption.None,
+                    VibeOption.Yeehaw,
+                    VibeOption.Intergalactic,
+                    VibeOption.Island,
+                ),
+            ),
+        )
+        advanceUntilIdle()
+        assertTrue { !values[values.lastIndex].showImageEditProgress }
+        assertNull(values.last().exportImageCanvas.imageWithEdit)
     }
 }

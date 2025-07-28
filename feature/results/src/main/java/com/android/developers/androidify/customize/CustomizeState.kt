@@ -15,12 +15,10 @@
  */
 package com.android.developers.androidify.customize
 
-import android.R.attr.rotation
 import android.graphics.Bitmap
 import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.geometry.R
 import androidx.compose.ui.geometry.Size
 
 data class CustomizeExportState(
@@ -33,9 +31,10 @@ data class CustomizeExportState(
     val toolState: Map<CustomizeTool, ToolState> = mapOf(
         CustomizeTool.Size to AspectRatioToolState(),
         CustomizeTool.Background to BackgroundToolState(),
+        CustomizeTool.Vibes to VibesToolState(),
     ),
     val exportImageCanvas: ExportImageCanvas = ExportImageCanvas(),
-
+    val showImageEditProgress: Boolean = false,
 )
 
 interface ToolState {
@@ -64,6 +63,16 @@ data class BackgroundToolState(
     ),
 ) : ToolState
 
+data class VibesToolState(
+    override val selectedToolOption: VibeOption = VibeOption.None,
+    override val options: List<VibeOption> = listOf(
+        VibeOption.None,
+        VibeOption.Yeehaw,
+        VibeOption.Island,
+        VibeOption.Intergalactic,
+    ),
+) : ToolState
+
 data class ExportImageCanvas(
     val imageBitmap: Bitmap? = null,
     val aspectRatioOption: SizeOption = SizeOption.Square,
@@ -77,6 +86,8 @@ data class ExportImageCanvas(
     @param:DrawableRes
     val selectedBackgroundDrawable: Int? = com.android.developers.androidify.results.R.drawable.background_square_blocks,
     val includeWatermark: Boolean = true,
+    val vibe: VibeOption? = null,
+    val imageWithEdit: Bitmap? = null,
 ) {
     fun updateAspectRatioAndBackground(
         backgroundOption: BackgroundOption,
