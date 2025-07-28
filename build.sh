@@ -46,45 +46,12 @@ java -version
 # Also clear JAVA_HOME variable so java -version is used instead
 export JAVA_HOME=
 
-
-# Add the local SDK and emulator tools to the PATH for this session.
-# The system-wide Java will already be in the PATH.
-export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"
-echo "INFO: Local tools added to PATH."
-
-
-# Step 3: Download and set up the Android SDK.
-if [ ! -d "$ANDROID_HOME/cmdline-tools" ]; then
-  echo "INFO: Android SDK not found. Setting it up now..."
-
-  # The URL for the command-line tools can change.
-  # You can find the latest URL at: https://developer.android.com/studio#command-line-tools-only
-  CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip"
-
-  echo "INFO: Downloading Android command-line tools..."
-  wget -q -O /tmp/cmdline-tools.zip "$CMDLINE_TOOLS_URL"
-
-  # Unzip into a temporary directory first.
-  unzip -q -d /tmp/android-tmp /tmp/cmdline-tools.zip
-
-  # The SDK manager expects the tools to be in $ANDROID_HOME/cmdline-tools/latest
-  # The zip extracts to 'cmdline-tools', so we move its contents to the correct location.
-  mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
-  mv /tmp/android-tmp/cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest/"
-
-  # Clean up temporary files.
-  rm -rf /tmp/android-tmp /tmp/cmdline-tools.zip
-
-  echo "INFO: Android command-line tools installed."
-else
-  echo "INFO: Android SDK already found at '$ANDROID_HOME'."
-fi
-
-
-# Step 4: Accept licenses and install required SDK packages.
 echo "INFO: Accepting SDK licenses..."
 # The 'yes' command automatically pipes "y" to the license agreement prompts.
-echo y | ${ANDROID_HOME}/tools/bin/sdkmanager --licenses
+export ANDROID_HOME=/opt/android-sdk/current
+echo "Installing build-tools..."
+echo y | ${ANDROID_HOME}/tools/bin/sdkmanager "build-tools;$ANDROID_BUILD_TOOLS_VERSION" > /dev/null
+echo y | ${ANDROID_HOME}/tools/bin/sdkmanager --licenses > /dev/null
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
 sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
