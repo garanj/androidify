@@ -53,42 +53,53 @@ echo "INFO: Local tools added to PATH."
 
 
 # Step 3: Download and set up the Android SDK.
-if [ ! -d "$ANDROID_HOME/cmdline-tools" ]; then
-  echo "INFO: Android SDK not found. Setting it up now..."
-
-  # The URL for the command-line tools can change.
-  # You can find the latest URL at: https://developer.android.com/studio#command-line-tools-only
-  CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip"
-
-  echo "INFO: Downloading Android command-line tools..."
-  wget -q -O /tmp/cmdline-tools.zip "$CMDLINE_TOOLS_URL"
-
-  # Unzip into a temporary directory first.
-  unzip -q -d /tmp/android-tmp /tmp/cmdline-tools.zip
-
-  # The SDK manager expects the tools to be in $ANDROID_HOME/cmdline-tools/latest
-  # The zip extracts to 'cmdline-tools', so we move its contents to the correct location.
-  mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
-  mv /tmp/android-tmp/cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest/"
-
-  # Clean up temporary files.
-  rm -rf /tmp/android-tmp /tmp/cmdline-tools.zip
-
-  echo "INFO: Android command-line tools installed."
-else
-  echo "INFO: Android SDK already found at '$ANDROID_HOME'."
+# We first remove any old directory to ensure a clean state, which prevents
+# errors from inconsistent or pre-existing installations in the CI environment.
+if [ -d "$ANDROID_HOME" ]; then
+  echo "INFO: Found a pre-existing SDK directory. Removing it to ensure a clean build."
+  # Use sudo as the directory is in /opt
+  sudo rm -rf "$ANDROID_HOME"
 fi
 
+echo "INFO: Android SDK not found or was just removed. Setting it up now..."
+
+# Create the parent directory with correct permissions before downloading.
+sudo mkdir -p "$ANDROID_HOME"
+
+# The URL for the command-line tools can change.
+# You can find the latest URL at: https://developer.android.com/studio#command-line-tools-only
+CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip"
+
+echo "INFO: Downloading Android command-line tools..."
+wget -q -O /tmp/cmdline-tools.zip "$CMDLINE_TOOLS_URL"
+
+# Unzip into a temporary directory first.
+unzip -q -d /tmp/android-tmp /tmp/cmdline-tools.zip
+
+# The SDK manager expects the tools to be in $ANDROID_HOME/cmdline-tools/latest
+# The zip extracts to 'cmdline-tools', so we move its contents to the correct location.
+mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
+mv /tmp/android-tmp/cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest/"
+
+# Clean up temporary files.
+rm -rf /tmp/android-tmp /tmp/cmdline-tools.zip
+
+echo "INFO: Android command-line tools installed."
+
+# Now, accept licenses and install packages.
+# It's best practice to accept licenses *after* the tools are in place.
 echo "INFO: Accepting all pending SDK licenses..."
-# The 'yes' command automatically pipes "y" to the license agreement prompts.
 yes | sdkmanager --licenses
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
 # This single command will install/update all necessary packages.
-# Ensure ANDROID_SDK_VERSION and ANDROID_BUILD_TOOLS_VERSION are correctly defined earlier in the script.
 sdkmanager "platforms;android-${ANDROID_SDK_VERSION}" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "${EMULATOR_IMAGE}" "emulator"
 
+# Run license acceptance AGAIN after installing new packages. This is crucial.
+echo "INFO: Accepting licenses for newly installed packages..."
 yes | sdkmanager --licenses
+
+
 # --- Build Process ---
 
 # This script assembles the release build of the Android application.
@@ -105,7 +116,7 @@ echo "INFO: Building the production release bundle..."
 
 # Check if the build was successful
 if [ $? -eq 0 ]; then
-  echo "SUCCESS: Build successful! The AAB can be found in app/build/outputs/bundle/prodRelease/"
+  echo "SUCCESS: Build successful! The AAB can be found in app/build/outputs/bundle/release/"
 else
   echo "FAILURE: Build failed. Please check the console output for errors."
   exit 1
