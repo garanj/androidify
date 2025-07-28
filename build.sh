@@ -88,7 +88,7 @@ echo "INFO: Installing Android SDK packages, including emulator and system image
 # Ensure ANDROID_SDK_VERSION and ANDROID_BUILD_TOOLS_VERSION are correctly defined earlier in the script.
 sdkmanager "platforms;android-${ANDROID_SDK_VERSION}" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "${EMULATOR_IMAGE}" "emulator"
 
-
+yes | sdkmanager --licenses
 # --- Build Process ---
 
 # This script assembles the release build of the Android application.
