@@ -79,16 +79,14 @@ else
   echo "INFO: Android SDK already found at '$ANDROID_HOME'."
 fi
 
-echo "INFO: Accepting SDK licenses..."
+echo "INFO: Accepting all pending SDK licenses..."
 # The 'yes' command automatically pipes "y" to the license agreement prompts.
-
-echo "Installing build-tools..."
-yes | sdkmanager "build-tools;35.0.0" > /dev/null
-yes | sdkmanager "platforms;android-36" > /dev/null
-yes | sdkmanager --licenses > /dev/null
+yes | sdkmanager --licenses
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
-sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
+# This single command will install/update all necessary packages.
+# Ensure ANDROID_SDK_VERSION and ANDROID_BUILD_TOOLS_VERSION are correctly defined earlier in the script.
+sdkmanager "platforms;android-${ANDROID_SDK_VERSION}" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "${EMULATOR_IMAGE}" "emulator"
 
 
 # --- Build Process ---
