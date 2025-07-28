@@ -17,11 +17,6 @@ ANDROID_BUILD_TOOLS_VERSION="35.0.0"
 # be used by the new build command.
 EMULATOR_IMAGE="system-images;android-34;google_atd;x86_64"
 
-# Define installation paths for local tools.
-# These will be created within the project directory.
-export ANDROID_HOME=/opt/android-sdk/current
-
-
 # --- Environment Setup ---
 
 # Step 1: Check for essential command-line tools.
@@ -51,44 +46,20 @@ export JAVA_HOME=
 export PATH="$PATH:$ANDROID_HOME/cmdline-tools/latest/bin:$ANDROID_HOME/platform-tools:$ANDROID_HOME/emulator"
 echo "INFO: Local tools added to PATH."
 
-
-# Step 3: Download and set up the Android SDK.
-if [ ! -d "$ANDROID_HOME/cmdline-tools" ]; then
-  echo "INFO: Android SDK not found. Setting it up now..."
-
-  # The URL for the command-line tools can change.
-  # You can find the latest URL at: https://developer.android.com/studio#command-line-tools-only
-  CMDLINE_TOOLS_URL="https://dl.google.com/android/repository/commandlinetools-linux-13114758_latest.zip"
-
-  echo "INFO: Downloading Android command-line tools..."
-  wget -q -O /tmp/cmdline-tools.zip "$CMDLINE_TOOLS_URL"
-
-  # Unzip into a temporary directory first.
-  unzip -q -d /tmp/android-tmp /tmp/cmdline-tools.zip
-
-  # The SDK manager expects the tools to be in $ANDROID_HOME/cmdline-tools/latest
-  # The zip extracts to 'cmdline-tools', so we move its contents to the correct location.
-  mkdir -p "$ANDROID_HOME/cmdline-tools/latest"
-  mv /tmp/android-tmp/cmdline-tools/* "$ANDROID_HOME/cmdline-tools/latest/"
-
-  # Clean up temporary files.
-  rm -rf /tmp/android-tmp /tmp/cmdline-tools.zip
-
-  echo "INFO: Android command-line tools installed."
-else
-  echo "INFO: Android SDK already found at '$ANDROID_HOME'."
-fi
-
+# Now, accept licenses and install packages.
+# It's best practice to accept licenses *after* the tools are in place.
 echo "INFO: Accepting all pending SDK licenses..."
-# The 'yes' command automatically pipes "y" to the license agreement prompts.
 yes | sdkmanager --licenses
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
 # This single command will install/update all necessary packages.
-# Ensure ANDROID_SDK_VERSION and ANDROID_BUILD_TOOLS_VERSION are correctly defined earlier in the script.
 sdkmanager "platforms;android-${ANDROID_SDK_VERSION}" "build-tools;${ANDROID_BUILD_TOOLS_VERSION}" "platform-tools" "${EMULATOR_IMAGE}" "emulator"
 
+# Run license acceptance AGAIN after installing new packages. This is crucial.
+echo "INFO: Accepting licenses for newly installed packages..."
 yes | sdkmanager --licenses
+
+
 # --- Build Process ---
 
 # This script assembles the release build of the Android application.
@@ -97,15 +68,15 @@ chmod +x ./gradlew
 
 # Clean the project (optional, but good for a fresh release build)
 echo "INFO: Cleaning the project..."
-./gradlew clean -Pandroid.sdk.path=/opt/android-sdk/current
+./gradlew clean -Pandroid.sdk.path=$ANDROID_HOME
 
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
-./gradlew app:bundleRelease -x test -Pandroid.sdk.path=/opt/android-sdk/current
+./gradlew app:bundleRelease -x test -Pandroid.sdk.path=$ANDROID_HOME
 
 # Check if the build was successful
 if [ $? -eq 0 ]; then
-  echo "SUCCESS: Build successful! The AAB can be found in app/build/outputs/bundle/prodRelease/"
+  echo "SUCCESS: Build successful! The AAB can be found in app/build/outputs/bundle/release/"
 else
   echo "FAILURE: Build failed. Please check the console output for errors."
   exit 1
