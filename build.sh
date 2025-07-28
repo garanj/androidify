@@ -9,7 +9,7 @@ DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
 # Define the Android SDK version you want to target.
 ANDROID_SDK_VERSION="36"
-ANDROID_BUILD_TOOLS_VERSION="34.0.0"
+ANDROID_BUILD_TOOLS_VERSION="35.0.0"
 
 # Switched from 'google_apis' to 'google_atd' (Google Automated Test Device).
 # This system image is designed for headless, automated testing in CI environments
@@ -84,10 +84,11 @@ echo "INFO: Accepting SDK licenses..."
 
 echo "Installing build-tools..."
 echo y | sdkmanager "build-tools;$ANDROID_BUILD_TOOLS_VERSION" > /dev/null
+echo y | sdkmanager "platforms;android-$ANDROID_SDK_VERSION" > /dev/null
 echo y | sdkmanager --licenses > /dev/null
 
 echo "INFO: Installing Android SDK packages, including emulator and system image..."
-sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
+echo y | sdkmanager "platforms;android-$ANDROID_SDK_VERSION" "build-tools;$ANDROID_BUILD_TOOLS_VERSION" "platform-tools" "$EMULATOR_IMAGE" "emulator"
 
 
 # --- Build Process ---
