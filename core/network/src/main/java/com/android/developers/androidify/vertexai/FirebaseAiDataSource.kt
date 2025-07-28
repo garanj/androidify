@@ -60,7 +60,10 @@ interface FirebaseAiDataSource {
 class FirebaseAiDataSourceImpl @Inject constructor(
     private val remoteConfigDataSource: RemoteConfigDataSource,
 ) : FirebaseAiDataSource {
-    private fun createGenerativeTextModel(jsonSchema: Schema, temperature: Float? = null): GenerativeModel {
+    private fun createGenerativeTextModel(
+        jsonSchema: Schema,
+        temperature: Float? = null,
+    ): GenerativeModel {
         return Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel(
             modelName = remoteConfigDataSource.textModelName(),
             generationConfig = generationConfig {
@@ -82,12 +85,12 @@ class FirebaseAiDataSourceImpl @Inject constructor(
         return Firebase.ai(backend = GenerativeBackend.vertexAI()).imagenModel(
             remoteConfigDataSource.imageModelName(),
             safetySettings =
-            ImagenSafetySettings(
-                safetyFilterLevel = ImagenSafetyFilterLevel.BLOCK_LOW_AND_ABOVE,
-                // Uses `ALLOW_ADULT` filter since `ALLOW_ALL` requires a special approval
-                // See https://cloud.google.com/vertex-ai/generative-ai/docs/image/responsible-ai-imagen#person-face-gen
-                personFilterLevel = ImagenPersonFilterLevel.ALLOW_ADULT,
-            ),
+                ImagenSafetySettings(
+                    safetyFilterLevel = ImagenSafetyFilterLevel.BLOCK_LOW_AND_ABOVE,
+                    // Uses `ALLOW_ADULT` filter since `ALLOW_ALL` requires a special approval
+                    // See https://cloud.google.com/vertex-ai/generative-ai/docs/image/responsible-ai-imagen#person-face-gen
+                    personFilterLevel = ImagenPersonFilterLevel.ALLOW_ADULT,
+                ),
         )
     }
 
@@ -141,6 +144,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
             image,
         )
     }
+
     private fun createFineTunedModel(): GenerativeModel {
         return Firebase.ai.generativeModel(
             remoteConfigDataSource.getFineTunedModelName(),
@@ -154,7 +158,10 @@ class FirebaseAiDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun generateImageFromPromptAndSkinTone(prompt: String, skinTone: String): Bitmap {
+    override suspend fun generateImageFromPromptAndSkinTone(
+        prompt: String,
+        skinTone: String,
+    ): Bitmap {
         val basePromptTemplate = remoteConfigDataSource.promptImageGenerationWithSkinTone()
         val imageGenerationPrompt = basePromptTemplate
             .replace("{prompt}", prompt)
@@ -256,9 +263,10 @@ class FirebaseAiDataSourceImpl @Inject constructor(
             image(image)
             text(backgroundPrompt)
         }
-        return model.generateContent(prompt)
-            .candidates.first()
-            .content.parts.firstNotNullOf { it.asImageOrNull() }
+        val response = model.generateContent(prompt)
+        val image = response.candidates.firstOrNull()
+            ?.content?.parts?.firstNotNullOfOrNull { it.asImageOrNull() }
+        return image ?: throw IllegalStateException("Could not extract image from model response")
     }
 
     private suspend fun executePromptGeneration(

@@ -18,6 +18,7 @@ package com.android.developers.androidify.customize
 import android.app.Application
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
@@ -138,21 +139,30 @@ class CustomizeExportViewModel @Inject constructor(
                         exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = null),
                     )
                 }
-            } else {
-                _state.update {
-                    it.copy(showImageEditProgress = true)
-                }
-                val bitmap = imageGenerationRepository
-                    .generateImageWithEdit(
-                        state.value.exportImageCanvas.imageBitmap!!,
-                        vibeOption.prompt,
-                    )
+                return@launch
+            }
+
+            val image = state.value.exportImageCanvas.imageBitmap
+            if (image == null) {
+                return@launch
+            }
+
+            _state.update { it.copy(showImageEditProgress = true) }
+            try {
+                val bitmap = imageGenerationRepository.generateImageWithEdit(
+                    image,
+                    vibeOption.prompt,
+                )
                 _state.update {
                     it.copy(
-                        showImageEditProgress = false,
                         exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = bitmap),
                     )
                 }
+            } catch (e: Exception) {
+                Log.e("CustomizeExportViewModel", "Image generation failed", e)
+                snackbarHostState.value.showSnackbar("Background vibe generation failed")
+            } finally {
+                _state.update { it.copy(showImageEditProgress = false) }
             }
         }
     }
