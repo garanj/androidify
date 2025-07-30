@@ -73,7 +73,7 @@ echo "INFO: Cleaning the project..."
 cp test-google-services.json app/google-services.json
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
-./gradlew app:bundleRelease -x test -Pandroid.sdk.path=$ANDROID_HOME
+./gradlew app:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME
 
 # Check if the build was successful
 if [ $? -eq 0 ]; then
