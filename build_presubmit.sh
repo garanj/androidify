@@ -6,7 +6,7 @@ set -e
 # --- Configuration ---
 # Get the script's directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
+echo DIR
 # Define the Android SDK version you want to target.
 ANDROID_SDK_VERSION="36"
 ANDROID_BUILD_TOOLS_VERSION="35.0.0"
@@ -59,6 +59,12 @@ sdkmanager "platforms;android-${ANDROID_SDK_VERSION}" "build-tools;${ANDROID_BUI
 echo "INFO: Accepting licenses for newly installed packages..."
 yes | sdkmanager --licenses
 
+echo "Copying google-services.json"
+cp /tmpfs/src/git/androidify-prebuilts/google-services.json ${DIR}/app
+
+echo "Copying local.properties"
+cp /tmpfs/src/git/androidify-prebuilts/gradle.properties ${DIR}
+ls
 
 # --- Build Process ---
 
@@ -69,8 +75,7 @@ chmod +x ./gradlew
 # Clean the project (optional, but good for a fresh release build)
 echo "INFO: Cleaning the project..."
 ./gradlew clean -Pandroid.sdk.path=$ANDROID_HOME
-# Load up test google-services.json
-cp test-google-services.json app/google-services.json
+
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
 ./gradlew app:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME
