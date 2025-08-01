@@ -346,18 +346,6 @@ fun SelectedToolDetail(
                     },
                 )
             }
-
-            CustomizeTool.Vibes -> {
-                val vibesToolState = toolState as VibesToolState
-                VibesTool(
-                    vibesToolState.options,
-                    vibesToolState.selectedToolOption,
-                    singleLine = singleLine,
-                    onVibesOptionSelected = {
-                        onSelectedToolStateChanged(vibesToolState.copy(selectedToolOption = it))
-                    },
-                )
-            }
         }
     }
 }

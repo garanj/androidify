@@ -101,6 +101,15 @@ class CustomizeExportViewModel @Inject constructor(
                         ),
                     )
                 }
+                if (backgroundOption.aiBackground) {
+                    triggerAiBackgroundGeneration(backgroundOption)
+                } else {
+                    _state.update {
+                        it.copy(
+                            exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = null),
+                        )
+                    }
+                }
             }
             is SizeOption -> {
                 _state.update {
@@ -113,26 +122,13 @@ class CustomizeExportViewModel @Inject constructor(
                     )
                 }
             }
-            is VibeOption -> {
-                val vibeOption = toolState.selectedToolOption as VibeOption
-                if (vibeOption != state.value.exportImageCanvas.vibe) {
-                    _state.update {
-                        it.copy(
-                            toolState = it.toolState + (it.selectedTool to toolState),
-                            exportImageCanvas = it.exportImageCanvas.copy(vibe = vibeOption),
-                        )
-                    }
-                    // invoke background work
-                    changeImageVibe(vibeOption)
-                }
-            }
             else -> throw IllegalArgumentException("Unknown tool option")
         }
     }
 
-    private fun changeImageVibe(vibeOption: VibeOption) {
+    private fun triggerAiBackgroundGeneration(backgroundOption: BackgroundOption) {
         viewModelScope.launch(Dispatchers.IO) {
-            if (vibeOption.prompt == null) {
+            if (backgroundOption.prompt == null) {
                 _state.update {
                     it.copy(
                         showImageEditProgress = false,
@@ -151,7 +147,7 @@ class CustomizeExportViewModel @Inject constructor(
             try {
                 val bitmap = imageGenerationRepository.generateImageWithEdit(
                     image,
-                    vibeOption.prompt,
+                    backgroundOption.prompt,
                 )
                 _state.update {
                     it.copy(

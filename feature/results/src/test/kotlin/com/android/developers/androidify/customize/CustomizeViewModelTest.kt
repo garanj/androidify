@@ -138,7 +138,7 @@ class CustomizeViewModelTest {
     }
 
     @Test
-    fun changeVibe_NotNull() = runTest {
+    fun changeBackground_NotNull() = runTest {
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
         backgroundScope.launch(UnconfinedTestDispatcher()) {
@@ -152,13 +152,13 @@ class CustomizeViewModelTest {
         )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
-            VibesToolState(
-                selectedToolOption = VibeOption.Yeehaw,
+            BackgroundToolState(
+                selectedToolOption = BackgroundOption.Yeehaw,
                 options = listOf(
-                    VibeOption.None,
-                    VibeOption.Yeehaw,
-                    VibeOption.Intergalactic,
-                    VibeOption.Island,
+                    BackgroundOption.None,
+                    BackgroundOption.Yeehaw,
+                    BackgroundOption.Intergalactic,
+                    BackgroundOption.Island,
                 ),
             ),
         )
@@ -169,7 +169,7 @@ class CustomizeViewModelTest {
     }
 
     @Test
-    fun changeVibe_None() = runTest {
+    fun changeBackground_None() = runTest {
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
         backgroundScope.launch(UnconfinedTestDispatcher()) {
@@ -183,13 +183,13 @@ class CustomizeViewModelTest {
         )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
-            VibesToolState(
-                selectedToolOption = VibeOption.None,
+            BackgroundToolState(
+                selectedToolOption = BackgroundOption.None,
                 options = listOf(
-                    VibeOption.None,
-                    VibeOption.Yeehaw,
-                    VibeOption.Intergalactic,
-                    VibeOption.Island,
+                    BackgroundOption.None,
+                    BackgroundOption.Yeehaw,
+                    BackgroundOption.Intergalactic,
+                    BackgroundOption.Island,
                 ),
             ),
         )
