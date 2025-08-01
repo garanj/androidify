@@ -197,6 +197,7 @@ data class ExportImageCanvas(
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_tablet_light
                     else -> {
                         offset = Offset(0f, 0f)
+                        rotation = 0f
                         imageSize = Size(newCanvasSize.width, newCanvasSize.height)
                         null
                     }
