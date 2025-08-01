@@ -62,7 +62,8 @@ yes | sdkmanager --licenses
 echo "Copying google-services.json"
 cp /tmpfs/src/git/androidify-prebuilts/google-services.json ${DIR}/app
 
-echo "Copying local.properties"
+echo "Copying gradle.properties"
+echo "" >> ${DIR}/gradle.properties # add a new line to the file
 cat /tmpfs/src/git/androidify-prebuilts/gradle.properties >> ${DIR}/gradle.properties
 ls
 
