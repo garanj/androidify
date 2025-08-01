@@ -17,10 +17,3 @@ set -e
 # in the job configuration.
 cd "${KOKORO_ARTIFACTS_DIR}/github/androidify"
 ./build_presubmit.sh
-
-# Create the target directory in KOKORO_ARTIFACTS_DIR if it doesn't exist.
-ARTIFACT_DIR="$KOKORO_ARTIFACTS_DIR/app-bundles"
-mkdir -p "$ARTIFACT_DIR"
-
-# Copy all .aab files to the KOKORO_ARTIFACTS_DIR.
-cp app/build/outputs/bundle/release/*.aab "$ARTIFACT_DIR"
