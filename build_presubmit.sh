@@ -63,7 +63,7 @@ echo "Copying google-services.json"
 cp /tmpfs/src/git/androidify-prebuilts/google-services.json ${DIR}/app
 
 echo "Copying local.properties"
-cp /tmpfs/src/git/androidify-prebuilts/gradle.properties ${DIR}
+cat /tmpfs/src/git/androidify-prebuilts/gradle.properties >> ${DIR}/gradle.properties
 ls
 
 # --- Build Process ---
