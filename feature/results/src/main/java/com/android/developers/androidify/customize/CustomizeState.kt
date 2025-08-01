@@ -106,6 +106,7 @@ data class ExportImageCanvas(
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_square_none
                     else -> {
                         offset = Offset(0f, 0f)
+                        rotation = 0f
                         imageSize = Size(newCanvasSize.width, newCanvasSize.height)
                         null
                     }
@@ -128,6 +129,7 @@ data class ExportImageCanvas(
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_banner_plain
                     else -> {
                         offset = Offset(0f, 0f)
+                        rotation = 0f
                         imageSize = Size(newCanvasSize.width, newCanvasSize.height)
                         null
                     }
@@ -149,6 +151,7 @@ data class ExportImageCanvas(
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_social_header_plain
                     else -> {
                         offset = Offset(0f, 0f)
+                        rotation = 0f
                         imageSize = Size(newCanvasSize.width, newCanvasSize.height)
                         null
                     }
@@ -171,6 +174,7 @@ data class ExportImageCanvas(
                     BackgroundOption.Plain -> com.android.developers.androidify.results.R.drawable.background_wallpaper_plain
                     else -> {
                         offset = Offset(0f, 0f)
+                        rotation = 0f
                         imageSize = Size(newCanvasSize.width, newCanvasSize.height)
                         null
                     }
