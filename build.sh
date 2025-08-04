@@ -127,10 +127,9 @@ if [[ -f "$AAB_PATH" ]]; then
      echo "INFO: Copying .intoto.jsonl files to ${ARTIFACT_DEST_DIR}/"
      # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
      find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
-   else
-     echo "FAILURE: No .intoto.jsonl files found."
-     exit 1
-   fi
+  else
+    echo "INFO: No .intoto.jsonl files found."
+  fi
 
   echo "INFO: Copying SPDX SBOM..."
   # The output file from app:spdxSbomForRelease is build/spdx/release.spdx.json

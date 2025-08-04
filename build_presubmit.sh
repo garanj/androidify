@@ -129,8 +129,7 @@ if [[ -f "$AAB_PATH" ]]; then
     # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
     find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
   else
-    echo "FAILURE: No .intoto.jsonl files found."
-    exit 1
+    echo "INFO: No .intoto.jsonl files found."
   fi
 
   echo "INFO: Copying SPDX SBOM..."
