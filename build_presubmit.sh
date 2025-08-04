@@ -109,6 +109,9 @@ if [[ -f "$AAB_PATH" ]]; then
 
   # Copy any .intointo.jsonl files to the artifact directory
   echo "INFO: Searching for and copying .intointo.jsonl files..."
+  ls
+  echo "INFO: Logging output directory contents"
+  ls "$AAB_SRC_DIR/"
   find . -type f -name "*.intointo.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
   echo "INFO: Finished copying .intointo.jsonl files."
 
