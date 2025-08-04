@@ -22,7 +22,7 @@ set -e
 # --- Configuration ---
 # Get the script's directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
+echo DIR
 # Define the Android SDK version you want to target.
 ANDROID_SDK_VERSION="36"
 ANDROID_BUILD_TOOLS_VERSION="36.0.0"
@@ -82,6 +82,7 @@ cp /tmpfs/src/git/androidify-prebuilts/google-services.json ${DIR}/app
 echo "Copying gradle.properties"
 echo "" >> ${DIR}/gradle.properties # add a new line to the file
 cat /tmpfs/src/git/androidify-prebuilts/gradle.properties >> ${DIR}/gradle.properties
+ls
 
 # --- Build Process ---
 
@@ -95,7 +96,7 @@ echo "INFO: Cleaning the project..."
 
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
-./gradlew app:bundleRelease -x test -Pandroid.sdk.path=$ANDROID_HOME
+./gradlew app:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME
 
 # --- Artifact Collection ---
 echo "INFO: Preparing artifacts for Kokoro..."
