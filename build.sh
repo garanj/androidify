@@ -87,5 +87,36 @@ else
   echo "FAILURE: Build failed. Please check the console output for errors."
   exit 1
 fi
+# --- Artifact Collection ---
+echo "INFO: Preparing artifacts for Kokoro..."
+
+# Default output path for the bundle
+AAB_SRC_DIR="app/build/outputs/bundle/release"
+# The default name of the AAB for a release bundle
+AAB_FILE="app-release.aab"
+AAB_PATH="${AAB_SRC_DIR}/${AAB_FILE}"
+
+# Check if the AAB exists
+if [[ -f "$AAB_PATH" ]]; then
+  # Create a directory within Kokoro's artifact collection area
+  ARTIFACT_DEST_DIR="${KOKORO_ARTIFACTS_DIR}/artifacts"
+  mkdir -p "${ARTIFACT_DEST_DIR}"
+
+  # Copy the AAB
+  cp "${AAB_PATH}" "${ARTIFACT_DEST_DIR}/app-release-unsigned.aab"
+  echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
+
+  # Copy any .intointo.jsonl files to the artifact directory
+  echo "INFO: Searching for and copying .intointo.jsonl files..."
+  ls
+  echo "INFO: Logging output directory contents"
+  ls "$AAB_SRC_DIR/"
+  find . -type f -name "*.intointo.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
+  echo "INFO: Finished copying .intointo.jsonl files."
+
+else
+  echo "FAILURE: AAB not found at ${AAB_PATH}"
+  # Optionally fail the build: exit 1
+fi
 
 exit 0
