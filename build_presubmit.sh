@@ -117,17 +117,25 @@ if [[ -f "$AAB_PATH" ]]; then
   cp "${AAB_PATH}" "${ARTIFACT_DEST_DIR}/app-release-unsigned.aab"
   echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
 
-  # Copy any .intointo.jsonl files to the artifact directory
-  echo "INFO: Searching for and copying .intointo.jsonl files..."
-  ls
-  echo "INFO: Logging output directory contents"
-  ls "$AAB_SRC_DIR/"
-  find . -type f -name "*.intointo.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
-  echo "INFO: Finished copying .intointo.jsonl files."
+  # Find and list the files before copying
+  # Store the find results in a variable to avoid running find twice
+  # and to handle the case where no files are found gracefully.
+  intoto_files=$(find . -type f -name "*.intoto.jsonl")
+
+  if [ -n "$intoto_files" ]; then
+    echo "INFO: Found the following .intoto.jsonl files:"
+    echo "$intoto_files" # This will list each file on a new line
+    echo "INFO: Copying .intoto.jsonl files to ${ARTIFACT_DEST_DIR}/"
+    # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
+    find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
+  else
+    echo "FAILURE: No .intoto.jsonl files found."
+    exit 1
+  fi
 
 else
   echo "FAILURE: AAB not found at ${AAB_PATH}"
-  # Optionally fail the build: exit 1
+  exit 1
 fi
 
 exit 0
