@@ -96,7 +96,7 @@ echo "INFO: Cleaning the project..."
 
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
-./gradlew app:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
+./gradlew app:bundleRelease app:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
 # --- Artifact Collection ---
 echo "INFO: Preparing artifacts for Kokoro..."
@@ -132,6 +132,10 @@ if [[ -f "$AAB_PATH" ]]; then
     echo "FAILURE: No .intoto.jsonl files found."
     exit 1
   fi
+
+  echo "INFO: Copying SPDX SBOM..."
+  # The output file from app:spdxSbomForRelease is build/spdx/release.spdx.json
+  cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
 
 else
   echo "FAILURE: AAB not found at ${AAB_PATH}"
