@@ -31,7 +31,8 @@ ANDROID_BUILD_TOOLS_VERSION="36.0.0"
 # This system image is designed for headless, automated testing in CI environments
 # and is more compatible with software rendering. It will be installed but may not
 # be used by the new build command.
-EMULATOR_IMAGE="system-images;android-36;google_atd;x86_64"
+# 36 not available yet as per b/432143095
+EMULATOR_IMAGE="system-images;android-35;google_atd;x86_64"
 
 # --- Environment Setup ---
 
