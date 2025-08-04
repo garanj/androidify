@@ -107,6 +107,11 @@ if [[ -f "$AAB_PATH" ]]; then
   cp "${AAB_PATH}" "${ARTIFACT_DEST_DIR}/app-release-unsigned.aab"
   echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
 
+  # Copy any .intointo.jsonl files to the artifact directory
+  echo "INFO: Searching for and copying .intointo.jsonl files..."
+  find . -type f -name "*.intointo.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
+  echo "INFO: Finished copying .intointo.jsonl files."
+
 else
   echo "FAILURE: AAB not found at ${AAB_PATH}"
   # Optionally fail the build: exit 1
