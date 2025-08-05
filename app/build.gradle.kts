@@ -26,6 +26,7 @@ plugins {
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.baselineprofile)
     id("com.google.android.gms.oss-licenses-plugin")
+    id("org.spdx.sbom") version "0.9.0"
 }
 
 android {
@@ -99,6 +100,16 @@ baselineProfile() {
     dexLayoutOptimization = true
 }
 
+spdxSbom {
+    targets {
+        // create a target named "release",
+        // this is used for the task name (spdxSbomForRelease)
+        // and output file (release.spdx.json)
+        create("release") {
+            configurations.set(listOf("releaseRuntimeClasspath"))
+        }
+    }
+}
 dependencies {
     debugImplementation(libs.leakcanary.android)
     implementation(libs.androidx.app.startup)
@@ -155,3 +166,4 @@ androidComponents {
         variantBuilder.enableAndroidTest = false
     }
 }
+
