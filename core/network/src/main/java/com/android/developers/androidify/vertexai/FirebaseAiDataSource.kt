@@ -260,8 +260,8 @@ class FirebaseAiDataSourceImpl @Inject constructor(
             },
         )
         val prompt = content {
-            image(image)
             text(backgroundPrompt)
+            image(image)
         }
         val response = model.generateContent(prompt)
         val image = response.candidates.firstOrNull()
