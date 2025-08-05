@@ -260,8 +260,10 @@ private fun CustomizeExportContents(
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween,
                     ) {
-                        Box(modifier = Modifier.weight(0.6f),
-                            contentAlignment = Alignment.Center) {
+                        Box(
+                            modifier = Modifier.weight(0.6f),
+                            contentAlignment = Alignment.Center,
+                        ) {
                             imageResult(
                                 state.exportImageCanvas,
                             )
