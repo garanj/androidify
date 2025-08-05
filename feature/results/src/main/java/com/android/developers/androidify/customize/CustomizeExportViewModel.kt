@@ -24,8 +24,10 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.data.DataModule_Companion_IoDispatcherFactory.ioDispatcher
 import com.android.developers.androidify.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -33,6 +35,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
@@ -127,7 +130,7 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     private fun triggerAiBackgroundGeneration(backgroundOption: BackgroundOption) {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch {
             if (backgroundOption.prompt == null) {
                 _state.update {
                     it.copy(
