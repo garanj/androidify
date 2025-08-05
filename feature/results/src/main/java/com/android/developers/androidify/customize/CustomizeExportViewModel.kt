@@ -150,7 +150,7 @@ class CustomizeExportViewModel @Inject constructor(
             try {
                 val bitmap = imageGenerationRepository.generateImageWithEdit(
                     image,
-                    "Add the input image as the main subject to the result, it should be the most prominent element of the resultant image - almost the original size with the background just underneath the content. The background is as follows: \"" + backgroundOption.prompt + "\"",
+                    "Add the input image as the main subject to the result, it should be the most prominent element of the resultant image - the original size with the background just underneath the content. The background is described as follows: \"" + backgroundOption.prompt + "\"",
                 )
                 _state.update {
                     it.copy(
