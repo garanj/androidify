@@ -33,5 +33,3 @@
 -keepattributes Signature
 -keepattributes *Annotation*
 -keepattributes InnerClasses
-
--keep class okhttp3.internal.Util { *; }
