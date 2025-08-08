@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -75,7 +74,8 @@ fun ImageResult(
                 modifier = Modifier.fillMaxSize(),
             ) {
                 if (exportImageCanvas.showSticker &&
-                    exportImageCanvas.imageBitmapRemovedBackground != null) {
+                    exportImageCanvas.imageBitmapRemovedBackground != null
+                ) {
                     Image(
                         bitmap = exportImageCanvas.imageBitmapRemovedBackground.asImageBitmap(),
                         modifier = Modifier

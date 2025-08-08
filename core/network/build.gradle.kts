@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.firebase.config)
     implementation(projects.core.util)
     implementation(libs.firebase.config.ktx)
+    implementation(libs.mlkit.segmentation)
     ksp(libs.hilt.compiler)
 
     androidTestImplementation(libs.androidx.ui.test.junit4)

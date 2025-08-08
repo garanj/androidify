@@ -70,7 +70,7 @@ data class BackgroundToolState(
         BackgroundOption.GreenThumb,
         BackgroundOption.Gamer,
         BackgroundOption.Jetsetter,
-        BackgroundOption.Chef
+        BackgroundOption.Chef,
     ),
 ) : ToolState
 
@@ -220,10 +220,10 @@ data class ExportImageCanvas(
             SizeOption.Sticker -> {
                 offset = Offset(0f, 0f)
                 imageSize = Size(newCanvasSize.width, newCanvasSize.height)
-                image = null
                 rotation = 0f
                 backgroundColor = null
                 showSticker = true
+                image = null
             }
         }
         return copy(
@@ -235,7 +235,7 @@ data class ExportImageCanvas(
             aspectRatioOption = sizeOption,
             selectedBackgroundOption = if (SizeOption.Sticker == sizeOption) BackgroundOption.None else backgroundOption,
             backgroundColor = backgroundColor,
-            showSticker = showSticker
+            showSticker = showSticker,
         )
     }
 }

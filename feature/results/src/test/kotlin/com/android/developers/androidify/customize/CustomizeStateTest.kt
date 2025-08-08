@@ -77,7 +77,7 @@ class CustomizeStateTest {
                 BackgroundOption.GreenThumb,
                 BackgroundOption.Gamer,
                 BackgroundOption.Jetsetter,
-                BackgroundOption.Chef
+                BackgroundOption.Chef,
             ),
             state.options,
         )

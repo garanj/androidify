@@ -42,7 +42,6 @@ import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.R
 import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
-import com.android.developers.androidify.util.backgroundRepeatX
 import com.android.developers.androidify.util.dpToPx
 import com.android.developers.androidify.util.isAtLeastMedium
 

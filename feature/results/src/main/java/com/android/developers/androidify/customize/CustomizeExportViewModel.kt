@@ -24,31 +24,24 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.developers.androidify.data.DataModule_Companion_IoDispatcherFactory.ioDispatcher
 import com.android.developers.androidify.data.ImageGenerationRepository
-import com.android.developers.androidify.segmentation.SubjectSegmentationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
-    private val subjectSegmentationHelper: SubjectSegmentationHelper,
     application: Application,
 ) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state = _state.asStateFlow()
-
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -98,6 +91,24 @@ class CustomizeExportViewModel @Inject constructor(
         }
     }
 
+    private fun triggerStickerBackgroundRemoval(bitmap: Bitmap) {
+        viewModelScope.launch {
+            val stickerBitmap = imageGenerationRepository.removeBackground(
+                bitmap,
+            )
+            _state.update {
+                it.copy(
+                    showImageEditProgress = false,
+                    exportImageCanvas = it.exportImageCanvas.copy(imageBitmapRemovedBackground = stickerBitmap)
+                        .updateAspectRatioAndBackground(
+                            it.exportImageCanvas.selectedBackgroundOption,
+                            SizeOption.Sticker,
+                        ),
+                )
+            }
+        }
+    }
+
     fun selectedToolStateChanged(toolState: ToolState) {
         when (toolState.selectedToolOption) {
             is BackgroundOption -> {
@@ -123,33 +134,57 @@ class CustomizeExportViewModel @Inject constructor(
             }
             is SizeOption -> {
                 if (toolState.selectedToolOption is SizeOption.Sticker) {
-                    // TODO kick this off to a background thread and return the
-                    //  state immediately with loading to ensure that the UI is updated
                     val bitmap = state.value.exportImageCanvas.imageBitmap
                     if (bitmap != null) {
-                        val stickerBitmap =
-                            if (state.value.exportImageCanvas.imageBitmapRemovedBackground == null)
-                                subjectSegmentationHelper.removeBackground(
-                                    bitmap,
+                        if (state.value.exportImageCanvas.imageBitmapRemovedBackground == null) {
+                            _state.update {
+                                it.copy(
+                                    toolState = it.toolState + (it.selectedTool to toolState),
+                                    showImageEditProgress = true,
+                                    exportImageCanvas = it.exportImageCanvas
+                                        .updateAspectRatioAndBackground(
+                                            it.exportImageCanvas.selectedBackgroundOption,
+                                            SizeOption.Sticker,
+                                        ),
                                 )
-                            else state.value.exportImageCanvas.imageBitmapRemovedBackground
-
-                        it.exportImageCanvas.copy(imageBitmapRemovedBackground = stickerBitmap)
-                            .updateAspectRatioAndBackground(
-                                it.exportImageCanvas.selectedBackgroundOption,
-                                (toolState.selectedToolOption as SizeOption),
-                            )
+                            }
+                            triggerStickerBackgroundRemoval(bitmap)
+                        } else {
+                            _state.update {
+                                it.copy(
+                                    toolState = it.toolState + (it.selectedTool to toolState),
+                                    showImageEditProgress = false,
+                                    exportImageCanvas = it.exportImageCanvas
+                                        .updateAspectRatioAndBackground(
+                                            it.exportImageCanvas.selectedBackgroundOption,
+                                            (toolState.selectedToolOption as SizeOption),
+                                        ),
+                                )
+                            }
+                        }
                     } else {
-                        it.exportImageCanvas.updateAspectRatioAndBackground(
-                            it.exportImageCanvas.selectedBackgroundOption,
-                            (toolState.selectedToolOption as SizeOption),
-                        )
+                        _state.update {
+                            it.copy(
+                                toolState = it.toolState + (it.selectedTool to toolState),
+                                showImageEditProgress = false,
+                                exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
+                                    it.exportImageCanvas.selectedBackgroundOption,
+                                    (toolState.selectedToolOption as SizeOption),
+                                ),
+                            )
+                        }
                     }
                 } else {
-                    it.exportImageCanvas.updateAspectRatioAndBackground(
-                        it.exportImageCanvas.selectedBackgroundOption,
-                        (toolState.selectedToolOption as SizeOption),
-                    )
+                    _state.update {
+                        it.copy(
+                            toolState = it.toolState + (it.selectedTool to toolState),
+                            showImageEditProgress = false,
+                            exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
+                                it.exportImageCanvas.selectedBackgroundOption,
+                                (toolState.selectedToolOption as SizeOption),
+                            ),
+                        )
+                    }
                 }
             }
             else -> throw IllegalArgumentException("Unknown tool option")

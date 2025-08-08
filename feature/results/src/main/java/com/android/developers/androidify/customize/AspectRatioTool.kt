@@ -63,7 +63,7 @@ fun AspectRatioTool(
                             .aspectRatio(tool.aspectRatio)
                             .padding(6.dp)
                             .fillMaxSize(),
-                        contentAlignment = Alignment.Center
+                        contentAlignment = Alignment.Center,
                     ) {
                         Image(painterResource(R.drawable.sticker_size), contentDescription = null)
                     }
@@ -86,7 +86,6 @@ fun AspectRatioTool(
                             .background(MaterialTheme.colorScheme.surfaceBright),
                     )
                 }
-
             }
         },
     )
@@ -103,7 +102,7 @@ private fun AspectRatioToolPreview() {
                 SizeOption.SocialHeader,
                 SizeOption.Wallpaper,
                 SizeOption.WallpaperTablet,
-                SizeOption.Sticker
+                SizeOption.Sticker,
             ),
             selectedOption = SizeOption.Square,
             onSizeOptionSelected = {},
