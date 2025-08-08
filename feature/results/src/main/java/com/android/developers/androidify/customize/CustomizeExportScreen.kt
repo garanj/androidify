@@ -184,8 +184,7 @@ private fun CustomizeExportContents(
                 ) {
                     ImageResult(
                         this@movableContentWithReceiverOf,
-                        modifier = Modifier
-                            .padding(16.dp),
+                        modifier = Modifier,
                         outerChromeModifier = Modifier
                             .then(chromeModifier)
                             .loadingShimmerOverlay(

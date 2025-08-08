@@ -66,8 +66,7 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     fun shareClicked() {
-        viewModelScope.launch {
-            val exportImageCanvas = state.value.exportImageCanvas
+        viewModelScope.launch {            val exportImageCanvas = state.value.exportImageCanvas
             val resultBitmap =
                 composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
                     ImageResult(
