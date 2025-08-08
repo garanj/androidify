@@ -22,7 +22,7 @@ set -e
 # --- Configuration ---
 # Get the script's directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
+echo DIR
 # Define the Android SDK version you want to target.
 ANDROID_SDK_VERSION="36"
 ANDROID_BUILD_TOOLS_VERSION="36.0.0"
@@ -82,6 +82,7 @@ cp /tmpfs/src/git/androidify-prebuilts/google-services.json ${DIR}/app
 echo "Copying gradle.properties"
 echo "" >> ${DIR}/gradle.properties # add a new line to the file
 cat /tmpfs/src/git/androidify-prebuilts/gradle.properties >> ${DIR}/gradle.properties
+ls
 
 # --- Build Process ---
 
@@ -95,7 +96,7 @@ echo "INFO: Cleaning the project..."
 
 # Build the production release bundle without generating a baseline profile.
 echo "INFO: Building the production release bundle..."
-./gradlew app:bundleRelease app:spdxSbomForRelease -x test -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
+./gradlew app:bundleRelease app:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
 # --- Artifact Collection ---
 echo "INFO: Preparing artifacts for Kokoro..."
@@ -116,17 +117,17 @@ if [[ -f "$AAB_PATH" ]]; then
   cp "${AAB_PATH}" "${ARTIFACT_DEST_DIR}/app-release-unsigned.aab"
   echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
 
-   # Find and list the files before copying
-   # Store the find results in a variable to avoid running find twice
-   # and to handle the case where no files are found gracefully.
-   intoto_files=$(find . -type f -name "*.intoto.jsonl")
+  # Find and list the files before copying
+  # Store the find results in a variable to avoid running find twice
+  # and to handle the case where no files are found gracefully.
+  intoto_files=$(find . -type f -name "*.intoto.jsonl")
 
-   if [ -n "$intoto_files" ]; then
-     echo "INFO: Found the following .intoto.jsonl files:"
-     echo "$intoto_files" # This will list each file on a new line
-     echo "INFO: Copying .intoto.jsonl files to ${ARTIFACT_DEST_DIR}/"
-     # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
-     find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
+  if [ -n "$intoto_files" ]; then
+    echo "INFO: Found the following .intoto.jsonl files:"
+    echo "$intoto_files" # This will list each file on a new line
+    echo "INFO: Copying .intoto.jsonl files to ${ARTIFACT_DEST_DIR}/"
+    # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
+    find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
   else
     echo "INFO: No .intoto.jsonl files found."
   fi
@@ -135,7 +136,9 @@ if [[ -f "$AAB_PATH" ]]; then
   # The output file from app:spdxSbomForRelease is build/spdx/release.spdx.json
   cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
 
- else
-   echo "FAILURE: AAB not found at ${AAB_PATH}"
-   exit 1
- fi
+else
+  echo "FAILURE: AAB not found at ${AAB_PATH}"
+  exit 1
+fi
+
+exit 0

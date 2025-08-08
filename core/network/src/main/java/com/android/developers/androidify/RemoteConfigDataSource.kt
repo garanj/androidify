@@ -34,6 +34,12 @@ interface RemoteConfigDataSource {
     fun getPromoVideoLink(): String
 
     fun getDancingDroidLink(): String
+
+    fun useImagen(): Boolean
+
+    fun getFineTunedModelName(): String
+
+    fun getImageGenerationEditsModelName(): String
 }
 
 @Singleton
@@ -82,5 +88,16 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
 
     override fun getDancingDroidLink(): String {
         return remoteConfig.getString("dancing_droid_gif_link")
+    }
+
+    override fun useImagen(): Boolean {
+        return remoteConfig.getBoolean("use_imagen")
+    }
+    override fun getFineTunedModelName(): String {
+        return remoteConfig.getString("fine_tuned_model_name")
+    }
+
+    override fun getImageGenerationEditsModelName(): String {
+        return remoteConfig.getString("image_generation_model_edits")
     }
 }

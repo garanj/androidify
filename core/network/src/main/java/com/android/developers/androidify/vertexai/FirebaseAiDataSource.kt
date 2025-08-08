@@ -32,8 +32,10 @@ import com.google.firebase.ai.type.ImagenPersonFilterLevel
 import com.google.firebase.ai.type.ImagenSafetyFilterLevel
 import com.google.firebase.ai.type.ImagenSafetySettings
 import com.google.firebase.ai.type.PublicPreviewAPI
+import com.google.firebase.ai.type.ResponseModality
 import com.google.firebase.ai.type.SafetySetting
 import com.google.firebase.ai.type.Schema
+import com.google.firebase.ai.type.asImageOrNull
 import com.google.firebase.ai.type.content
 import com.google.firebase.ai.type.generationConfig
 import kotlinx.serialization.json.Json
@@ -50,6 +52,7 @@ interface FirebaseAiDataSource {
     suspend fun generateDescriptivePromptFromImage(image: Bitmap): ValidatedDescription
     suspend fun generateImageFromPromptAndSkinTone(prompt: String, skinTone: String): Bitmap
     suspend fun generatePrompt(prompt: String): GeneratedPrompt
+    suspend fun generateImageWithEdit(image: Bitmap, backgroundPrompt: String): Bitmap
 }
 
 @OptIn(PublicPreviewAPI::class)
@@ -57,7 +60,10 @@ interface FirebaseAiDataSource {
 class FirebaseAiDataSourceImpl @Inject constructor(
     private val remoteConfigDataSource: RemoteConfigDataSource,
 ) : FirebaseAiDataSource {
-    private fun createGenerativeTextModel(jsonSchema: Schema, temperature: Float? = null): GenerativeModel {
+    private fun createGenerativeTextModel(
+        jsonSchema: Schema,
+        temperature: Float? = null,
+    ): GenerativeModel {
         return Firebase.ai(backend = GenerativeBackend.vertexAI()).generativeModel(
             modelName = remoteConfigDataSource.textModelName(),
             generationConfig = generationConfig {
@@ -139,20 +145,39 @@ class FirebaseAiDataSourceImpl @Inject constructor(
         )
     }
 
-    override suspend fun generateImageFromPromptAndSkinTone(prompt: String, skinTone: String): Bitmap {
-        val generativeModel = createGenerativeImageModel()
-        // Retrieve the base prompt template from Remote Config
-        val basePromptTemplate = remoteConfigDataSource.promptImageGenerationWithSkinTone()
+    private fun createFineTunedModel(): GenerativeModel {
+        return Firebase.ai.generativeModel(
+            remoteConfigDataSource.getFineTunedModelName(),
+            safetySettings = listOf(
+                SafetySetting(HarmCategory.HARASSMENT, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.HATE_SPEECH, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.SEXUALLY_EXPLICIT, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.DANGEROUS_CONTENT, HarmBlockThreshold.LOW_AND_ABOVE),
+                SafetySetting(HarmCategory.CIVIC_INTEGRITY, HarmBlockThreshold.LOW_AND_ABOVE),
+            ),
+        )
+    }
 
-        // Perform the substitution
+    override suspend fun generateImageFromPromptAndSkinTone(
+        prompt: String,
+        skinTone: String,
+    ): Bitmap {
+        val basePromptTemplate = remoteConfigDataSource.promptImageGenerationWithSkinTone()
         val imageGenerationPrompt = basePromptTemplate
             .replace("{prompt}", prompt)
             .replace("{skinTone}", skinTone)
-
-        return executeImageGeneration(
-            generativeModel,
-            imageGenerationPrompt,
-        )
+        if (remoteConfigDataSource.useImagen()) {
+            val generativeModel = createGenerativeImageModel()
+            return executeImageGeneration(
+                generativeModel,
+                imageGenerationPrompt,
+            )
+        } else {
+            val fineTunedModel = createFineTunedModel()
+            val response = fineTunedModel.generateContent(imageGenerationPrompt)
+            return response.candidates.firstOrNull()?.content?.parts?.firstOrNull()?.asImageOrNull()
+                ?: throw IllegalStateException("Could not extract image from fine-tuned model response")
+        }
     }
 
     private suspend fun executeTextValidation(
@@ -219,6 +244,29 @@ class FirebaseAiDataSourceImpl @Inject constructor(
         )
         val generativeModel = createGenerativeTextModel(jsonSchema, temperature = 0.75f)
         return executePromptGeneration(generativeModel, prompt)
+    }
+
+    override suspend fun generateImageWithEdit(
+        image: Bitmap,
+        backgroundPrompt: String,
+    ): Bitmap {
+        val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
+            modelName = remoteConfigDataSource.getImageGenerationEditsModelName(),
+            generationConfig = generationConfig {
+                responseModalities = listOf(
+                    ResponseModality.TEXT,
+                    ResponseModality.IMAGE,
+                )
+            },
+        )
+        val prompt = content {
+            text(backgroundPrompt)
+            image(image)
+        }
+        val response = model.generateContent(prompt)
+        val image = response.candidates.firstOrNull()
+            ?.content?.parts?.firstNotNullOfOrNull { it.asImageOrNull() }
+        return image ?: throw IllegalStateException("Could not extract image from model response")
     }
 
     private suspend fun executePromptGeneration(

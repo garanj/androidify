@@ -18,20 +18,25 @@ package com.android.developers.androidify.customize
 import android.app.Application
 import android.graphics.Bitmap
 import android.net.Uri
+import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.data.DataModule_Companion_IoDispatcherFactory.ioDispatcher
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.segmentation.SubjectSegmentationHelper
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import javax.inject.Named
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
@@ -94,56 +99,96 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     fun selectedToolStateChanged(toolState: ToolState) {
-        viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    toolState = it.toolState + (it.selectedTool to toolState),
-                    exportImageCanvas =
-                        when (toolState.selectedToolOption) {
-                            is BackgroundOption -> {
-                                val backgroundOption =
-                                    toolState.selectedToolOption as BackgroundOption
-                                it.exportImageCanvas.updateAspectRatioAndBackground(
-                                    backgroundOption,
-                                    it.exportImageCanvas.aspectRatioOption,
+        when (toolState.selectedToolOption) {
+            is BackgroundOption -> {
+                val backgroundOption = toolState.selectedToolOption as BackgroundOption
+                _state.update {
+                    it.copy(
+                        toolState = it.toolState + (it.selectedTool to toolState),
+                        exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
+                            backgroundOption,
+                            it.exportImageCanvas.aspectRatioOption,
+                        ),
+                    )
+                }
+                if (backgroundOption.aiBackground) {
+                    triggerAiBackgroundGeneration(backgroundOption)
+                } else {
+                    _state.update {
+                        it.copy(
+                            exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = null),
+                        )
+                    }
+                }
+            }
+            is SizeOption -> {
+                if (toolState.selectedToolOption is SizeOption.Sticker) {
+                    // TODO kick this off to a background thread and return the
+                    //  state immediately with loading to ensure that the UI is updated
+                    val bitmap = state.value.exportImageCanvas.imageBitmap
+                    if (bitmap != null) {
+                        val stickerBitmap =
+                            if (state.value.exportImageCanvas.imageBitmapRemovedBackground == null)
+                                subjectSegmentationHelper.removeBackground(
+                                    bitmap,
                                 )
-                            }
+                            else state.value.exportImageCanvas.imageBitmapRemovedBackground
 
-                            is SizeOption -> {
-                                if (toolState.selectedToolOption is SizeOption.Sticker) {
-                                    // TODO kick this off to a background thread and return the
-                                    //  state immediately with loading to ensure that the UI is updated
-                                    val bitmap = state.value.exportImageCanvas.imageBitmap
-                                    if (bitmap != null) {
-                                        val stickerBitmap =
-                                            if (state.value.exportImageCanvas.imageBitmapRemovedBackground == null)
-                                                subjectSegmentationHelper.removeBackground(
-                                                    bitmap,
-                                                )
-                                            else state.value.exportImageCanvas.imageBitmapRemovedBackground
+                        it.exportImageCanvas.copy(imageBitmapRemovedBackground = stickerBitmap)
+                            .updateAspectRatioAndBackground(
+                                it.exportImageCanvas.selectedBackgroundOption,
+                                (toolState.selectedToolOption as SizeOption),
+                            )
+                    } else {
+                        it.exportImageCanvas.updateAspectRatioAndBackground(
+                            it.exportImageCanvas.selectedBackgroundOption,
+                            (toolState.selectedToolOption as SizeOption),
+                        )
+                    }
+                } else {
+                    it.exportImageCanvas.updateAspectRatioAndBackground(
+                        it.exportImageCanvas.selectedBackgroundOption,
+                        (toolState.selectedToolOption as SizeOption),
+                    )
+                }
+            }
+            else -> throw IllegalArgumentException("Unknown tool option")
+        }
+    }
 
-                                        it.exportImageCanvas.copy(imageBitmapRemovedBackground = stickerBitmap)
-                                            .updateAspectRatioAndBackground(
-                                                it.exportImageCanvas.selectedBackgroundOption,
-                                                (toolState.selectedToolOption as SizeOption),
-                                            )
-                                    } else {
-                                        it.exportImageCanvas.updateAspectRatioAndBackground(
-                                            it.exportImageCanvas.selectedBackgroundOption,
-                                            (toolState.selectedToolOption as SizeOption),
-                                        )
-                                    }
-                                } else {
-                                    it.exportImageCanvas.updateAspectRatioAndBackground(
-                                        it.exportImageCanvas.selectedBackgroundOption,
-                                        (toolState.selectedToolOption as SizeOption),
-                                    )
-                                }
-                            }
+    private fun triggerAiBackgroundGeneration(backgroundOption: BackgroundOption) {
+        viewModelScope.launch {
+            if (backgroundOption.prompt == null) {
+                _state.update {
+                    it.copy(
+                        showImageEditProgress = false,
+                        exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = null),
+                    )
+                }
+                return@launch
+            }
 
-                            else -> throw IllegalArgumentException("Unknown tool option")
-                        },
+            val image = state.value.exportImageCanvas.imageBitmap
+            if (image == null) {
+                return@launch
+            }
+
+            _state.update { it.copy(showImageEditProgress = true) }
+            try {
+                val bitmap = imageGenerationRepository.generateImageWithEdit(
+                    image,
+                    "Add the input image android bot as the main subject to the result, it should be the most prominent element of the resultant image, large and filling the foreground, standing in the center of the frame with the central focus, and the background just underneath the content. The background is described as follows: \"" + backgroundOption.prompt + "\"",
                 )
+                _state.update {
+                    it.copy(
+                        exportImageCanvas = it.exportImageCanvas.copy(imageWithEdit = bitmap),
+                    )
+                }
+            } catch (e: Exception) {
+                Log.e("CustomizeExportViewModel", "Image generation failed", e)
+                snackbarHostState.value.showSnackbar("Background vibe generation failed")
+            } finally {
+                _state.update { it.copy(showImageEditProgress = false) }
             }
         }
     }
@@ -151,13 +196,12 @@ class CustomizeExportViewModel @Inject constructor(
     fun downloadClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas
-            val resultBitmap =
-                composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
-                    ImageResult(
-                        exportImageCanvas = exportImageCanvas,
-                        modifier = Modifier.fillMaxSize(),
-                    )
-                }
+            val resultBitmap = composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+                ImageResult(
+                    exportImageCanvas = exportImageCanvas,
+                    modifier = Modifier.fillMaxSize(),
+                )
+            }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
                 val savedOriginalUri =

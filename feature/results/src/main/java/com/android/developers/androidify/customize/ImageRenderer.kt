@@ -83,6 +83,14 @@ fun ImageResult(
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )
+                } else if (exportImageCanvas.imageWithEdit != null) {
+                    Image(
+                        bitmap = exportImageCanvas.imageWithEdit.asImageBitmap(),
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                    )
                 } else if (exportImageCanvas.imageBitmap != null) {
                     Image(
                         bitmap = exportImageCanvas.imageBitmap.asImageBitmap(),

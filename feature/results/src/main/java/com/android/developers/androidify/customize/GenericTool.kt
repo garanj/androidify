@@ -17,16 +17,19 @@ package com.android.developers.androidify.customize
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -39,6 +42,7 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import coil3.compose.rememberAsyncImagePainter
 import com.android.developers.androidify.theme.AndroidifyTheme
 
@@ -63,7 +67,7 @@ fun <T : ToolOption> GenericTool(
                     individualToolContent(tool)
                 },
                 onToolSelected = onToolSelected,
-                tool = tool
+                tool = tool,
             )
         }
     }
@@ -96,7 +100,8 @@ fun <T : ToolOption> GenericToolButton(
         }
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            modifier = backgroundModifier.padding(8.dp),
+            modifier = backgroundModifier.padding(8.dp)
+                .width(IntrinsicSize.Min),
         ) {
             Box(
                 modifier = Modifier
@@ -109,6 +114,11 @@ fun <T : ToolOption> GenericToolButton(
                 tool.displayName,
                 textAlign = TextAlign.Center,
                 style = MaterialTheme.typography.bodyMedium,
+                maxLines = 1,
+                modifier = Modifier.basicMarquee(
+                    repeatDelayMillis = 0,
+                    iterations = 300
+                )
             )
         }
     }
@@ -123,6 +133,20 @@ private fun GenericToolPreview() {
                 BackgroundOption.None,
                 BackgroundOption.Lightspeed,
                 BackgroundOption.IO,
+                BackgroundOption.None,
+                BackgroundOption.Plain,
+                BackgroundOption.Lightspeed,
+                BackgroundOption.IO,
+                BackgroundOption.MusicLover,
+                BackgroundOption.PoolMaven,
+                BackgroundOption.SoccerFanatic,
+                BackgroundOption.StarGazer,
+                BackgroundOption.FitnessBuff,
+                BackgroundOption.Fandroid,
+                BackgroundOption.GreenThumb,
+                BackgroundOption.Gamer,
+                BackgroundOption.Jetsetter,
+                BackgroundOption.Chef
             ),
             singleLine = false,
             selectedOption = BackgroundOption.Lightspeed,
