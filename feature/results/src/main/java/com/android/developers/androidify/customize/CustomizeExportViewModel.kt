@@ -147,9 +147,8 @@ class CustomizeExportViewModel @Inject constructor(
 
             _state.update { it.copy(showImageEditProgress = true) }
             try {
-                val bitmap = imageGenerationRepository.generateImageWithEdit(
-                    image,
-                    "Add the input image android bot as the main subject to the result, it should be the most prominent element of the resultant image, large and filling the foreground, standing in the center of the frame with the central focus, and the background just underneath the content. The background is described as follows: \"" + backgroundOption.prompt + "\"",
+                val bitmap = imageGenerationRepository.addBackgroundToBot(
+                    image, backgroundOption.prompt,
                 )
                 _state.update {
                     it.copy(

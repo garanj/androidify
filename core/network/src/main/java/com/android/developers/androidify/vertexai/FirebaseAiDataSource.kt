@@ -248,7 +248,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
 
     override suspend fun generateImageWithEdit(
         image: Bitmap,
-        backgroundPrompt: String,
+        backgroundPrompt: String
     ): Bitmap {
         val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
             modelName = remoteConfigDataSource.getImageGenerationEditsModelName(),
