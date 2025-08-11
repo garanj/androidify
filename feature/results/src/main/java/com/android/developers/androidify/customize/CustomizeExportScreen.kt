@@ -63,7 +63,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.LookaheadScope
@@ -73,6 +72,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
@@ -100,15 +100,15 @@ import com.android.developers.androidify.theme.R as ThemeR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomizeAndExportScreen(
-    resultImage: Bitmap,
+    resultImageUri: Uri,
     originalImageUri: Uri?,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
     isMediumWindowSize: Boolean = isAtLeastMedium(),
     viewModel: CustomizeExportViewModel = hiltViewModel<CustomizeExportViewModel>(),
 ) {
-    LaunchedEffect(resultImage, originalImageUri) {
-        viewModel.setArguments(resultImage, originalImageUri)
+    LaunchedEffect(resultImageUri, originalImageUri) {
+        viewModel.setArguments(resultImageUri, originalImageUri)
     }
     val state = viewModel.state.collectAsStateWithLifecycle()
 
@@ -494,9 +494,9 @@ fun CustomizeExportPreview() {
                     displayName = "Pixel Watch 3",
                     hasAndroidify = true,
                 )
-                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val imageUri = ("android.resource://com.android.developers.androidify.results/" + R.drawable.placeholderbot).toUri()
                 val state = CustomizeExportState(
-                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
+                    exportImageCanvas = ExportImageCanvas(imageUri = imageUri),
                     connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
@@ -526,7 +526,7 @@ fun CustomizeExportPreviewLarge() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val imageUri = ("android.resource://com.android.developers.androidify.results/" + R.drawable.placeholderbot).toUri()
                 val connectedWatch = ConnectedWatch(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",
@@ -534,7 +534,7 @@ fun CustomizeExportPreviewLarge() {
                 )
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
-                        imageBitmap = bitmap.asAndroidBitmap(),
+                        imageUri = imageUri,
                         aspectRatioOption = SizeOption.Square,
                     ),
                     selectedTool = CustomizeTool.Background,

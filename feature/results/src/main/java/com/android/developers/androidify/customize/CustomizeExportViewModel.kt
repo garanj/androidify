@@ -120,13 +120,13 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     fun setArguments(
-        resultImageUrl: Bitmap,
+        resultImageUrl: Uri,
         originalImageUrl: Uri?,
     ) {
         _state.update {
             _state.value.copy(
                 originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl),
+                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
             )
         }
     }
