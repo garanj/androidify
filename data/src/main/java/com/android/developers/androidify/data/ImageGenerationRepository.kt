@@ -19,6 +19,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.model.ValidatedDescription
 import com.android.developers.androidify.model.ValidatedImage
 import com.android.developers.androidify.util.LocalFileProvider
@@ -45,6 +46,7 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
     private val internetConnectivityManager: InternetConnectivityManager,
     private val geminiNanoDataSource: GeminiNanoGenerationDataSource,
     private val firebaseAiDataSource: FirebaseAiDataSource,
+    private val remoteConfigDataSource: RemoteConfigDataSource
 ) : ImageGenerationRepository {
 
     override suspend fun initialize() {
@@ -128,21 +130,8 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addBackgroundToBot(image: Bitmap, backgroundPrompt: String): Bitmap {
-        val backgroundBotInstructions = """
-            Add the input image android bot as the main subject to the result, 
-            it should be the most prominent element of the resultant image, large and 
-            filling the foreground - more than 50% of the resultant frame, 
-            standing in the center of the frame with the central
-            focus, and the background just underneath the content. 
-            
-            Always include the input Android Bot in the final result image as the subject of the image. 
-            It should be prominently featured in the foreground, center of the frame, without any adjustments other 
-            than the lighting of the surrounding environment. There should only be one of the bots in the image.  
-            style="3d animation style, simplified shapes, mouthless character, realistic physics simulation"
-            
-            Do not alter the input Android Bot image, do not change its shape or add any hands, eyes, mouths etc. Do not change the characters color scheme.
-            
-            The background is described as follows: \"""".trimIndent() + backgroundPrompt + "\""
+        val backgroundBotInstructions = remoteConfigDataSource.getBotBackgroundInstructionPrompt() +
+               "\"" +  backgroundPrompt + "\""
         return firebaseAiDataSource.generateImageWithEdit(image, backgroundBotInstructions)
     }
 }
