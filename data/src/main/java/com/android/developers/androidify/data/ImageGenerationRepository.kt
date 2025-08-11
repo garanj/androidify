@@ -128,22 +128,11 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun addBackgroundToBot(image: Bitmap, backgroundPrompt: String): Bitmap {
-     /*   val systemPrompt = """
-            Always include the input Android Bot in the final result image as the subject of the image. 
-            It should be prominently featured in the foreground, center of the frame, without any adjustments other 
-            than the lighting of the surrounding environment. There should only be one of the bots in the image.  
-            style="3d animation style, simplified shapes, mouthless character, realistic physics simulation"
-            
-            negativePrompt="fading, smile face, smile, mouth shape, mouth, teeth, lips, thumbs, 
-            cartoony or overly bright visuals, smiling, new visual elements, hands, mouth, eyes, 
-            paws, human-like visual elements, text, logos, dark, gritty, changing the character's color scheme, 
-            sudden movements, glitching" 
-            
-        """.trimIndent()*/
         val backgroundBotInstructions = """
             Add the input image android bot as the main subject to the result, 
             it should be the most prominent element of the resultant image, large and 
-            filling the foreground, standing in the center of the frame with the central
+            filling the foreground - more than 50% of the resultant frame, 
+            standing in the center of the frame with the central
             focus, and the background just underneath the content. 
             
             Always include the input Android Bot in the final result image as the subject of the image. 
