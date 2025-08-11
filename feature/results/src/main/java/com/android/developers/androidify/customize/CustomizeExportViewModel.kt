@@ -54,7 +54,6 @@ class CustomizeExportViewModel @Inject constructor(
 
     override fun onCleared() {
         super.onCleared()
-        composableBitmapRenderer.dispose()
     }
     fun setArguments(
         resultImageUrl: Bitmap,
