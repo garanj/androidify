@@ -27,6 +27,7 @@ import android.util.Log
 import android.view.Display
 import android.view.Surface
 import android.view.ViewGroup
+import android.view.WindowManager
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
@@ -52,15 +53,13 @@ import androidx.savedstate.SavedStateRegistry
 import androidx.savedstate.SavedStateRegistryController
 import androidx.savedstate.SavedStateRegistryOwner
 import androidx.savedstate.setViewTreeSavedStateRegistryOwner
+import com.android.developers.androidify.theme.R
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import javax.inject.Inject
 import javax.inject.Singleton
 
 interface ComposableBitmapRenderer {
-    fun initialize()
-
-    fun dispose()
 
     suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap?
 }
@@ -79,34 +78,25 @@ interface ComposableBitmapRenderer {
  */
 @Singleton
 class ComposableBitmapRendererImpl @Inject constructor(private val application: Application) : ComposableBitmapRenderer {
-    private val texture = SurfaceTexture(false)
-    private val surface = Surface(texture)
-    private var virtualDisplay: VirtualDisplay? = null
-
-    override fun initialize() {
-        virtualDisplay =
-            (application.getSystemService(DISPLAY_SERVICE) as DisplayManager).createVirtualDisplay(
-                "virtualDisplay",
-                1,
-                1,
-                72,
-                surface,
-                DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY,
-            )
-    }
-
-    override fun dispose() {
-        virtualDisplay?.release()
-        surface.release()
-        texture.release()
-    }
 
     private suspend fun <T> useVirtualDisplay(callback: suspend (display: Display) -> T): T? {
-        if (virtualDisplay == null) {
-            Log.e("OffscreenBitmapManager", "virtualDisplay is null")
-            initialize()
-        }
-        return callback(virtualDisplay!!.display)
+        val texture = SurfaceTexture(false)
+        val surface = Surface(texture)
+        val virtualDisplay: VirtualDisplay? =
+                (application.getSystemService(DISPLAY_SERVICE) as DisplayManager).createVirtualDisplay(
+                    "virtualDisplay",
+                    1,
+                    1,
+                    72,
+                    surface,
+                    DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY,
+                )
+
+        val result = callback(virtualDisplay!!.display)
+        virtualDisplay.release()
+        surface.release()
+        texture.release()
+        return result
     }
 
     override suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap? {
