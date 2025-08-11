@@ -158,15 +158,9 @@ fun BackgroundLayout(
                 .then(safeAnimateBounds)
                 .rotate(rotationAnimation),
         ) {
-            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None) {
-                Modifier
-            } else {
-                Modifier.clip(RoundedCornerShape(6))
-            }
             Box(
                 modifier = Modifier
-                    .fillMaxSize()
-                    .then(clip),
+                    .fillMaxSize(),
                 contentAlignment = Alignment.Center,
             ) {
                 content()
