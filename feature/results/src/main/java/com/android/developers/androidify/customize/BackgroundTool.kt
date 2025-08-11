@@ -61,7 +61,7 @@ fun BackgroundTool(
         individualToolContent = { tool ->
             Box(
                 modifier = Modifier
-                    .aspectRatio(1f)
+                    .size(70.dp)
                     .border(
                         2.dp,
                         color = MaterialTheme.colorScheme.primary,
