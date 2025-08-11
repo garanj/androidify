@@ -16,28 +16,105 @@
 package com.android.developers.androidify.ondevice
 
 import android.graphics.Bitmap
+import android.print.PrintJobInfo.STATE_COMPLETED
+import android.provider.SyncStateContract.Helpers.update
+import android.util.Log
+import coil3.util.CoilUtils.result
+import com.google.android.gms.common.moduleinstall.InstallStatusListener
+import com.google.android.gms.common.moduleinstall.ModuleInstallClient
+import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_CANCELED
+import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_FAILED
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
+import kotlinx.coroutines.Job
+import javax.inject.Inject
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
+import kotlin.coroutines.suspendCoroutine
 
 interface LocalSegmentationDataSource {
     suspend fun removeBackground(bitmap: Bitmap): Bitmap
 }
 
-class LocalSegmentationDataSourceImpl : LocalSegmentationDataSource {
-
-    override suspend fun removeBackground(bitmap: Bitmap): Bitmap {
-        val image = InputImage.fromBitmap(bitmap, 0)
+class LocalSegmentationDataSourceImpl @Inject constructor(
+    private val moduleInstallClient: ModuleInstallClient
+) : LocalSegmentationDataSource {
+    private val segmenter by lazy {
         val options = SubjectSegmenterOptions.Builder()
             .enableForegroundBitmap()
             .build()
+        SubjectSegmentation.getClient(options)
+    }
 
-        val segmenter = SubjectSegmentation.getClient(options)
+    private suspend fun isSubjectSegmentationModuleInstalled(): Boolean {
+        val areModulesAvailable =
+            suspendCancellableCoroutine { continuation ->
+                moduleInstallClient.areModulesAvailable(segmenter)
+                    .addOnSuccessListener {
+                        continuation.resume(it.areModulesAvailable())
+                    }
+                    .addOnFailureListener {
+                        continuation.resumeWithException(it)
+                    }
+            }
+        return areModulesAvailable
+    }
 
+    private suspend fun installSubjectSegmentationModule(): Boolean {
+        val result = suspendCancellableCoroutine { continuation ->
+            val listener = InstallStatusListener { update ->
+                Log.d("LocalSegmentationDataSource", "Download progress: ${update.installState}")
+
+                if (update.installState == STATE_COMPLETED) {
+                    continuation.resume(true)
+                } else if (update.installState == STATE_FAILED || update.installState == STATE_CANCELED) {
+                    continuation.resumeWithException(
+                        Exception("Module download failed or was canceled. State: ${update.installState}")
+                    )
+                } else {
+                    Log.d("LocalSegmentationDataSource", "State update: ${update.installState}")
+                }
+            }
+            val moduleInstallRequest = ModuleInstallRequest.newBuilder()
+                .addApi(segmenter)
+                .setListener(listener)
+                .build()
+
+            moduleInstallClient
+                .installModules(moduleInstallRequest)
+                .addOnFailureListener {
+                    Log.e("LocalSegmentationDataSource", "Failed to download module", it)
+                }
+                .addOnCompleteListener {
+                    Log.d("LocalSegmentationDataSource", "Successfully triggered download - await download progress updates")
+                }
+
+        }
+        return result
+    }
+
+    override suspend fun removeBackground(bitmap: Bitmap): Bitmap {
+        val areModulesAvailable = isSubjectSegmentationModuleInstalled()
+
+        if (!areModulesAvailable) {
+            Log.d("LocalSegmentationDataSource", "Modules not available - downloading")
+            val result = installSubjectSegmentationModule()
+            if (!result) {
+                throw Exception("Failed to download module")
+            }
+        } else {
+            Log.d("LocalSegmentationDataSource", "Modules available")
+        }
+        val image = InputImage.fromBitmap(bitmap, 0)
         return suspendCancellableCoroutine { continuation ->
+            continuation.invokeOnCancellation { cause ->
+                Log.d("LocalSegmentationDataSource", "Continuation was cancelled!", cause)
+            }
             segmenter.process(image)
                 .addOnSuccessListener { result ->
                     if (result.foregroundBitmap != null) {
@@ -47,6 +124,7 @@ class LocalSegmentationDataSourceImpl : LocalSegmentationDataSource {
                     }
                 }
                 .addOnFailureListener { e ->
+                    Log.e("LocalSegmentationDataSource", "Exception while executing background removal", e)
                     continuation.resumeWithException(e)
                 }
         }

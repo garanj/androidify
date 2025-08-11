@@ -2,6 +2,7 @@
 # build
 agp = "8.11.1"
 compileSdk = "36"
+core = "1.5.0"
 leakcanaryAndroid = "2.14"
 minSdk = "26"
 javaVersion = "17"
@@ -48,6 +49,7 @@ material = "1.12.0"
 media3 = "1.7.1"
 navigation3 = "1.0.0-alpha05"
 okhttp = "4.12.0"
+playServicesBaseTesting = "16.1.0"
 poseDetection = "18.0.0-beta5"
 profileinstaller = "1.4.1"
 retrofit = "2.11.0"
@@ -61,7 +63,9 @@ uiTooling = "1.8.3"
 window = "1.4.0"
 aiEdge = "0.0.1-exp02"
 lifecycleProcess = "2.9.1"
+mlkitCommon = "18.11.0"
 mlkitSegmentation = "16.0.0-beta1"
+playServicesBase = "18.4.0"
 
 [libraries]
 accompanist-permissions = { module = "com.google.accompanist:accompanist-permissions", version.ref = "accompanist" }
@@ -78,6 +82,7 @@ androidx-camera-core = { module = "androidx.camera:camera-core", version.ref = "
 androidx-camera-lifecycle = { group = "androidx.camera", name = "camera-lifecycle", version.ref = "camerax" }
 androidx-compose-bom = { group = "androidx.compose", name = "compose-bom-alpha", version.ref = "composeBom" }
 androidx-concurrent-futures-ktx = { module = "androidx.concurrent:concurrent-futures-ktx", version.ref = "concurrent" }
+androidx-core = { module = "androidx.test:core", version.ref = "core" }
 androidx-core-ktx = { group = "androidx.core", name = "core-ktx", version.ref = "coreKtx" }
 androidx-core-splashscreen = { module = "androidx.core:core-splashscreen", version.ref = "coreSplashscreen" }
 androidx-espresso-core = { group = "androidx.test.espresso", name = "espresso-core", version.ref = "espressoCore" }
@@ -123,9 +128,11 @@ kotlinx-coroutines-test = { group = "org.jetbrains.kotlinx", name = "kotlinx-cor
 kotlinx-serialization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "kotlinxSerializationJson" }
 leakcanary-android = { module = "com.squareup.leakcanary:leakcanary-android", version.ref = "leakcanaryAndroid" }
 logging-interceptor = { group = "com.squareup.okhttp3", name = "logging-interceptor", version.ref = "loggingInterceptor" }
+mlkit-common = { group = "com.google.mlkit", name = "common", version.ref = "mlkitCommon" }
 mlkit-pose-detection = { module = "com.google.mlkit:pose-detection", version.ref = "poseDetection" }
 mlkit-segmentation = { module = "com.google.android.gms:play-services-mlkit-subject-segmentation", version.ref = "mlkitSegmentation" }
 okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhttp" }
+play-services-base-testing = { module = "com.google.android.gms:play-services-base-testing", version.ref = "playServicesBaseTesting" }
 retrofit = { group = "com.squareup.retrofit2", name = "retrofit", version.ref = "retrofit" }
 retrofit-kotlin-serialization = { group = "com.squareup.retrofit2", name = "converter-kotlinx-serialization", version.ref = "retrofit" }
 robolectric = { group = "org.robolectric", name = "robolectric", version.ref = "robolectric" }
@@ -137,6 +144,7 @@ ai-edge = { group = "com.google.ai.edge.aicore", name = "aicore", version.ref = 
 google-oss-licenses = { group = "com.google.android.gms", name = "play-services-oss-licenses", version.ref = "googleOss" }
 google-oss-licenses-plugin = { group = "com.google.android.gms", name = "oss-licenses-plugin", version.ref = "googleOssPlugin" }
 androidx-lifecycle-process = { group = "androidx.lifecycle", name = "lifecycle-process", version.ref = "lifecycleProcess" }
+play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
