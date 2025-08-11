@@ -40,7 +40,7 @@ fun AspectRatioTool(
     selectedOption: SizeOption,
     onSizeOptionSelected: (SizeOption) -> Unit,
     modifier: Modifier = Modifier,
-    singleLine: Boolean = true,
+    singleLine: Boolean = false,
 ) {
     GenericTool(
         modifier = modifier.wrapContentSize()
