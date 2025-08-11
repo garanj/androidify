@@ -85,12 +85,12 @@ class FirebaseAiDataSourceImpl @Inject constructor(
         return Firebase.ai(backend = GenerativeBackend.vertexAI()).imagenModel(
             remoteConfigDataSource.imageModelName(),
             safetySettings =
-            ImagenSafetySettings(
-                safetyFilterLevel = ImagenSafetyFilterLevel.BLOCK_LOW_AND_ABOVE,
-                // Uses `ALLOW_ADULT` filter since `ALLOW_ALL` requires a special approval
-                // See https://cloud.google.com/vertex-ai/generative-ai/docs/image/responsible-ai-imagen#person-face-gen
-                personFilterLevel = ImagenPersonFilterLevel.ALLOW_ADULT,
-            ),
+                ImagenSafetySettings(
+                    safetyFilterLevel = ImagenSafetyFilterLevel.BLOCK_LOW_AND_ABOVE,
+                    // Uses `ALLOW_ADULT` filter since `ALLOW_ALL` requires a special approval
+                    // See https://cloud.google.com/vertex-ai/generative-ai/docs/image/responsible-ai-imagen#person-face-gen
+                    personFilterLevel = ImagenPersonFilterLevel.ALLOW_ADULT,
+                ),
         )
     }
 
@@ -248,7 +248,7 @@ class FirebaseAiDataSourceImpl @Inject constructor(
 
     override suspend fun generateImageWithEdit(
         image: Bitmap,
-        backgroundPrompt: String
+        backgroundPrompt: String,
     ): Bitmap {
         val model = Firebase.ai(backend = GenerativeBackend.googleAI()).generativeModel(
             modelName = remoteConfigDataSource.getImageGenerationEditsModelName(),
