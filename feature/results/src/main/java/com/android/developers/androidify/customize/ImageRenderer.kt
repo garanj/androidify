@@ -158,7 +158,8 @@ fun BackgroundLayout(
                 .then(safeAnimateBounds)
                 .rotate(rotationAnimation),
         ) {
-            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None) {
+            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None
+                || exportImageCanvas.selectedBackgroundOption.aiBackground) {
                 Modifier
             } else {
                 Modifier.clip(RoundedCornerShape(6))

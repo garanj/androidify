@@ -58,9 +58,9 @@ class FakeImageGenerationRepository : ImageGenerationRepository {
         return imageUri
     }
 
-    override suspend fun generateImageWithEdit(
+    override suspend fun addBackgroundToBot(
         image: Bitmap,
-        editPrompt: String,
+        backgroundPrompt: String,
     ): Bitmap {
         return createBitmap(1, 1)
     }
