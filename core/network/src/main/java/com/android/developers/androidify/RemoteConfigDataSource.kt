@@ -40,6 +40,8 @@ interface RemoteConfigDataSource {
     fun getFineTunedModelName(): String
 
     fun getImageGenerationEditsModelName(): String
+
+    fun getBotBackgroundInstructionPrompt(): String
 }
 
 @Singleton
@@ -99,5 +101,9 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
 
     override fun getImageGenerationEditsModelName(): String {
         return remoteConfig.getString("image_generation_model_edits")
+    }
+
+    override fun getBotBackgroundInstructionPrompt(): String {
+        return remoteConfig.getString("bot_background_instruction_prompt")
     }
 }

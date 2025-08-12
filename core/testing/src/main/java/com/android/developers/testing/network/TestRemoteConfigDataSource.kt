@@ -71,4 +71,8 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
     override fun getImageGenerationEditsModelName(): String {
         return "test_image_model"
     }
+
+    override fun getBotBackgroundInstructionPrompt(): String {
+        return "bot_background_instruction_prompt"
+    }
 }

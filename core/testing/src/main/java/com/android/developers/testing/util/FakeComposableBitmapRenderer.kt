@@ -22,11 +22,6 @@ import androidx.core.graphics.createBitmap
 import com.android.developers.androidify.customize.ComposableBitmapRenderer
 
 class FakeComposableBitmapRenderer : ComposableBitmapRenderer {
-    override fun initialize() {
-    }
-
-    override fun dispose() {
-    }
 
     override suspend fun renderComposableToBitmap(
         canvasSize: Size,

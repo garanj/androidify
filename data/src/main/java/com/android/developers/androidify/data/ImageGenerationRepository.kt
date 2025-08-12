@@ -19,6 +19,7 @@ import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
+import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.model.ValidatedDescription
 import com.android.developers.androidify.model.ValidatedImage
 import com.android.developers.androidify.ondevice.LocalSegmentationDataSource
@@ -36,8 +37,8 @@ interface ImageGenerationRepository {
     suspend fun saveImage(imageBitmap: Bitmap): Uri
     suspend fun saveImageToExternalStorage(imageBitmap: Bitmap): Uri
     suspend fun saveImageToExternalStorage(imageUri: Uri): Uri
-    suspend fun generateImageWithEdit(image: Bitmap, editPrompt: String): Bitmap
 
+    suspend fun addBackgroundToBot(image: Bitmap, backgroundPrompt: String) : Bitmap
     suspend fun removeBackground(image: Bitmap): Bitmap
 }
 
@@ -47,6 +48,7 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
     private val internetConnectivityManager: InternetConnectivityManager,
     private val geminiNanoDataSource: GeminiNanoGenerationDataSource,
     private val firebaseAiDataSource: FirebaseAiDataSource,
+    private val remoteConfigDataSource: RemoteConfigDataSource,
     private val localSegmentationDataSource: LocalSegmentationDataSource,
 ) : ImageGenerationRepository {
 
@@ -130,8 +132,10 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun generateImageWithEdit(image: Bitmap, editPrompt: String): Bitmap {
-        return firebaseAiDataSource.generateImageWithEdit(image, editPrompt)
+    override suspend fun addBackgroundToBot(image: Bitmap, backgroundPrompt: String): Bitmap {
+        val backgroundBotInstructions = remoteConfigDataSource.getBotBackgroundInstructionPrompt() +
+               "\"" +  backgroundPrompt + "\""
+        return firebaseAiDataSource.generateImageWithEdit(image, backgroundBotInstructions)
     }
 
     override suspend fun removeBackground(image: Bitmap): Bitmap {
