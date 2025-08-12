@@ -125,7 +125,7 @@ private fun BackgroundToolPreview() {
                 BackgroundOption.GreenThumb,
                 BackgroundOption.Gamer,
                 BackgroundOption.Jetsetter,
-                BackgroundOption.Chef
+                BackgroundOption.Chef,
             ),
             selectedOption = BackgroundOption.Lightspeed,
             onBackgroundOptionSelected = {},

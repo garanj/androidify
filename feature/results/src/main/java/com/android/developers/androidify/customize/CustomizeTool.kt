@@ -35,11 +35,13 @@ sealed class SizeOption(
     override val key: String,
 ) : ToolOption {
 
-    object Square : SizeOption(1f, Size(1000f, 1000f), "1:1", "square")
+    object Square : SizeOption(1f, Size(2000f, 2000f), "1:1", "square")
     object Banner : SizeOption(4f, Size(4000f, 1000f), "Banner", "banner")
     object Wallpaper : SizeOption(9 / 16f, Size(900f, 1600f), "Wallpaper", "wallpaper")
     object SocialHeader : SizeOption(3f, Size(3000f, 1000f), "3:1", "social_header")
     object WallpaperTablet : SizeOption(1280 / 800f, Size(1280f, 800f), "Large wallpaper", "wallpaper_large")
+
+    object Sticker : SizeOption(1f, Size(2000f, 2000f), "Sticker", "sticker")
 }
 
 sealed class BackgroundOption(
@@ -61,7 +63,7 @@ sealed class BackgroundOption(
         "IO",
         R.drawable.background_option_io,
     )
-    object MusicLover: BackgroundOption(
+    object MusicLover : BackgroundOption(
         "Music lover",
         "music",
         R.drawable.background_option_music_lover,
@@ -76,7 +78,7 @@ sealed class BackgroundOption(
      Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the room/setup. This low perspective emphasizes the expanse of the floor, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition.
 
      Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
     object PoolMaven : BackgroundOption(
         "Pool maven",
@@ -95,7 +97,7 @@ sealed class BackgroundOption(
             Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the room/setup. This low perspective emphasizes the expanse of the floor, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition. The foreground has the same pink tiles that surround the pool.
 
             Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
 
     object SoccerFanatic : BackgroundOption(
@@ -119,9 +121,9 @@ sealed class BackgroundOption(
   Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the room/setup. This low perspective emphasizes the expanse of the floor, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition.
 
   Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
-    object StarGazer: BackgroundOption(
+    object StarGazer : BackgroundOption(
         "StarGazer",
         "star",
         R.drawable.background_option_stargazer,
@@ -136,10 +138,10 @@ sealed class BackgroundOption(
    Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the room/setup. This low perspective emphasizes the expanse of the floor, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition.
 
    Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
 
-    object FitnessBuff: BackgroundOption(
+    object FitnessBuff : BackgroundOption(
         "Fitness buff",
         "fitness",
         R.drawable.background_option_fitness,
@@ -154,10 +156,10 @@ sealed class BackgroundOption(
     Captured from a very low, zoomed-out angle, the scene emphasizes the vast aerobics stage and its contents, creating profound depth. Objects appear much smaller relative to the wide composition, subtly placed at the edges to leave the center foreground clear. Make sure that no characters appear in the scene, and that no objects are given eyes and mouths. There should be a clear horizon line close to the center of the composition where the floor meets the back wall.
 
     Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the aerobics stage and its contents. This low perspective emphasizes the expanse of the stage's surface, which appears to stretch far into the distance, creating a profound sense of depth and length. Place the scene items towards the edges of the composition, ensuring that the vast middle foreground remains clear and open.
-            """.trimIndent()
+        """.trimIndent(),
     )
 
-    object Fandroid: BackgroundOption(
+    object Fandroid : BackgroundOption(
         "Fandroid",
         "fandroid",
         R.drawable.background_option_fandroid,
@@ -178,10 +180,10 @@ sealed class BackgroundOption(
      Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the room/setup. This low perspective emphasizes the expanse of the floor, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition.
 
        Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
 
-    object GreenThumb: BackgroundOption(
+    object GreenThumb : BackgroundOption(
         displayName = "Green thumb",
         key = "green_thumb",
         previewDrawableInt = R.drawable.background_option_greenthumb,
@@ -196,10 +198,10 @@ sealed class BackgroundOption(
   Crucially, the scene is captured from a very low camera angle, almost at ground level, significantly zoomed out to showcase a much wider view of the space. This low perspective emphasizes the expanse of the ground, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition.
 
   Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
 
-    object Gamer: BackgroundOption(
+    object Gamer : BackgroundOption(
         displayName = "Gamer",
         key = "gamer",
         previewDrawableInt = R.drawable.background_option_gamer,
@@ -214,9 +216,9 @@ sealed class BackgroundOption(
     Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the room/setup. This low perspective emphasizes the expanse of the floor, which appears to stretch far into the distance, creating a profound sense of depth and length. The objects in the scene should appear much smaller in relation to the overall composition.
 
     Place the scene items, to the edges of the composition, so that when an object is placed in the middle of the foreground, it does not completely cover what's behind it.
-        """.trimIndent()
+        """.trimIndent(),
     )
-    object Jetsetter: BackgroundOption(
+    object Jetsetter : BackgroundOption(
         displayName = "Jetsetter",
         key = "jetsetter",
         previewDrawableInt = R.drawable.background_option_jetsetter,
@@ -229,10 +231,10 @@ sealed class BackgroundOption(
   A collection of brightly colored, stylized luggage — including vibrant bags, deep blue cloud-shaped carry-ons, and sunny yellow star-shaped duffel bags — sit neatly arranged. The foreground is a deliberate blank space, with only the clean, subtly glowing cloud floor visible, offering an open area for a future character or object to be added, perhaps a traveler waiting for their destination. The overall atmosphere is serene and anticipatory, with the warm, ethereal light creating long, dynamic shadows that enhance the 3D rendering.
 
   Crucially, the scene is captured from a very low camera angle, almost at ground level, significantly zoomed out to showcase a much wider view of the waiting area. This low perspective emphasizes the expansive cloud station, creating a profound sense of depth and scale. The area above the horizon line is clean, open, and uncluttered, emphasizing the vastness of the sky. The items and the colorful luggage appear smaller in relation to the overall composition, positioned slightly to the edges to allow the sweeping view of the planes and sky above, ensuring that the middle foreground remains clear and open.
-        """.trimIndent()
+        """.trimIndent(),
     )
 
-    object Chef: BackgroundOption(
+    object Chef : BackgroundOption(
         "Masterchef",
         "chef",
         R.drawable.background_option_chef,
@@ -247,6 +249,6 @@ sealed class BackgroundOption(
            Captured from a very low, zoomed-out angle, the scene emphasizes the vast work surface and its contents, creating profound depth. Objects appear much smaller relative to the wide composition, subtly placed at the edges to leave the center foreground and upper area clear, creating a parting in the middle of the scene. No characters appear, and no objects are given eyes and mouths.
 
            Crucially, the scene is captured from a very low camera angle, almost at floor level, significantly zoomed out to showcase a much wider view of the work surface and its contents. This low perspective emphasizes the expanse of the surface, which appears to stretch far into the distance, creating a profound sense of depth and length. Place the scene items towards the edges of the composition, ensuring that the vast middle foreground remains clear and open.
-        """.trimIndent()
+        """.trimIndent(),
     )
 }

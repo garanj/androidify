@@ -24,10 +24,8 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
-import com.android.developers.androidify.data.DataModule_Companion_IoDispatcherFactory.ioDispatcher
 import com.android.developers.androidify.data.ImageGenerationRepository
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -35,7 +33,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
-import javax.inject.Named
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
@@ -55,6 +52,7 @@ class CustomizeExportViewModel @Inject constructor(
     override fun onCleared() {
         super.onCleared()
     }
+
     fun setArguments(
         resultImageUrl: Bitmap,
         originalImageUrl: Uri?,
@@ -70,12 +68,13 @@ class CustomizeExportViewModel @Inject constructor(
     fun shareClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas
-            val resultBitmap = composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
-                ImageResult(
-                    exportImageCanvas = exportImageCanvas,
-                    modifier = Modifier.fillMaxSize(),
-                )
-            }
+            val resultBitmap =
+                composableBitmapRenderer.renderComposableToBitmap(exportImageCanvas.canvasSize) {
+                    ImageResult(
+                        exportImageCanvas = exportImageCanvas,
+                        modifier = Modifier.fillMaxSize(),
+                    )
+                }
             if (resultBitmap != null) {
                 val imageFileUri = imageGenerationRepository.saveImage(resultBitmap)
 
@@ -85,11 +84,49 @@ class CustomizeExportViewModel @Inject constructor(
             }
         }
     }
+
     fun onSavedUriConsumed() {
         _state.update {
             it.copy(savedUri = null)
         }
     }
+
+    private fun triggerStickerBackgroundRemoval(bitmap: Bitmap, previousSizeOption: SizeOption) {
+        viewModelScope.launch {
+            try {
+                val stickerBitmap = imageGenerationRepository.removeBackground(
+                    bitmap,
+                )
+                _state.update {
+                    it.copy(
+                        showImageEditProgress = false,
+                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmapRemovedBackground = stickerBitmap)
+                            .updateAspectRatioAndBackground(
+                                it.exportImageCanvas.selectedBackgroundOption,
+                                SizeOption.Sticker,
+                            ),
+                    )
+                }
+            } catch (exception: Exception) {
+                Log.e("CustomizeExportViewModel", "Background removal failed", exception)
+                snackbarHostState.value.showSnackbar("Background removal failed")
+                _state.update {
+                    val aspectRatioToolState = (it.toolState[CustomizeTool.Size] as AspectRatioToolState)
+                        .copy(selectedToolOption =  previousSizeOption)
+                    it.copy(
+                        toolState = it.toolState + (CustomizeTool.Size to aspectRatioToolState),
+                        showImageEditProgress = false,
+                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmapRemovedBackground = null)
+                            .updateAspectRatioAndBackground(
+                                it.exportImageCanvas.selectedBackgroundOption,
+                                previousSizeOption,
+                            ),
+                    )
+                }
+            }
+        }
+    }
+
     fun selectedToolStateChanged(toolState: ToolState) {
         when (toolState.selectedToolOption) {
             is BackgroundOption -> {
@@ -114,14 +151,35 @@ class CustomizeExportViewModel @Inject constructor(
                 }
             }
             is SizeOption -> {
-                _state.update {
-                    it.copy(
-                        toolState = it.toolState + (it.selectedTool to toolState),
-                        exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
-                            it.exportImageCanvas.selectedBackgroundOption,
-                            (toolState.selectedToolOption as SizeOption),
-                        ),
-                    )
+                val selectedSizeOption = toolState.selectedToolOption as SizeOption
+                val needsBackgroundRemoval = selectedSizeOption == SizeOption.Sticker &&
+                        state.value.exportImageCanvas.imageBitmapRemovedBackground == null
+
+                val imageBitmap = state.value.exportImageCanvas.imageBitmap
+                if (needsBackgroundRemoval && imageBitmap != null) {
+                    val previousSizeOption = state.value.exportImageCanvas.aspectRatioOption
+                    _state.update {
+                        it.copy(
+                            toolState = it.toolState + (it.selectedTool to toolState),
+                            showImageEditProgress = true,
+                            exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
+                                it.exportImageCanvas.selectedBackgroundOption,
+                                SizeOption.Sticker,
+                            ),
+                        )
+                    }
+                    triggerStickerBackgroundRemoval(imageBitmap, previousSizeOption)
+                } else {
+                    _state.update {
+                        it.copy(
+                            toolState = it.toolState + (it.selectedTool to toolState),
+                            showImageEditProgress = false,
+                            exportImageCanvas = it.exportImageCanvas.updateAspectRatioAndBackground(
+                                it.exportImageCanvas.selectedBackgroundOption,
+                                selectedSizeOption,
+                            ),
+                        )
+                    }
                 }
             }
             else -> throw IllegalArgumentException("Unknown tool option")

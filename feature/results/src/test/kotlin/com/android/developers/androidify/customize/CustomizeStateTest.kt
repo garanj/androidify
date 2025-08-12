@@ -53,6 +53,7 @@ class CustomizeStateTest {
                 SizeOption.WallpaperTablet,
                 SizeOption.Banner,
                 SizeOption.SocialHeader,
+                SizeOption.Sticker
             ),
             state.options,
         )
@@ -77,7 +78,7 @@ class CustomizeStateTest {
                 BackgroundOption.GreenThumb,
                 BackgroundOption.Gamer,
                 BackgroundOption.Jetsetter,
-                BackgroundOption.Chef
+                BackgroundOption.Chef,
             ),
             state.options,
         )
@@ -224,6 +225,24 @@ class CustomizeStateTest {
             Offset(newCanvasSize.width * -0.02f, newCanvasSize.height * 0.1f),
             updatedCanvas.imageOffset,
         )
+    }
+
+    @Test
+    fun updateAspectRatioAndBackground_Sticker() {
+        val initialCanvas = ExportImageCanvas()
+        val updatedCanvas = initialCanvas.updateAspectRatioAndBackground(
+            backgroundOption = BackgroundOption.None,
+            sizeOption = SizeOption.Sticker,
+        )
+        val newCanvasSize = SizeOption.Sticker.dimensions
+
+        Assert.assertEquals(SizeOption.Sticker, updatedCanvas.aspectRatioOption)
+        Assert.assertEquals(BackgroundOption.None, updatedCanvas.selectedBackgroundOption)
+        Assert.assertEquals(newCanvasSize, updatedCanvas.canvasSize)
+        Assert.assertNull(updatedCanvas.selectedBackgroundDrawable)
+        Assert.assertEquals(0f, updatedCanvas.imageRotation)
+        Assert.assertEquals(newCanvasSize, updatedCanvas.imageSize)
+        Assert.assertEquals(Offset.Companion.Zero, updatedCanvas.imageOffset)
     }
 
     @Test

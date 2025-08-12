@@ -18,10 +18,10 @@ package com.android.developers.androidify.startup
 import android.annotation.SuppressLint
 import android.content.Context
 import androidx.startup.Initializer
+import com.google.firebase.Firebase
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
-import com.google.firebase.Firebase
 
 /**
  * Initialize [FirebaseAppCheck] using the App Startup Library.

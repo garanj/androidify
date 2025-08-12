@@ -22,6 +22,7 @@ import android.util.Log
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.model.ValidatedDescription
 import com.android.developers.androidify.model.ValidatedImage
+import com.android.developers.androidify.ondevice.LocalSegmentationDataSource
 import com.android.developers.androidify.util.LocalFileProvider
 import com.android.developers.androidify.vertexai.FirebaseAiDataSource
 import java.io.File
@@ -38,6 +39,7 @@ interface ImageGenerationRepository {
     suspend fun saveImageToExternalStorage(imageUri: Uri): Uri
 
     suspend fun addBackgroundToBot(image: Bitmap, backgroundPrompt: String) : Bitmap
+    suspend fun removeBackground(image: Bitmap): Bitmap
 }
 
 @Singleton
@@ -46,7 +48,8 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
     private val internetConnectivityManager: InternetConnectivityManager,
     private val geminiNanoDataSource: GeminiNanoGenerationDataSource,
     private val firebaseAiDataSource: FirebaseAiDataSource,
-    private val remoteConfigDataSource: RemoteConfigDataSource
+    private val remoteConfigDataSource: RemoteConfigDataSource,
+    private val localSegmentationDataSource: LocalSegmentationDataSource,
 ) : ImageGenerationRepository {
 
     override suspend fun initialize() {
@@ -133,5 +136,9 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
         val backgroundBotInstructions = remoteConfigDataSource.getBotBackgroundInstructionPrompt() +
                "\"" +  backgroundPrompt + "\""
         return firebaseAiDataSource.generateImageWithEdit(image, backgroundBotInstructions)
+    }
+
+    override suspend fun removeBackground(image: Bitmap): Bitmap {
+        return localSegmentationDataSource.removeBackground(image)
     }
 }

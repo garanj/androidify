@@ -23,7 +23,6 @@ import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -35,7 +34,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.RobolectricTestRunner
-import kotlin.test.assertContains
 import kotlin.test.assertFalse
 import kotlin.test.assertNotNull
 import kotlin.test.assertNull
@@ -165,13 +163,13 @@ class CustomizeViewModelTest {
                 options = listOf(
                     BackgroundOption.None,
                     BackgroundOption.IO,
-                    BackgroundOption.Chef
+                    BackgroundOption.Chef,
                 ),
             ),
         )
         advanceUntilIdle()
         assertFalse { values[values.lastIndex].showImageEditProgress }
-       // assertTrue(values.any { it.showImageEditProgress })
+        // assertTrue(values.any { it.showImageEditProgress })
         assertNotNull(values.last().exportImageCanvas.imageWithEdit)
     }
 
@@ -195,7 +193,7 @@ class CustomizeViewModelTest {
                 options = listOf(
                     BackgroundOption.None,
                     BackgroundOption.IO,
-                    BackgroundOption.Chef
+                    BackgroundOption.Chef,
                 ),
             ),
         )

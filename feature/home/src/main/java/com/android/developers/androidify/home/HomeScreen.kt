@@ -461,7 +461,7 @@ private fun DancingBot(
         Image(
             painter = painterResource(id = R.drawable.dancing_droid_gif_placeholder),
             contentDescription = null,
-            modifier = modifier
+            modifier = modifier,
         )
     } else {
         AsyncImage(
@@ -554,49 +554,48 @@ private fun VideoPlayer(
             }
         }
 
+        var videoFullyOnScreen by remember { mutableStateOf(false) }
+        val isWindowOccluded = LocalOcclusion.current
+        Box(
+            Modifier
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .onVisibilityChanged(
+                    minDurationMs = 100,
+                    minFractionVisible = 1f,
+                ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
+                .then(modifier),
+        ) {
+            player?.let { currentPlayer ->
+                LaunchedEffect(videoFullyOnScreen, LocalOcclusion.current.value) {
+                    if (videoFullyOnScreen && !isWindowOccluded.value) currentPlayer.play() else currentPlayer.pause()
+                }
 
-    var videoFullyOnScreen by remember { mutableStateOf(false) }
-    val isWindowOccluded = LocalOcclusion.current
-    Box(
-        Modifier
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .onVisibilityChanged(
-                minDurationMs = 100,
-                minFractionVisible = 1f,
-            ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
-            .then(modifier),
-    ) {
-        player?.let { currentPlayer ->
-            LaunchedEffect(videoFullyOnScreen, LocalOcclusion.current.value) {
-                if (videoFullyOnScreen && !isWindowOccluded.value) currentPlayer.play() else currentPlayer.pause()
-            }
+                // Render the video
+                PlayerSurface(currentPlayer, surfaceType = SURFACE_TYPE_TEXTURE_VIEW)
 
-            // Render the video
-            PlayerSurface(currentPlayer, surfaceType = SURFACE_TYPE_TEXTURE_VIEW)
-
-            // Show a play / pause button
-            val playPauseButtonState = rememberPlayPauseButtonState(currentPlayer)
-            OutlinedIconButton(
-                onClick = playPauseButtonState::onClick,
-                enabled = playPauseButtonState.isEnabled,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                colors = IconButtonDefaults.outlinedIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                ),
-            ) {
-                val icon =
-                    if (playPauseButtonState.showPlay) R.drawable.rounded_play_arrow_24 else R.drawable.rounded_pause_24
-                val contentDescription =
-                    if (playPauseButtonState.showPlay) R.string.play else R.string.pause
-                Icon(
-                    painterResource(icon),
-                    stringResource(contentDescription),
-                )
+                // Show a play / pause button
+                val playPauseButtonState = rememberPlayPauseButtonState(currentPlayer)
+                OutlinedIconButton(
+                    onClick = playPauseButtonState::onClick,
+                    enabled = playPauseButtonState.isEnabled,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    colors = IconButtonDefaults.outlinedIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    ),
+                ) {
+                    val icon =
+                        if (playPauseButtonState.showPlay) R.drawable.rounded_play_arrow_24 else R.drawable.rounded_pause_24
+                    val contentDescription =
+                        if (playPauseButtonState.showPlay) R.string.play else R.string.pause
+                    Icon(
+                        painterResource(icon),
+                        stringResource(contentDescription),
+                    )
+                }
             }
         }
     }
-}
 }

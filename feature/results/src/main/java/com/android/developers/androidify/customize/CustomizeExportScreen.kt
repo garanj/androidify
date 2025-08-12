@@ -166,24 +166,28 @@ private fun CustomizeExportContents(
     ) { paddingValues ->
         val imageResult = remember(state.showImageEditProgress) {
             movableContentWithReceiverOf<ExportImageCanvas> {
+                val chromeModifier = if (this.showSticker) {
+                    Modifier
+                        .clip(RoundedCornerShape(6))
+                } else {
+                    Modifier.dropShadow(
+                        RoundedCornerShape(6),
+                        shadow = Shadow(
+                            radius = 26.dp,
+                            spread = 10.dp,
+                            color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f),
+                        ),
+                    ).clip(RoundedCornerShape(6))
+                }
                 Box(
                     Modifier
                         .padding(16.dp),
                 ) {
                     ImageResult(
                         this@movableContentWithReceiverOf,
-                        modifier = Modifier
-                            .padding(16.dp),
+                        modifier = Modifier,
                         outerChromeModifier = Modifier
-                            .dropShadow(
-                                RoundedCornerShape(6),
-                                shadow = Shadow(
-                                    radius = 26.dp,
-                                    spread = 10.dp,
-                                    color = MaterialTheme.colorScheme.inverseSurface.copy(alpha = 0.2f),
-                                ),
-                            )
-                            .clip(RoundedCornerShape(6))
+                            .then(chromeModifier)
                             .loadingShimmerOverlay(
                                 visible = state.showImageEditProgress,
                                 clipShape = RoundedCornerShape(percent = 6),

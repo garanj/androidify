@@ -75,11 +75,21 @@ dependencies {
     implementation(libs.firebase.analytics) {
         exclude(group = "com.google.guava")
     }
+
     implementation(libs.firebase.app.check)
     implementation(libs.firebase.config)
     implementation(projects.core.util)
     implementation(libs.firebase.config.ktx)
+    implementation(libs.mlkit.segmentation)
+    implementation(libs.mlkit.common)
+    implementation(libs.play.services.base)
     ksp(libs.hilt.compiler)
+
+    testImplementation(libs.play.services.base.testing)
+    testImplementation(libs.junit)
+    testImplementation(libs.kotlinx.coroutines.test)
+    testImplementation(libs.robolectric)
+    testImplementation(libs.androidx.core)
 
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)
