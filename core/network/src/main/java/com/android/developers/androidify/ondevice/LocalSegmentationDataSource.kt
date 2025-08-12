@@ -17,22 +17,16 @@ package com.android.developers.androidify.ondevice
 
 import android.graphics.Bitmap
 import android.print.PrintJobInfo.STATE_COMPLETED
-import android.provider.SyncStateContract.Helpers.update
 import android.util.Log
-import coil3.util.CoilUtils.result
 import com.google.android.gms.common.moduleinstall.InstallStatusListener
 import com.google.android.gms.common.moduleinstall.ModuleInstallClient
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
-import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate
-import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState
 import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_CANCELED
 import com.google.android.gms.common.moduleinstall.ModuleInstallStatusUpdate.InstallState.STATE_FAILED
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
-import kotlinx.coroutines.Job
 import javax.inject.Inject
-import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
 import kotlin.coroutines.suspendCoroutine
