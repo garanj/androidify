@@ -53,7 +53,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
 
     private suspend fun isSubjectSegmentationModuleInstalled(): Boolean {
         val areModulesAvailable =
-            suspendCancellableCoroutine { continuation ->
+            suspendCoroutine { continuation ->
                 moduleInstallClient.areModulesAvailable(segmenter)
                     .addOnSuccessListener {
                         continuation.resume(it.areModulesAvailable())
@@ -66,7 +66,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
     }
 
     private suspend fun installSubjectSegmentationModule(): Boolean {
-        val result = suspendCancellableCoroutine { continuation ->
+        val result = suspendCoroutine { continuation ->
             val listener = InstallStatusListener { update ->
                 Log.d("LocalSegmentationDataSource", "Download progress: ${update.installState}")
 
@@ -111,10 +111,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
             Log.d("LocalSegmentationDataSource", "Modules available")
         }
         val image = InputImage.fromBitmap(bitmap, 0)
-        return suspendCancellableCoroutine { continuation ->
-            continuation.invokeOnCancellation { cause ->
-                Log.d("LocalSegmentationDataSource", "Continuation was cancelled!", cause)
-            }
+        return suspendCoroutine { continuation ->
             segmenter.process(image)
                 .addOnSuccessListener { result ->
                     if (result.foregroundBitmap != null) {
