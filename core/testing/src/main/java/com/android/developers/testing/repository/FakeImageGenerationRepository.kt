@@ -64,4 +64,8 @@ class FakeImageGenerationRepository : ImageGenerationRepository {
     ): Bitmap {
         return createBitmap(1, 1)
     }
+
+    override suspend fun removeBackground(image: Bitmap): Bitmap {
+        return createBitmap(1, 1)
+    }
 }

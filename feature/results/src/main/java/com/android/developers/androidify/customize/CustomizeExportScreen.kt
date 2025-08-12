@@ -168,6 +168,7 @@ private fun CustomizeExportContents(
             movableContentWithReceiverOf<ExportImageCanvas> {
                 val chromeModifier = if (this.showSticker) {
                     Modifier
+                        .clip(RoundedCornerShape(6))
                 } else {
                     Modifier.dropShadow(
                         RoundedCornerShape(6),
