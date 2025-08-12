@@ -91,7 +91,6 @@ dependencies {
     testImplementation(libs.robolectric)
     testImplementation(libs.androidx.core)
 
-// Or the latest version
     androidTestImplementation(libs.androidx.ui.test.junit4)
     androidTestImplementation(libs.hilt.android.testing)
     androidTestImplementation(projects.core.testing)

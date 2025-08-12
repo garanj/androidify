@@ -65,11 +65,12 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
 
         override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
             Log.d("LocalSegmentationDataSource", "Download progress: ${update.installState}.. ${continuation.hashCode()} ${continuation.isActive}")
+            if (!continuation.isActive) return
             if (update.installState == ModuleInstallStatusUpdate.InstallState.STATE_COMPLETED) {
                 continuation.resume(true)
             } else if (update.installState == STATE_FAILED || update.installState == STATE_CANCELED) {
                 continuation.resumeWithException(
-                    Exception("Module download failed or was canceled. State: ${update.installState}")
+                    ImageSegmentationException("Module download failed or was canceled. State: ${update.installState}")
                 )
             } else {
                 Log.d("LocalSegmentationDataSource", "State update: ${update.installState}")
@@ -88,6 +89,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
                 .installModules(moduleInstallRequest)
                 .addOnFailureListener {
                     Log.e("LocalSegmentationDataSource", "Failed to download module", it)
+                    continuation.resumeWithException(it)
                 }
                 .addOnCompleteListener {
                     Log.d("LocalSegmentationDataSource", "Successfully triggered download - await download progress updates")
@@ -115,7 +117,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
                     if (result.foregroundBitmap != null) {
                         continuation.resume(result.foregroundBitmap!!)
                     } else {
-                        continuation.resumeWithException(Exception("Subject not found"))
+                        continuation.resumeWithException(ImageSegmentationException("Subject not found"))
                     }
                 }
                 .addOnFailureListener { e ->
@@ -125,3 +127,5 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
         }
     }
 }
+
+class ImageSegmentationException(message: String? = null): Exception(message)
