@@ -48,7 +48,9 @@ android {
     }
 
     buildTypes {
-        debug {}
+        debug {
+            versionNameSuffix = "-debug"
+        }
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             matchingFallbacks += listOf("release")
