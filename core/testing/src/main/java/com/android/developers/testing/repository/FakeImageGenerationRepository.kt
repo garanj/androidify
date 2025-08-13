@@ -57,4 +57,15 @@ class FakeImageGenerationRepository : ImageGenerationRepository {
         if (exceptionToThrow != null) throw exceptionToThrow!!
         return imageUri
     }
+
+    override suspend fun addBackgroundToBot(
+        image: Bitmap,
+        backgroundPrompt: String,
+    ): Bitmap {
+        return createBitmap(1, 1)
+    }
+
+    override suspend fun removeBackground(image: Bitmap): Bitmap {
+        return createBitmap(1, 1)
+    }
 }

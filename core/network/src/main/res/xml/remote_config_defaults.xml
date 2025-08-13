@@ -16,8 +16,25 @@
 -->
 <defaults>
     <entry>
+        <key>bot_background_instruction_prompt</key>
+        <value>Add the input image android bot as the main subject to the result,
+            it should be the most prominent element of the resultant image, large and
+            filling the foreground - more than 50% of the resultant frame,
+            standing in the center of the frame with the central
+            focus, and the background just underneath the content.
+
+            Always include the input Android Bot in the final result image as the subject of the image.
+            It should be prominently featured in the foreground, center of the frame, without any adjustments other
+            than the lighting of the surrounding environment. There should only be one of the bots in the image.
+            style="3d animation style, simplified shapes, mouthless character, realistic physics simulation"
+
+            Do not alter the input Android Bot image, do not change its shape or add any hands, eyes, mouths etc. Do not change the characters color scheme.
+
+            The background is described as follows:</value>
+    </entry>
+    <entry>
         <key>use_imagen</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
     <entry>
         <key>prompt_image_validation</key>
@@ -122,6 +139,10 @@
     <entry>
         <key>promo_video_link</key>
         <value>https://services.google.com/fh/files/misc/androidfy_storyboard_b_v07.mp4</value>
+    </entry>
+    <entry>
+        <key>image_generation_model_edits</key>
+        <value>gemini-2.0-flash-preview-image-generation</value>
     </entry>
     <entry>
         <key>text_model_name</key>

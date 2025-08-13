@@ -37,8 +37,8 @@ android {
         applicationId = "com.android.developers.androidify"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -48,7 +48,9 @@ android {
     }
 
     buildTypes {
-        debug {}
+        debug {
+            versionNameSuffix = "-debug"
+        }
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             matchingFallbacks += listOf("release")

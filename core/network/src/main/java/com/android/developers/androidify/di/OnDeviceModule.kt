@@ -13,20 +13,22 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.developers.testing.util
+package com.android.developers.androidify.di
 
-import android.graphics.Bitmap
-import androidx.compose.runtime.Composable
-import androidx.compose.ui.geometry.Size
-import androidx.core.graphics.createBitmap
-import com.android.developers.androidify.customize.ComposableBitmapRenderer
+import android.content.Context
+import com.google.android.gms.common.moduleinstall.ModuleInstall
+import com.google.android.gms.common.moduleinstall.ModuleInstallClient
+import dagger.Module
+import dagger.Provides
+import dagger.hilt.InstallIn
+import dagger.hilt.android.qualifiers.ApplicationContext
+import dagger.hilt.components.SingletonComponent
 
-class FakeComposableBitmapRenderer : ComposableBitmapRenderer {
-
-    override suspend fun renderComposableToBitmap(
-        canvasSize: Size,
-        composableContent: @Composable (() -> Unit),
-    ): Bitmap? {
-        return createBitmap(1, 1)
+@Module
+@InstallIn(SingletonComponent::class)
+object OnDeviceModule {
+    @Provides
+    fun provideModuleInstallClient(@ApplicationContext context: Context): ModuleInstallClient {
+        return ModuleInstall.getClient(context)
     }
 }

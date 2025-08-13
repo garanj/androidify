@@ -37,7 +37,6 @@ import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Rect
 import androidx.compose.ui.geometry.Size
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.asImageBitmap
@@ -74,7 +73,25 @@ fun ImageResult(
                 exportImageCanvas,
                 modifier = Modifier.fillMaxSize(),
             ) {
-                if (exportImageCanvas.imageBitmap != null) {
+                if (exportImageCanvas.showSticker &&
+                    exportImageCanvas.imageBitmapRemovedBackground != null
+                ) {
+                    Image(
+                        bitmap = exportImageCanvas.imageBitmapRemovedBackground.asImageBitmap(),
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                    )
+                } else if (exportImageCanvas.imageWithEdit != null) {
+                    Image(
+                        bitmap = exportImageCanvas.imageWithEdit.asImageBitmap(),
+                        modifier = Modifier
+                            .fillMaxSize(),
+                        contentScale = ContentScale.Crop,
+                        contentDescription = null,
+                    )
+                } else if (exportImageCanvas.imageBitmap != null) {
                     Image(
                         bitmap = exportImageCanvas.imageBitmap.asImageBitmap(),
                         modifier = Modifier
@@ -94,9 +111,14 @@ fun BackgroundLayout(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit,
 ) {
+    val backgroundModifier = if (exportImageCanvas.backgroundColor != null) {
+        Modifier.background(exportImageCanvas.backgroundColor)
+    } else {
+        Modifier
+    }
     Box(
         modifier = modifier.fillMaxSize()
-            .background(Color.White),
+            .then(backgroundModifier),
     ) {
         if (exportImageCanvas.selectedBackgroundDrawable != null) {
             Image(
@@ -150,7 +172,8 @@ fun BackgroundLayout(
                 .then(safeAnimateBounds)
                 .rotate(rotationAnimation),
         ) {
-            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None) {
+            val clip = if (exportImageCanvas.selectedBackgroundOption == BackgroundOption.None
+                || exportImageCanvas.selectedBackgroundOption.aiBackground) {
                 Modifier
             } else {
                 Modifier.clip(RoundedCornerShape(6))
