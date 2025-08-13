@@ -4,7 +4,6 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class InitialRequest(
-    val sizeInBytes: Long = 0,
     val transferId: String = "",
     val token: String = ""
 )

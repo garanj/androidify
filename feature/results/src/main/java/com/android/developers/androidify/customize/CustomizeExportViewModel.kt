@@ -26,9 +26,11 @@ import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.data.WearAssetTransmitter
 import com.android.developers.androidify.data.WearDeviceRepository
+import com.android.developers.androidify.watchface.WatchFaceCreator
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -37,7 +39,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import java.io.File
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -46,6 +48,7 @@ class CustomizeExportViewModel @Inject constructor(
     val composableBitmapRenderer: ComposableBitmapRenderer,
     val wearDeviceRepository: WearDeviceRepository,
     val wearAssetTransmitter: WearAssetTransmitter,
+    val watchFaceCreator: WatchFaceCreator,
     application: Application,
 ) : AndroidViewModel(application) {
 
@@ -173,20 +176,25 @@ class CustomizeExportViewModel @Inject constructor(
     }
     fun installWatchFace() {
         transferJob = viewModelScope.launch {
-            val nodeId = connectedDevice.value?.nodeId
-            val resultBitmap = state.value.exportImageCanvas.imageBitmap
-            if (nodeId != null && resultBitmap != null) {
-                _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.Sending) }
+            withContext(Dispatchers.IO) {
+                val nodeId = connectedDevice.value?.nodeId
+                if (nodeId != null && state.value.exportImageCanvas.imageBitmap != null) {
+                    _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.Sending) }
+                    val wfBitmap = state.value.exportImageCanvas.imageBitmap
+                    val watchFacePackage = watchFaceCreator.createWatchFacePackage(wfBitmap!!)
 
-                val response = wearAssetTransmitter.doTransfer(nodeId, File(""), "")
+                    val response = wearAssetTransmitter.doTransfer(nodeId, watchFacePackage)
 
-                if (response != WatchFaceInstallError.NO_ERROR) {
-                    _state.update {
-                        it.copy(installationStatus = WatchFaceInstallationStatus.Complete(
-                            success = false,
-                            installError = response,
-                            otherNodeId = nodeId,
-                        ))
+                    if (response != WatchFaceInstallError.NO_ERROR) {
+                        _state.update {
+                            it.copy(
+                                installationStatus = WatchFaceInstallationStatus.Complete(
+                                    success = false,
+                                    installError = response,
+                                    otherNodeId = nodeId,
+                                )
+                            )
+                        }
                     }
                 }
             }

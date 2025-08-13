@@ -22,6 +22,8 @@ import com.android.developers.androidify.util.LocalFileProvider
 import com.android.developers.androidify.util.LocalFileProviderImpl
 import com.android.developers.androidify.vertexai.FirebaseAiDataSource
 import com.android.developers.androidify.vertexai.FirebaseAiDataSourceImpl
+import com.android.developers.androidify.watchface.WatchFaceCreator
+import com.android.developers.androidify.watchface.WatchFaceCreatorImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
@@ -82,4 +84,8 @@ internal abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindsWearAssetTransmitter(impl: WearAssetTransmitterImpl): WearAssetTransmitter
+
+    @Binds
+    @Singleton
+    abstract fun bindsWatchFaceCreator(impl: WatchFaceCreatorImpl): WatchFaceCreator
 }

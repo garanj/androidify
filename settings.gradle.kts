@@ -16,6 +16,12 @@ dependencyResolutionManagement {
     repositories {
         google()
         mavenCentral()
+        maven {
+            url = uri("https://jitpack.io")
+            content {
+                includeGroup("com.github.xgouchet")
+            }
+        }
     }
 }
 
@@ -33,6 +39,7 @@ include(":core:util")
 include(":core:theme")
 include(":core:testing")
 include(":benchmark")
+include(":watchface")
 include(":wear")
 include(":wear:watchface")
 include(":wear:common")

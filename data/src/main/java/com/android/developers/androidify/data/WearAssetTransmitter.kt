@@ -7,6 +7,7 @@ import android.net.Uri
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import com.android.developers.androidify.watchface.WatchFacePackage
 import com.android.developers.androidify.wear.common.InitialRequest
 import com.android.developers.androidify.wear.common.InitialResponse
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
@@ -41,8 +42,7 @@ interface WearAssetTransmitter {
 
     suspend fun doTransfer(
         nodeId: String,
-        apkFile: File,
-        validationToken: String,
+        watchFacePackage: WatchFacePackage
     ): WatchFaceInstallError
 }
 
@@ -89,24 +89,12 @@ class WearAssetTransmitterImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override suspend fun doTransfer(
         nodeId: String,
-        apkFile: File,
-        validationToken: String,
+        watchFacePackage: WatchFacePackage,
     ): WatchFaceInstallError {
-        // TODO: Replace this with the actual generated watch face
-        Log.i(TAG, "Doing transfer")
-        val watchFaceBytes = context.assets.open("example.apk").readAllBytes()
-        val watchFaceFile = File.createTempFile("example", ".apk")
-        watchFaceFile.writeBytes(watchFaceBytes)
-        Log.i(TAG, "Temp file created")
-        // End temporary block
-
-        // Hard-coded token for temporary use
-        val token = "E+LO9PKpm/uaJ7gZwSDO3CmnL16wDJrhpcX49A2Gdm8=:MS4wLjA="
-
         var readyToReceive = false
         val maybeTransferId = UUID.randomUUID().toString().take(8)
         try {
-            readyToReceive = assetTransferSetup(nodeId, maybeTransferId, token, watchFaceFile)
+            readyToReceive = assetTransferSetup(nodeId, maybeTransferId, watchFacePackage.validationToken)
         } catch (e: TimeoutCancellationException) {
             return WatchFaceInstallError.SEND_SETUP_TIMEOUT
         } catch (e: Exception) {
@@ -120,12 +108,14 @@ class WearAssetTransmitterImpl @Inject constructor(
         transferId = maybeTransferId
 
         try {
-            assetTransfer(nodeId, watchFaceFile)
+            assetTransfer(nodeId, watchFacePackage.file)
         } catch (e: TimeoutCancellationException) {
             return WatchFaceInstallError.TRANSFER_TIMEOUT
         } catch (e: Exception) {
             Log.e(TAG, "Error transferring watch face", e)
             return WatchFaceInstallError.TRANSFER_ERROR
+        } finally {
+            watchFacePackage.file.delete()
         }
         return WatchFaceInstallError.NO_ERROR
     }
@@ -133,10 +123,9 @@ class WearAssetTransmitterImpl @Inject constructor(
     private suspend fun assetTransferSetup(
         nodeId: String,
         transferId: String,
-        token: String,
-        file: File,
+        token: String
     ): Boolean {
-        val initialRequest = InitialRequest(transferId = transferId, token = token, sizeInBytes = file.length())
+        val initialRequest = InitialRequest(transferId = transferId, token = token)
         val requestBytes = ProtoBuf.encodeToByteArray(initialRequest)
 
         val response = withContext(Dispatchers.IO) {

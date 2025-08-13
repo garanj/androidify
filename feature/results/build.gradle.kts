@@ -72,6 +72,8 @@ dependencies {
     implementation(projects.core.util)
     implementation(projects.data)
     implementation(projects.wear.common)
+    // TODO - move this
+    implementation(projects.watchface)
     testImplementation(kotlin("test"))
 
     // Android Instrumented Tests

@@ -48,6 +48,7 @@ dependencies {
     implementation(projects.core.network)
     implementation(projects.core.util)
     implementation(projects.wear.common)
+    implementation(projects.watchface)
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="no"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:tools="http://schemas.android.com/tools"
+      package="com.watchfacedesigner.androiddigital"
+      android:versionCode="1"
+      android:versionName="1.0">
+
+  <uses-feature android:name="android.hardware.type.watch" />
+
+  <uses-sdk android:minSdkVersion="33" />
+
+  <application
+      android:label="Android digital"
+      android:hasCode="false">
+    <meta-data
+        android:name="com.google.android.wearable.standalone"
+        android:value="true" />
+    <property
+        android:name="com.google.wear.watchface.format.publisher"
+        android:value="WatchFaceDesigner-v29" />
+    <property
+        android:name="com.google.wear.watchface.format.version"
+        android:value="1" />
+  </application>
+</manifest>
