@@ -15,8 +15,6 @@
  */
 package com.android.developers.androidify.util
 
-import androidx.compose.animation.ExperimentalSharedTransitionApi
-import androidx.compose.animation.SharedTransitionScope
 import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.text.input.TextFieldDecorator
 import androidx.compose.foundation.text.input.TextFieldState
@@ -24,41 +22,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.layout.approachLayout
 import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.unit.round
 import kotlinx.coroutines.delay
 import java.text.BreakIterator
 import java.text.StringCharacterIterator
-
-/**
- * Skips to the end size for a particular composable, skipping through the intermediate animated sizes.
- * Similar to skipToLookaheadSize, but for placement instead.
- * This is useful if you'd like your content to be placed in its final position and not have any animations affect its layout.
- * See the usage on the CameraPreviewScreen composable, we want the camera contents to remain in place,
- * but the animation should perform a progressive reveal.
- *
- * @param scope The SharedTransitionScope where the transition is taking place.
- * @return Modifier chain.
- */
-@OptIn(ExperimentalSharedTransitionApi::class)
-fun Modifier.skipToLookaheadPlacement(scope: SharedTransitionScope): Modifier =
-    this.approachLayout(
-        isMeasurementApproachInProgress = { false },
-        isPlacementApproachInProgress = { scope.isTransitionActive },
-    ) { measurable, constraints ->
-        measurable.measure(constraints).run {
-            layout(width, height) {
-                coordinates?.let {
-                    with(scope) {
-                        val target = lookaheadScopeCoordinates.localLookaheadPositionOf(it)
-                        val actual = lookaheadScopeCoordinates.localPositionOf(it)
-                        place((target - actual).round())
-                    }
-                } ?: place(0, 0)
-            }
-        }
-    }
 
 @Composable
 fun AnimatedTextField(
