@@ -25,9 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
-import com.android.developers.androidify.data.WearAssetTransmitter
-import com.android.developers.androidify.data.WearDeviceRepository
-import com.android.developers.androidify.watchface.WatchFaceCreator
+import com.android.developers.androidify.data.WatchFaceInstallationRepository
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -36,7 +34,7 @@ import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -47,32 +45,28 @@ import javax.inject.Inject
 class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
-    val wearDeviceRepository: WearDeviceRepository,
-    val wearAssetTransmitter: WearAssetTransmitter,
-    val watchFaceCreator: WatchFaceCreator,
+    val watchfaceInstallationRepository: WatchFaceInstallationRepository,
     application: Application,
 ) : AndroidViewModel(application) {
 
     private val _state = MutableStateFlow(CustomizeExportState())
-    val state = _state.asStateFlow()
-
-    private var transferJob : Job? = null
-
-    val connectedDevice = wearDeviceRepository.connectedDevice.stateIn(
+    val state: StateFlow<CustomizeExportState> = combine(
+        _state,
+        watchfaceInstallationRepository.connectedDevice,
+        watchfaceInstallationRepository.watchFaceInstallationUpdates
+    ) {
+        currentState, device, installationStatus ->
+        currentState.copy(
+            connectedDevice = device,
+            installationStatus = installationStatus,
+        )
+    }.stateIn(
         scope = viewModelScope,
         started = WhileSubscribed(5000),
-        initialValue = null
+        initialValue = _state.value
     )
 
-    init {
-        viewModelScope.launch {
-            wearAssetTransmitter.receiveInstallUpdate().collect {
-                _state.update { state ->
-                    state.copy(installationStatus = it)
-                }
-            }
-        }
-    }
+    private var transferJob : Job? = null
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -287,13 +281,11 @@ class CustomizeExportViewModel @Inject constructor(
     fun installWatchFace() {
         transferJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
-                val nodeId = connectedDevice.value?.nodeId
-                if (nodeId != null && state.value.exportImageCanvas.imageBitmap != null) {
-                    _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.Sending) }
-                    val wfBitmap = state.value.exportImageCanvas.imageBitmap
-                    val watchFacePackage = watchFaceCreator.createWatchFacePackage(wfBitmap!!)
-
-                    val response = wearAssetTransmitter.doTransfer(nodeId, watchFacePackage)
+                val bitmap = state.value.exportImageCanvas.imageBitmap
+                val device = state.value.connectedDevice
+                if (device != null && bitmap != null) {
+                    val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
+                    val response = watchfaceInstallationRepository.createAndTransferWatchFace(device, wfBitmap)
 
                     if (response != WatchFaceInstallError.NO_ERROR) {
                         _state.update {
@@ -301,7 +293,7 @@ class CustomizeExportViewModel @Inject constructor(
                                 installationStatus = WatchFaceInstallationStatus.Complete(
                                     success = false,
                                     installError = response,
-                                    otherNodeId = nodeId,
+                                    otherNodeId = device.nodeId,
                                 )
                             )
                         }

@@ -1,20 +1,3 @@
-package com.android.developers.androidify.watchface
-
-import android.content.Context
-import android.graphics.Bitmap
-import android.graphics.Color
-import com.android.developers.androidify.watchface.PackPackage.Resource.Companion.fromByteArrayContents
-import com.android.developers.androidify.watchface.PackPackage.Resource.Companion.fromStringContents
-import com.google.android.wearable.watchface.validator.client.DwfValidatorFactory
-import dagger.hilt.android.qualifiers.ApplicationContext
-import java.io.ByteArrayOutputStream
-import java.io.File
-import java.util.UUID
-import javax.inject.Inject
-import javax.inject.Singleton
-import androidx.core.graphics.scale
-import kotlin.math.abs
-
 /*
  * Copyright 2025 Google LLC
  *
@@ -30,6 +13,21 @@ import kotlin.math.abs
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+package com.android.developers.androidify.watchface
+
+import android.content.Context
+import android.graphics.Bitmap
+import com.android.developers.androidify.watchface.PackPackage.Resource.Companion.fromByteArrayContents
+import com.android.developers.androidify.watchface.PackPackage.Resource.Companion.fromStringContents
+import com.google.android.wearable.watchface.validator.client.DwfValidatorFactory
+import dagger.hilt.android.qualifiers.ApplicationContext
+import java.io.ByteArrayOutputStream
+import java.io.File
+import java.util.UUID
+import javax.inject.Inject
+import javax.inject.Singleton
+import androidx.core.graphics.scale
+
 interface WatchFaceCreator {
     fun createWatchFacePackage(botBitmap: Bitmap, watchFaceName: String = "androiddigital"): WatchFacePackage
 }
@@ -56,7 +54,6 @@ class WatchFaceCreatorImpl @Inject constructor(
             "drawable",
             "bot.png",
             botBitmap
-                .floodFill()
                 .scale(312, 312)
                 .toByteArray(),
         )
@@ -121,79 +118,12 @@ class WatchFaceCreatorImpl @Inject constructor(
 
     private fun createUniqueWatchFaceName() =
         context.packageName + ".watchfacepush.bot" + UUID.randomUUID().toString()
+            // '-' is not allowed in valid package names, but is present in UUIDs.
             .replace("-", "").take(12)
 
     private fun Bitmap.toByteArray(format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 80): ByteArray {
         val stream = ByteArrayOutputStream()
         this.compress(format, quality, stream)
         return stream.toByteArray()
-    }
-
-    // TODO: Remove this when the bitmap has a transparent background anyway
-    fun Bitmap.floodFill(
-        startX: Int = 0,
-        startY: Int = 0,
-        baseColor: Int = Color.WHITE,
-        tolerance: Int = 10,
-        replacementColor: Int = Color.TRANSPARENT
-    ): Bitmap {
-        val width = this.width
-        val height = this.height
-        val pixels = IntArray(width * height)
-        this.getPixels(pixels, 0, width, 0, 0, width, height)
-
-        val startPixel = pixels[startY * width + startX]
-
-        if (!isColorWithinTolerance(startPixel, baseColor, tolerance)) {
-            return this
-        }
-
-        // Use ArrayDeque for a more efficient queue implementation
-        val queue = ArrayDeque<Pair<Int, Int>>()
-        val visited = BooleanArray(width * height)
-
-        queue.add(Pair(startX, startY))
-        visited[startY * width + startX] = true
-
-        while (queue.isNotEmpty()) {
-            val (x, y) = queue.removeFirst()
-            val currentIndex = y * width + x
-
-            pixels[currentIndex] = replacementColor
-
-            for ((dx, dy) in listOf(Pair(1, 0), Pair(-1, 0), Pair(0, 1), Pair(0, -1))) {
-                val nx = x + dx
-                val ny = y + dy
-                val neighborIndex = ny * width + nx
-
-                if (nx in 0 until width && ny in 0 until height && !visited[neighborIndex]) {
-                    visited[neighborIndex] = true
-                    val neighborPixel = pixels[neighborIndex]
-
-                    if (isColorWithinTolerance(neighborPixel, baseColor, tolerance)) {
-                        queue.addLast(Pair(nx, ny))
-                    }
-                }
-            }
-        }
-
-        return Bitmap.createBitmap(pixels, width, height, Bitmap.Config.ARGB_8888)
-    }
-
-    private fun isColorWithinTolerance(pixelColor: Int, baseColor: Int, tolerance: Int): Boolean {
-        // Skip already transparent pixels
-        if (Color.alpha(pixelColor) == 0) return false
-
-        val baseRed = Color.red(baseColor)
-        val baseGreen = Color.green(baseColor)
-        val baseBlue = Color.blue(baseColor)
-
-        val pixelRed = Color.red(pixelColor)
-        val pixelGreen = Color.green(pixelColor)
-        val pixelBlue = Color.blue(pixelColor)
-
-        return abs(pixelRed - baseRed) <= tolerance &&
-                abs(pixelGreen - baseGreen) <= tolerance &&
-                abs(pixelBlue - baseBlue) <= tolerance
     }
 }

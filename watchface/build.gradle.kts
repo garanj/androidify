@@ -27,6 +27,7 @@ android {
 dependencies {
     implementation(libs.hilt.android)
     ksp(libs.hilt.compiler)
-    implementation("com.google.android.wearable.watchface.validator:validator-push-android:1.0.0-alpha06")
-    //implementation("com.google.guava:guava:33.2.1-android")
+    implementation("com.google.android.wearable.watchface.validator:validator-push-android:1.0.0-alpha06") {
+        exclude(group = "com.google.guava", "listenablefuture")
+    }
 }

@@ -4,16 +4,13 @@ package com.android.developers.androidify.data
 
 import android.content.Context
 import android.net.Uri
-import android.os.Build
 import android.util.Log
-import androidx.annotation.RequiresApi
 import com.android.developers.androidify.watchface.WatchFacePackage
 import com.android.developers.androidify.wear.common.InitialRequest
 import com.android.developers.androidify.wear.common.InitialResponse
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import com.android.developers.androidify.wear.common.WearableConstants
-import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_CANCELLED_BY_USER
 import com.android.developers.androidify.wear.common.WearableConstants.SETUP_TIMEOUT_MS
 import com.android.developers.androidify.wear.common.WearableConstants.TRANSFER_TIMEOUT_MS
 import com.google.android.gms.wearable.ChannelClient
@@ -38,11 +35,11 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface WearAssetTransmitter {
-    suspend fun receiveInstallUpdate(): Flow<WatchFaceInstallationStatus.Complete>
+    val watchFaceInstallationUpdates: Flow<WatchFaceInstallationStatus>
 
     suspend fun doTransfer(
         nodeId: String,
-        watchFacePackage: WatchFacePackage
+        watchFacePackage: WatchFacePackage,
     ): WatchFaceInstallError
 }
 
@@ -53,7 +50,7 @@ class WearAssetTransmitterImpl @Inject constructor(
     private val channelClient: ChannelClient by lazy { Wearable.getChannelClient(context) }
     private val messageClient: MessageClient by lazy { Wearable.getMessageClient(context) }
 
-    private var transferId = UUID.randomUUID().toString().take(8)
+    private var transferId = generateTransferId()
 
     /** Sends the watch face to the watch. The approach taken is as follows:
      *
@@ -66,9 +63,8 @@ class WearAssetTransmitterImpl @Inject constructor(
      *                   success as well as the activation strategy to use. If there was an error
      *                   then the details of the error are sent.
      */
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
-    override suspend fun receiveInstallUpdate() = callbackFlow<WatchFaceInstallationStatus.Complete> {
-
+    override val watchFaceInstallationUpdates = callbackFlow {
+        trySend(WatchFaceInstallationStatus.NotStarted)
         val listener = MessageClient.OnMessageReceivedListener { event ->
             if (event.path.contains(transferId)) {
                 val response =
@@ -86,15 +82,15 @@ class WearAssetTransmitterImpl @Inject constructor(
         }
     }
 
-    @RequiresApi(Build.VERSION_CODES.TIRAMISU)
     override suspend fun doTransfer(
         nodeId: String,
         watchFacePackage: WatchFacePackage,
     ): WatchFaceInstallError {
         var readyToReceive = false
-        val maybeTransferId = UUID.randomUUID().toString().take(8)
+        val maybeTransferId = generateTransferId()
         try {
-            readyToReceive = assetTransferSetup(nodeId, maybeTransferId, watchFacePackage.validationToken)
+            readyToReceive =
+                assetTransferSetup(nodeId, maybeTransferId, watchFacePackage.validationToken)
         } catch (e: TimeoutCancellationException) {
             return WatchFaceInstallError.SEND_SETUP_TIMEOUT
         } catch (e: Exception) {
@@ -123,7 +119,7 @@ class WearAssetTransmitterImpl @Inject constructor(
     private suspend fun assetTransferSetup(
         nodeId: String,
         transferId: String,
-        token: String
+        token: String,
     ): Boolean {
         val initialRequest = InitialRequest(transferId = transferId, token = token)
         val requestBytes = ProtoBuf.encodeToByteArray(initialRequest)
@@ -144,12 +140,15 @@ class WearAssetTransmitterImpl @Inject constructor(
     private suspend fun assetTransfer(nodeId: String, file: File) {
         withContext(Dispatchers.IO) {
             withTimeout(TRANSFER_TIMEOUT_MS) {
-                val channelPath = WearableConstants.ANDROIDIFY_TRANSFER_PATH_TEMPLATE.format(transferId)
+                val channelPath =
+                    WearableConstants.ANDROIDIFY_TRANSFER_PATH_TEMPLATE.format(transferId)
                 val channel = channelClient.openChannel(nodeId, channelPath).await()
                 channelClient.sendFile(channel, Uri.fromFile(file)).await()
             }
         }
     }
+
+    private fun generateTransferId() = UUID.randomUUID().toString().take(8)
 
     companion object {
         private val TAG = WearAssetTransmitterImpl::class.java.simpleName

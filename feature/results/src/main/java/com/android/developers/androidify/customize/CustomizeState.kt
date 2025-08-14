@@ -20,9 +20,9 @@ import android.net.Uri
 import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
-import com.android.developers.androidify.data.ConnectedDevice
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import androidx.compose.ui.graphics.Color
+import com.android.developers.androidify.wear.common.ConnectedDevice
 
 data class CustomizeExportState(
     val originalImageUrl: Uri? = null,
@@ -37,6 +37,7 @@ data class CustomizeExportState(
     ),
     val exportImageCanvas: ExportImageCanvas = ExportImageCanvas(),
     val showImageEditProgress: Boolean = false,
+    val connectedDevice: ConnectedDevice? = null,
     val installationStatus: WatchFaceInstallationStatus = WatchFaceInstallationStatus.NotStarted
 )
 

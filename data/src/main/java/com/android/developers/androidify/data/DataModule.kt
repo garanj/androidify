@@ -15,7 +15,6 @@
  */
 package com.android.developers.androidify.data
 
-import android.content.Context
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.RemoteConfigDataSourceImpl
 import com.android.developers.androidify.util.LocalFileProvider
@@ -28,7 +27,6 @@ import dagger.Binds
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
-import dagger.hilt.android.qualifiers.ApplicationContext
 import dagger.hilt.components.SingletonComponent
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.Dispatchers
@@ -88,4 +86,8 @@ internal abstract class DataModule {
     @Binds
     @Singleton
     abstract fun bindsWatchFaceCreator(impl: WatchFaceCreatorImpl): WatchFaceCreator
+
+    @Binds
+    @Singleton
+    abstract fun bindsWatchFaceInstallationRepository(impl: WatchFaceInstallationRepositoryImpl): WatchFaceInstallationRepository
 }
