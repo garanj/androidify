@@ -64,7 +64,6 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.circle
 import androidx.graphics.shapes.rectangle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.android.developers.androidify.util.skipToLookaheadPlacement
 import kotlin.math.max
 
 sealed interface SharedElementKey {
@@ -123,7 +122,7 @@ fun Modifier.sharedBoundsReveal(
                 renderInOverlayDuringTransition = renderInOverlayDuringTransition,
             )
             .skipToLookaheadSize()
-            .skipToLookaheadPlacement(sharedTransitionScope)
+            .skipToLookaheadPosition()
     }
 }
 
@@ -201,7 +200,7 @@ fun Modifier.sharedBoundsRevealWithShapeMorph(
         val modifier = if (keepChildrenSizePlacement) {
             Modifier
                 .skipToLookaheadSize()
-                .skipToLookaheadPlacement(sharedTransitionScope)
+                .skipToLookaheadPosition()
         } else {
             Modifier
         }
