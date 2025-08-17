@@ -16,15 +16,12 @@
 package com.android.developers.androidify.customize
 
 import android.app.Application
-import android.graphics.Bitmap
-import android.graphics.BitmapFactory
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
-import androidx.lifecycle.application
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.data.ImageGenerationRepository
@@ -45,11 +42,12 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
-@HiltViewModel
-class CustomizeExportViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
+class CustomizeExportViewModel @AssistedInject constructor(
+    @Assisted("resultImageUrl") val resultImageUrl: Uri,
+    @Assisted("originalImageUrl") val originalImageUrl: Uri?,
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
     val watchfaceInstallationRepository: WatchFaceInstallationRepository,
@@ -57,6 +55,14 @@ class CustomizeExportViewModel @Inject constructor(
     val remoteConfigDataSource: RemoteConfigDataSource,
     application: Application,
 ) : AndroidViewModel(application) {
+
+    @AssistedFactory
+    interface Factory{
+        fun create(
+            @Assisted("resultImageUrl") resultImageUrl: Uri,
+            @Assisted("originalImageUrl")originalImageUrl: Uri?
+        ): CustomizeExportViewModel
+    }
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state: StateFlow<CustomizeExportState> = combine(
@@ -108,6 +114,8 @@ class CustomizeExportViewModel @Inject constructor(
 
         _state.update {
             CustomizeExportState(
+                originalImageUrl = originalImageUrl,
+                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
                 toolState = mapOf(
                     CustomizeTool.Size to AspectRatioToolState(),
                     CustomizeTool.Background to BackgroundToolState(
@@ -267,7 +275,7 @@ class CustomizeExportViewModel @Inject constructor(
                 return@launch
             }
 
-            val image = state.value.exportImageCanvas.imageUri?.let { uri -> convertUriToBitmap(uri) }
+            val image = state.value.exportImageCanvas.imageUri?.let { uri -> localFileProvider.loadBitmapFromUri(uri) }
             if (image == null) {
                 return@launch
             }
@@ -395,24 +403,6 @@ class CustomizeExportViewModel @Inject constructor(
         transferJob = null
         viewModelScope.launch {
             watchfaceInstallationRepository.resetInstallationStatus()
-        }
-    }
-
-    suspend fun convertUriToBitmap(uri: Uri): Bitmap? {
-        return withContext(ioDispatcher()) {
-            try {
-                val inputStream = application.contentResolver.openInputStream(uri)
-                if (inputStream != null) {
-                    val bitmap = BitmapFactory.decodeStream(inputStream)
-                    inputStream.close()
-                    bitmap
-                } else {
-                    null
-                }
-            } catch (e: Exception) {
-                e.printStackTrace()
-                null
-            }
         }
     }
 }

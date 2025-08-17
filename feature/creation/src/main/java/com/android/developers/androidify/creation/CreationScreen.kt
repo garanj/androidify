@@ -92,6 +92,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -124,6 +125,11 @@ import androidx.core.net.toUri
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.rectangle
 import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
@@ -159,8 +165,7 @@ import com.android.developers.androidify.creation.R as CreationR
 
 @Composable
 fun CreationScreen(
-    fileName: String? = null,
-    creationViewModel: CreationViewModel = hiltViewModel(),
+    creationViewModel: CreationViewModel,
     isMedium: Boolean = isAtLeastMedium(),
     onCameraPressed: () -> Unit = {},
     onBackPressed: () -> Unit,
@@ -173,19 +178,28 @@ fun CreationScreen(
     ) {
         creationViewModel.onBackPress()
     }
-    LaunchedEffect(Unit) {
-        if (fileName != null) {
-            creationViewModel.onImageSelected(fileName.toUri())
-        } else {
-            creationViewModel.onImageSelected(null)
-        }
-    }
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
             creationViewModel.onImageSelected(uri)
         }
     }
     val snackbarHostState by creationViewModel.snackbarHostState.collectAsStateWithLifecycle()
+
+    LaunchedEffect(uiState.resultBitmapUri) {
+        uiState.resultBitmapUri?.let { resultBitmapUri ->
+            onImageCreated(
+                resultBitmapUri,
+                uiState.descriptionText.text.toString(),
+                if (uiState.selectedPromptOption == PromptType.PHOTO) {
+                    uiState.imageUri
+                } else {
+                    null
+                }
+            )
+            creationViewModel.onResultDisplayed()
+        }
+    }
+
     when (uiState.screenState) {
         ScreenState.EDIT -> {
             EditScreen(
@@ -211,18 +225,6 @@ fun CreationScreen(
                 onCancelPress = {
                     creationViewModel.cancelInProgressTask()
                 },
-            )
-        }
-
-        ScreenState.RESULT -> {
-            onImageCreated(
-                uiState.resultBitmapUri!!,
-                uiState.descriptionText.text.toString(),
-                if (uiState.selectedPromptOption == PromptType.PHOTO) {
-                    uiState.imageUri
-                } else {
-                    null
-                }
             )
         }
     }
