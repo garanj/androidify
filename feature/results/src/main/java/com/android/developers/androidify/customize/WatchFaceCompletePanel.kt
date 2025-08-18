@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
 package com.android.developers.androidify.results
@@ -33,55 +48,54 @@ import com.android.developers.androidify.theme.AndroidifyTheme
 @Composable
 fun WatchFaceCompletePanel(
     modifier: Modifier = Modifier,
-    @DrawableRes iconResId:  Int,
+    @DrawableRes iconResId: Int,
     headline: String,
     callToAction: String,
 ) {
-        Row(
+    Row(
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(horizontal = 24.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(16.dp),
+    ) {
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 24.dp),
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(16.dp)
+                .size(60.dp)
+                .clip(CircleShape)
+                .background(Color.White),
+            contentAlignment = Alignment.Center,
         ) {
-            Box(
-                modifier = Modifier
-                    .size(60.dp)
-                    .clip(CircleShape)
-                    .background(Color.White),
-                contentAlignment = Alignment.Center
-            ) {
-                Icon(
-                    imageVector = ImageVector.vectorResource(id = iconResId),
-                    contentDescription = callToAction,
-                    modifier = Modifier.size(32.dp),
-                    tint = MaterialTheme.colorScheme.onSurface
-                )
-            }
-            Column {
-                Text(
-                    text = headline,
-                    style = MaterialTheme.typography.titleMediumEmphasized,
-                    color = MaterialTheme.colorScheme.onSurface,
-                    fontWeight = FontWeight.SemiBold
-                )
-                Spacer(modifier = Modifier.padding(top = 16.dp))
-                Text(
-                    text = callToAction,
-                    style = MaterialTheme.typography.titleMedium,
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
+            Icon(
+                imageVector = ImageVector.vectorResource(id = iconResId),
+                contentDescription = callToAction,
+                modifier = Modifier.size(32.dp),
+                tint = MaterialTheme.colorScheme.onSurface,
+            )
+        }
+        Column {
+            Text(
+                text = headline,
+                style = MaterialTheme.typography.titleMediumEmphasized,
+                color = MaterialTheme.colorScheme.onSurface,
+                fontWeight = FontWeight.SemiBold,
+            )
+            Spacer(modifier = Modifier.padding(top = 16.dp))
+            Text(
+                text = callToAction,
+                style = MaterialTheme.typography.titleMedium,
+                color = MaterialTheme.colorScheme.onSurface,
+            )
         }
     }
-
+}
 
 @Composable
 fun LongPressPanel() {
     WatchFaceCompletePanel(
         headline = stringResource(R.string.complete_headline_continue),
         callToAction = stringResource(R.string.complete_long_press),
-        iconResId = R.drawable.watch_arrow_24
+        iconResId = R.drawable.watch_arrow_24,
     )
 }
 
@@ -90,7 +104,7 @@ fun GrantPermissionsPanel() {
     WatchFaceCompletePanel(
         headline = stringResource(R.string.complete_headline_continue),
         callToAction = stringResource(R.string.complete_permissions),
-        iconResId = R.drawable.watch_arrow_24
+        iconResId = R.drawable.watch_arrow_24,
     )
 }
 
@@ -99,7 +113,7 @@ fun UpdateSettingsPanel() {
     WatchFaceCompletePanel(
         headline = stringResource(R.string.complete_headline_continue),
         callToAction = stringResource(R.string.complete_settings),
-        iconResId = R.drawable.watch_arrow_24
+        iconResId = R.drawable.watch_arrow_24,
     )
 }
 
@@ -108,7 +122,7 @@ fun AllDonePanel() {
     WatchFaceCompletePanel(
         headline = stringResource(R.string.complete_headline_all_done),
         callToAction = stringResource(R.string.complete_enjoy_watch_face),
-        iconResId = R.drawable.watch_check_24
+        iconResId = R.drawable.watch_check_24,
     )
 }
 
@@ -117,7 +131,7 @@ fun ErrorPanel() {
     WatchFaceCompletePanel(
         headline = stringResource(R.string.complete_error_headline),
         callToAction = stringResource(R.string.complete_error_message),
-        iconResId = R.drawable.watch_error_24
+        iconResId = R.drawable.watch_error_24,
     )
 }
 
@@ -152,4 +166,3 @@ private fun ErrorPanelPreview() {
         ErrorPanel()
     }
 }
-

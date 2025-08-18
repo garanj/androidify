@@ -256,7 +256,7 @@ private fun CustomizeExportContents(
                     installationStatus = state.installationStatus,
                     onWatchFaceInstallClick = {
                         onInstallWatchFaceClicked()
-                    }
+                    },
                 )
             }
         }
@@ -482,7 +482,7 @@ fun CustomizeExportPreview() {
                 val connectedDevice = ConnectedDevice(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",
-                    hasAndroidify = true
+                    hasAndroidify = true,
                 )
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
@@ -499,7 +499,7 @@ fun CustomizeExportPreview() {
                     isMediumWindowSize = false,
                     onSelectedToolStateChanged = {},
                     onInstallWatchFaceClicked = {},
-                    onResetWatchFaceSend = {}
+                    onResetWatchFaceSend = {},
                 )
             }
         }
@@ -517,7 +517,8 @@ fun CustomizeExportPreviewLarge() {
                 val connectedDevice = ConnectedDevice(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",
-                    hasAndroidify = true)
+                    hasAndroidify = true,
+                )
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
                         imageBitmap = bitmap.asAndroidBitmap(),
@@ -537,7 +538,7 @@ fun CustomizeExportPreviewLarge() {
                     isMediumWindowSize = true,
                     onSelectedToolStateChanged = {},
                     onInstallWatchFaceClicked = {},
-                    onResetWatchFaceSend = {}
+                    onResetWatchFaceSend = {},
                 )
             }
         }

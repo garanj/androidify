@@ -53,9 +53,9 @@ class CustomizeExportViewModel @Inject constructor(
     val state: StateFlow<CustomizeExportState> = combine(
         _state,
         watchfaceInstallationRepository.connectedDevice,
-        watchfaceInstallationRepository.watchFaceInstallationUpdates
+        watchfaceInstallationRepository.watchFaceInstallationUpdates,
     ) {
-        currentState, device, installationStatus ->
+            currentState, device, installationStatus ->
         currentState.copy(
             connectedDevice = device,
             installationStatus = installationStatus,
@@ -63,10 +63,10 @@ class CustomizeExportViewModel @Inject constructor(
     }.stateIn(
         scope = viewModelScope,
         started = WhileSubscribed(5000),
-        initialValue = _state.value
+        initialValue = _state.value,
     )
 
-    private var transferJob : Job? = null
+    private var transferJob: Job? = null
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -136,7 +136,7 @@ class CustomizeExportViewModel @Inject constructor(
                 snackbarHostState.value.showSnackbar("Background removal failed")
                 _state.update {
                     val aspectRatioToolState = (it.toolState[CustomizeTool.Size] as AspectRatioToolState)
-                        .copy(selectedToolOption =  previousSizeOption)
+                        .copy(selectedToolOption = previousSizeOption)
                     it.copy(
                         toolState = it.toolState + (CustomizeTool.Size to aspectRatioToolState),
                         showImageEditProgress = false,
@@ -177,7 +177,7 @@ class CustomizeExportViewModel @Inject constructor(
             is SizeOption -> {
                 val selectedSizeOption = toolState.selectedToolOption as SizeOption
                 val needsBackgroundRemoval = selectedSizeOption == SizeOption.Sticker &&
-                        state.value.exportImageCanvas.imageBitmapRemovedBackground == null
+                    state.value.exportImageCanvas.imageBitmapRemovedBackground == null
 
                 val imageBitmap = state.value.exportImageCanvas.imageBitmap
                 if (needsBackgroundRemoval && imageBitmap != null) {
@@ -230,7 +230,8 @@ class CustomizeExportViewModel @Inject constructor(
             _state.update { it.copy(showImageEditProgress = true) }
             try {
                 val bitmap = imageGenerationRepository.addBackgroundToBot(
-                    image, backgroundOption.prompt,
+                    image,
+                    backgroundOption.prompt,
                 )
                 _state.update {
                     it.copy(
@@ -294,7 +295,7 @@ class CustomizeExportViewModel @Inject constructor(
                                     success = false,
                                     installError = response,
                                     otherNodeId = device.nodeId,
-                                )
+                                ),
                             )
                         }
                     }

@@ -1,11 +1,11 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -20,26 +20,26 @@ import java.nio.charset.StandardCharsets
 
 data class PackPackage(
     val androidManifest: String,
-    val combinedPemString: String
+    val combinedPemString: String,
 ) {
     var resources: MutableList<Resource> = mutableListOf()
 
     data class Resource(
         val subdirectory: String,
         val name: String,
-        val contentsBase64: String
+        val contentsBase64: String,
     ) {
         companion object {
             fun fromBase64Contents(
                 subdirectory: String,
                 name: String,
-                contentsBase64: String
+                contentsBase64: String,
             ) = Resource(subdirectory, name, contentsBase64)
 
             fun fromByteArrayContents(
                 subdirectory: String,
                 name: String,
-                contentsBytes: ByteArray
+                contentsBytes: ByteArray,
             ): Resource {
                 val encodedContents = Base64.encodeToString(contentsBytes, Base64.NO_WRAP)
                 return fromBase64Contents(subdirectory, name, encodedContents)
@@ -48,7 +48,7 @@ data class PackPackage(
             fun fromStringContents(
                 subdirectory: String,
                 name: String,
-                contentsString: String
+                contentsString: String,
             ): Resource {
                 val bytes = contentsString.toByteArray(StandardCharsets.UTF_8)
                 return fromByteArrayContents(subdirectory, name, bytes)
@@ -63,7 +63,7 @@ data class PackPackage(
             androidManifest,
             resources.toTypedArray(),
             combinedPemString,
-            apk
+            apk,
         )
         return Base64.decode(resultBase64, Base64.DEFAULT)
     }
@@ -78,7 +78,7 @@ data class PackPackage(
             androidManifest: String,
             resources: Array<Resource>,
             combinedPemString: String,
-            apk: Boolean
+            apk: Boolean,
         ): String
     }
 }

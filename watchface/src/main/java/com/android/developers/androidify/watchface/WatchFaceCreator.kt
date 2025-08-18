@@ -1,11 +1,11 @@
 /*
- * Copyright 2025 Google LLC
+ * Copyright 2025 The Android Open Source Project
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
  * You may obtain a copy of the License at
  *
- * http://www.apache.org/licenses/LICENSE-2.0
+ *     https://www.apache.org/licenses/LICENSE-2.0
  *
  * Unless required by applicable law or agreed to in writing, software
  * distributed under the License is distributed on an "AS IS" BASIS,
@@ -17,6 +17,7 @@ package com.android.developers.androidify.watchface
 
 import android.content.Context
 import android.graphics.Bitmap
+import androidx.core.graphics.scale
 import com.android.developers.androidify.watchface.PackPackage.Resource.Companion.fromByteArrayContents
 import com.android.developers.androidify.watchface.PackPackage.Resource.Companion.fromStringContents
 import com.google.android.wearable.watchface.validator.client.DwfValidatorFactory
@@ -26,7 +27,6 @@ import java.io.File
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
-import androidx.core.graphics.scale
 
 interface WatchFaceCreator {
     fun createWatchFacePackage(botBitmap: Bitmap, watchFaceName: String = "androiddigital"): WatchFacePackage
@@ -35,14 +35,14 @@ interface WatchFaceCreator {
 @Singleton
 class WatchFaceCreatorImpl @Inject constructor(
     @ApplicationContext val context: Context,
-): WatchFaceCreator {
+) : WatchFaceCreator {
     override fun createWatchFacePackage(botBitmap: Bitmap, watchFaceName: String): WatchFacePackage {
         val watchFacePackageName = createUniqueWatchFaceName()
         val manifest = readStringAsset("$watchFaceName/AndroidManifest.xml")
 
         val wfPackage = PackPackage(
-            combinedPemString = readStringAsset("pem_txt").trim(),
-            androidManifest = replacePackageName(manifest, watchFacePackageName)
+            combinedPemString = generateSelfSignedCertificateAndKey().trim(),
+            androidManifest = replacePackageName(manifest, watchFacePackageName),
         )
 
         addTextFiles(watchFaceName, "raw", wfPackage)

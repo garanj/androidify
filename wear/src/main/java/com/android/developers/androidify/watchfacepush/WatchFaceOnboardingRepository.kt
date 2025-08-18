@@ -26,6 +26,8 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToByteArray
 import kotlinx.serialization.protobuf.ProtoBuf
 
+const val LAUNCHED_FROM_WATCH_FACE_TRANSFER = "launchedFromWatchFaceTransfer"
+
 class WatchFaceOnboardingRepository(
     val context: Context,
     val storedStateManager: StoredStateManager = StoredStateManager(context)
@@ -108,6 +110,7 @@ class WatchFaceOnboardingRepository(
         wakeDevice()
         val intent = Intent(context, MainActivity::class.java)
         intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.putExtra(LAUNCHED_FROM_WATCH_FACE_TRANSFER, true)
         context.startActivity(intent)
     }
 

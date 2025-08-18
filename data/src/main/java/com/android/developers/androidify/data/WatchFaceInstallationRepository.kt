@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package com.android.developers.androidify.data
 
 import android.graphics.Bitmap
@@ -20,18 +35,18 @@ interface WatchFaceInstallationRepository {
 class WatchFaceInstallationRepositoryImpl @Inject constructor(
     private val wearAssetTransmitter: WearAssetTransmitter,
     private val wearDeviceRepository: WearDeviceRepository,
-    private val watchFaceCreator: WatchFaceCreator
-): WatchFaceInstallationRepository {
+    private val watchFaceCreator: WatchFaceCreator,
+) : WatchFaceInstallationRepository {
     override val connectedDevice = wearDeviceRepository.connectedDevice
 
     private val manualStatusUpdates = MutableSharedFlow<WatchFaceInstallationStatus>(
         replay = 1,
-        onBufferOverflow = BufferOverflow.DROP_OLDEST
+        onBufferOverflow = BufferOverflow.DROP_OLDEST,
     )
 
     override val watchFaceInstallationUpdates: Flow<WatchFaceInstallationStatus> = merge(
         manualStatusUpdates,
-        wearAssetTransmitter.watchFaceInstallationUpdates
+        wearAssetTransmitter.watchFaceInstallationUpdates,
     )
 
     override suspend fun createAndTransferWatchFace(connectedDevice: ConnectedDevice, bitmap: Bitmap): WatchFaceInstallError {

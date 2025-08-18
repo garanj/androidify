@@ -13,6 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
+import com.android.developers.androidify.Versions
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
@@ -37,8 +38,8 @@ android {
         applicationId = "com.android.developers.androidify"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
-        versionCode = 3
-        versionName = "1.1.1"
+        versionCode = Versions.appVersionCode
+        versionName = Versions.appVersionName
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -94,6 +95,12 @@ android {
     testOptions {
         unitTests {
             isIncludeAndroidResources = true
+        }
+    }
+    // To avoid packaging conflicts when using bouncycastle
+    packaging {
+        resources {
+            excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
         }
     }
 }

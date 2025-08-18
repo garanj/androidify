@@ -21,6 +21,7 @@ import androidx.activity.compose.setContent
 import androidx.wear.ambient.AmbientLifecycleObserver
 import com.android.developers.androidify.ui.WatchFaceOnboardingScreen
 import com.android.developers.androidify.ui.theme.AndroidifyWearTheme
+import com.android.developers.androidify.watchfacepush.LAUNCHED_FROM_WATCH_FACE_TRANSFER
 
 class MainActivity : ComponentActivity() {
     val ambientCallback = object : AmbientLifecycleObserver.AmbientLifecycleCallback {
@@ -33,13 +34,17 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val launchedFromWatchFaceTransfer = intent.extras?.getBoolean(LAUNCHED_FROM_WATCH_FACE_TRANSFER) ?: false
+
         lifecycle.addObserver(AmbientLifecycleObserver(this, ambientCallback))
 
         setTheme(android.R.style.Theme_DeviceDefault)
 
         setContent {
             AndroidifyWearTheme {
-                WatchFaceOnboardingScreen()
+                WatchFaceOnboardingScreen(
+                    launchedFromWatchFaceTransfer = launchedFromWatchFaceTransfer)
             }
         }
     }

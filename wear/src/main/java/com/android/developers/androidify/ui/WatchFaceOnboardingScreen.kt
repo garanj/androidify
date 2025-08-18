@@ -2,10 +2,8 @@
 
 package com.android.developers.androidify.ui
 
-import android.util.Log
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -14,6 +12,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.LifecycleEventObserver
 import androidx.lifecycle.compose.LocalLifecycleOwner
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.wear.compose.material3.AppScaffold
 import com.android.developers.androidify.WatchFaceOnboardingViewModel
@@ -27,10 +26,11 @@ import com.google.accompanist.permissions.shouldShowRationale
 @Composable
 fun WatchFaceOnboardingScreen(
     modifier: Modifier = Modifier,
+    launchedFromWatchFaceTransfer: Boolean,
     viewModel: WatchFaceOnboardingViewModel = viewModel(factory = WatchFaceOnboardingViewModel.Factory),
 ) {
     AppScaffold {
-        val state by viewModel.state.collectAsState()
+        val state by viewModel.state.collectAsStateWithLifecycle()
 
         when (state) {
             is WatchFaceInstallationStatus.Receiving,
@@ -39,18 +39,21 @@ fun WatchFaceOnboardingScreen(
             }
             is WatchFaceInstallationStatus.Unknown,
             WatchFaceInstallationStatus.NotStarted -> {
-                WelcomeToAndroidifyScreen()
+                if (launchedFromWatchFaceTransfer) {
+                    TransmissionScreen()
+                } else {
+                    WelcomeToAndroidifyScreen()
+                }
             }
             is WatchFaceInstallationStatus.Complete -> {
                 val completeStatus = state as WatchFaceInstallationStatus.Complete
-                Log.d("WatchFaceOnboardingScreen", "completeStatus: $completeStatus")
                 if (completeStatus.success) {
                     WatchFaceGuidance(
                         strategy = completeStatus.activationStrategy,
                         onPermissionsChange = { granted, shouldShowRationale ->
                             viewModel.maybeSendUpdateOnPermissionsChange(granted, shouldShowRationale)
                         },
-                        onAllDoneClick =  {
+                        onAllDone =  {
                             viewModel.resetWatchFaceTransferState()
                         }
                     )
@@ -68,7 +71,7 @@ fun WatchFaceOnboardingScreen(
 fun WatchFaceGuidance(
     strategy: WatchFaceActivationStrategy,
     onPermissionsChange: (Boolean, Boolean) -> Unit,
-    onAllDoneClick: () -> Unit,
+    onAllDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val activePermission =
@@ -103,11 +106,11 @@ fun WatchFaceGuidance(
 
     when (strategy) {
         WatchFaceActivationStrategy.GO_TO_WATCH_SETTINGS -> OpenSettingsScreen()
-        WatchFaceActivationStrategy.LONG_PRESS_TO_SET -> LongPressScreen(onAllDoneClick = onAllDoneClick)
+        WatchFaceActivationStrategy.LONG_PRESS_TO_SET -> LongPressScreen(onAllDoneClick = onAllDone)
         WatchFaceActivationStrategy.FOLLOW_PROMPT_ON_WATCH -> PermissionsPromptScreen(
             launchPermissionRequest = { activePermission.launchPermissionRequest() },
         )
 
-        else -> AllDoneScreen(onAllDoneClick = onAllDoneClick)
+        else -> AllDoneScreen(onAllDone = onAllDone)
     }
 }
