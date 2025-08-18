@@ -16,6 +16,7 @@
 package com.android.developers.androidify.customize
 
 import android.app.Application
+import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
@@ -42,7 +43,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
 class CustomizeExportViewModel @AssistedInject constructor(
@@ -113,7 +113,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
         }
 
         _state.update {
-            CustomizeExportState(
+            it.copy(
                 originalImageUrl = originalImageUrl,
                 exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
                 toolState = mapOf(
@@ -124,6 +124,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 ),
             )
         }
+        loadInitialBitmap(resultImageUrl)
     }
 
     override fun onCleared() {
@@ -274,8 +275,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 }
                 return@launch
             }
-
-            val image = state.value.exportImageCanvas.imageUri?.let { uri -> localFileProvider.loadBitmapFromUri(uri) }
+            val image = state.value.exportImageCanvas.imageBitmap
             if (image == null) {
                 return@launch
             }
@@ -403,6 +403,21 @@ class CustomizeExportViewModel @AssistedInject constructor(
         transferJob = null
         viewModelScope.launch {
             watchfaceInstallationRepository.resetInstallationStatus()
+        }
+    }
+
+    private fun loadInitialBitmap(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                val bitmap = localFileProvider.loadBitmapFromUri(uri)
+                _state.update {
+                    it.copy(
+                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap)
+                    )
+                }
+            } catch (e: Exception) {
+                _snackbarHostState.value.showSnackbar("Could not load image.")
+            }
         }
     }
 }
