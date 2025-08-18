@@ -53,11 +53,15 @@ class CustomizeViewModelTest {
     private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
+    val fakeUri = Uri.parse("content://test/image.jpg")
+
     @Before
     fun setup() {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = false
         viewModel = CustomizeExportViewModel(
+            fakeUri,
+            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
@@ -80,7 +84,7 @@ class CustomizeViewModelTest {
         val initialState = viewModel.state.value
 
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             originalFakeUri,
         )
 
@@ -103,6 +107,8 @@ class CustomizeViewModelTest {
         val initialState = viewModel.state.value
 
         val viewModel = CustomizeExportViewModel(
+            fakeUri,
+            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
@@ -112,7 +118,7 @@ class CustomizeViewModelTest {
         )
 
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             null,
         )
 
@@ -139,7 +145,7 @@ class CustomizeViewModelTest {
         }
 
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             originalFakeUri,
         )
 
@@ -161,7 +167,7 @@ class CustomizeViewModelTest {
             }
         }
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             originalFakeUri,
         )
         advanceUntilIdle()
@@ -174,6 +180,8 @@ class CustomizeViewModelTest {
     @Test
     fun changeBackground_NotNull() = runTest {
         val viewModel = CustomizeExportViewModel(
+            fakeUri,
+            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
@@ -189,7 +197,7 @@ class CustomizeViewModelTest {
             }
         }
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             originalFakeUri,
         )
         advanceUntilIdle()
@@ -219,7 +227,7 @@ class CustomizeViewModelTest {
             }
         }
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             originalFakeUri,
         )
         advanceUntilIdle()
@@ -243,6 +251,8 @@ class CustomizeViewModelTest {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = true
         val viewModel = CustomizeExportViewModel(
+            fakeUri,
+            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
@@ -254,7 +264,7 @@ class CustomizeViewModelTest {
         val initialState = viewModel.state.value
 
         viewModel.setArguments(
-            fakeBitmap,
+            fakeUri,
             null,
         )
 
