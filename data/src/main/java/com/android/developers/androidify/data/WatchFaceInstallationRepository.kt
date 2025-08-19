@@ -26,9 +26,29 @@ import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.merge
 import javax.inject.Inject
 
+/**
+ * Repository for watch face installation.
+ */
 interface WatchFaceInstallationRepository {
+    /**
+     * Flow of currecntly connected device. Only one device is reported - the scenario of having
+     * multiple devices connected is not currently supported.
+     */
     val connectedDevice: Flow<ConnectedDevice?>
+
+    /**
+     * Flow of status updates from the watch as installation proceeds.
+     */
     val watchFaceInstallationUpdates: Flow<WatchFaceInstallationStatus>
+
+    /**
+     * Creates and transmits a watch face to the connected device. The bitmap is added into the
+     * template watch face.
+     *
+     * @param connectedDevice The device to install the watch face on.
+     * @param bitmap The bitmap to add to the watch face.
+     * @return The result of the transfer.
+     */
     suspend fun createAndTransferWatchFace(connectedDevice: ConnectedDevice, bitmap: Bitmap): WatchFaceInstallError
 }
 

@@ -17,6 +17,10 @@ package com.android.developers.androidify.watchface
 
 import java.io.File
 
+/**
+ * Data class representing a watch face package. This includes both the file for transmission and
+ * the validation key.
+ */
 data class WatchFacePackage(
     val file: File,
     val validationToken: String,

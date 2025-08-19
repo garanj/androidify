@@ -28,7 +28,20 @@ import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
 
+/**
+ * Class to create a watch face package for transmission to the watch for installation.
+ */
 interface WatchFaceCreator {
+    /**
+     * Creates a watch face package.
+     *
+     * @param botBitmap The bitmap to use as the bot icon on the watch face. This image is added to
+     * the package as res/drawable/bot.png, and can therefore be references in the watchface.xml
+     * file, for example as <Image resource="bot"/>.
+     * @param watchFaceName The name of the directory within the assets folder containing the watch
+     * face resources, for example, as exported from Watch Face Designer. This defaults to
+     * "androiddigital".
+     */
     fun createWatchFacePackage(botBitmap: Bitmap, watchFaceName: String = "androiddigital"): WatchFacePackage
 }
 
