@@ -20,8 +20,7 @@
     <string name="logo_description">Androidify logo</string>
 
     <string name="long_press_prompt">
-        To set the Androidify watch face, long-press on the current watch face and locate the
-        Androidify watch face in the watch face list.
+        To set the Androidify watch face, long-press on the current watch face.
     </string>
     <string name="long_press_button_text">Got it!</string>
     <string name="open_settings_prompt">
