@@ -129,8 +129,6 @@ abstract class ProcessFilesTask : DefaultTask() {
     fun taskAction() {
         val apkFile = inputFile.singleFile.resolve("default_watchface.apk")
 
-        println(apkFile.absolutePath)
-
         val stdOut = ByteArrayOutputStream()
         val stdErr = ByteArrayOutputStream()
 
