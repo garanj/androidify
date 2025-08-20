@@ -19,6 +19,7 @@ plugins {
     alias(libs.plugins.kotlin.android)
     alias(libs.plugins.hilt)
     alias(libs.plugins.kotlin.ksp)
+    alias(libs.plugins.serialization)
 }
 
 android {
@@ -52,6 +53,10 @@ dependencies {
         exclude(group = "com.google.guava", "listenablefuture")
     }
     implementation(libs.bcpkix.jdk18on)
+    implementation(libs.play.services.wearable)
+    implementation(libs.kotlinx.coroutines.play.services)
+    implementation(libs.kotlinx.serialization.protobuf)
+    implementation(projects.wear.common)
 
     // For testing
     androidTestImplementation(libs.robolectric)

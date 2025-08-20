@@ -19,6 +19,8 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.developers.androidify.watchface.creator.WatchFaceCreatorImpl
+import com.android.developers.androidify.watchface.creator.WatchFacePackage
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull

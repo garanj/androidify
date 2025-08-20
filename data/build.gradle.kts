@@ -16,7 +16,6 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.android)
-    alias(libs.plugins.serialization)
     alias(libs.plugins.kotlin.ksp)
     alias(libs.plugins.hilt)
 }
@@ -47,7 +46,6 @@ androidComponents {
 dependencies {
     implementation(projects.core.network)
     implementation(projects.core.util)
-    implementation(projects.wear.common)
     implementation(projects.watchface)
 
     implementation(libs.kotlinx.serialization.json)
@@ -62,8 +60,5 @@ dependencies {
         exclude(group = "com.google.guava")
     }
 
-    implementation(libs.play.services.wearable)
-    implementation(libs.kotlinx.coroutines.play.services)
-    implementation(libs.kotlinx.serialization.protobuf)
     ksp(libs.hilt.compiler)
 }

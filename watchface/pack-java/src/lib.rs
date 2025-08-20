@@ -24,7 +24,7 @@ use pack_api::{compile_and_sign_aab, compile_and_sign_apk, FileResource, Keys, P
 /// # Safety
 /// Function must be unsafe because it is called via Java JNI
 #[no_mangle]
-pub unsafe extern "C" fn Java_com_android_developers_androidify_watchface_PackPackage_nativeCompilePackage(
+pub unsafe extern "C" fn Java_com_android_developers_androidify_watchface_creator_PackPackage_nativeCompilePackage(
     mut env: JNIEnv,
     _this: JClass,
     manifest_jstring: JString,

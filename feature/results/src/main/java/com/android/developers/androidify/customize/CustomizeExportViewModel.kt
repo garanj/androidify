@@ -25,7 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
-import com.android.developers.androidify.data.WatchFaceInstallationRepository
+import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepository
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
