@@ -172,6 +172,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
 
         val response = runBlocking {
             if (canProceed) {
+                watchFaceOnboardingRepository.launchWatchFaceGuidance()
+
                 // The activation strategy is determined *before* the watch is transferred and
                 // installed, because installing / changing watch faces can lead to temporary
                 // inaccuracy in the Watch Face Push API reporting whether the app has the
@@ -192,9 +194,6 @@ class AndroidifyDataListenerService : WearableListenerService() {
                 transferTimeoutJob = serviceScope.launch {
                     configureTransferTimeout(initialRequest, nodeId, strategy)
                 }
-                // The UI is launched at this point on the watch to guide the user through the
-                // installation process.
-                watchFaceOnboardingRepository.launchWatchFaceGuidance()
             }
             InitialResponse(proceed = canProceed)
         }
