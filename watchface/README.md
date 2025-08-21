@@ -12,8 +12,10 @@ In order to modify these to show the Androidify bot, adjust an `<Image>` tag to 
 resource, e.g. `<Image resource="bot"/>`: In compiling the APK, the `bot.png` file will be added, so
 this resource will be available to the watch face.
 
-There is one watch face included in `assets` at the moment: `androiddigital`. You can simply add
-more and pass the name of the watch face you want to use to `createWatchFacePackage()`.
+You should ensure that any unnecessary images are removed from `res/drawable`, for example if Watch
+Face Designer outputted a placeholder image that you are replacing for `bot.png`, remove the
+placeholder image (it's likely large!). Furthermore, ensure that the images are optimized, for
+example, using `pngquant` on all images, to help keep the watch face size to a minimum.
 
 ## Packaging the watch face
 
