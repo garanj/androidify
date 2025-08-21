@@ -15,15 +15,20 @@
  */
 package com.android.developers.androidify.watchface.transfer
 
+import android.content.Context
 import android.graphics.Bitmap
+import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.watchface.creator.WatchFaceCreator
 import com.android.developers.androidify.wear.common.ConnectedDevice
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
+import dagger.hilt.android.qualifiers.ApplicationContext
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.channels.BufferOverflow
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.merge
+import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 /**
@@ -49,13 +54,27 @@ interface WatchFaceInstallationRepository {
      * @param bitmap The bitmap to add to the watch face.
      * @return The result of the transfer.
      */
-    suspend fun createAndTransferWatchFace(connectedDevice: ConnectedDevice, bitmap: Bitmap): WatchFaceInstallError
+    suspend fun createAndTransferWatchFace(
+        connectedDevice: ConnectedDevice,
+        watchFace: WatchFaceAsset,
+        bitmap: Bitmap,
+    ): WatchFaceInstallError
+
+    /**
+     * Retrieves a list of available watch faces.
+     *
+     * @return A result containing a list of watch face assets.
+     */
+    suspend fun getAvailableWatchFaces(): Result<List<WatchFaceAsset>>
+
+    suspend fun resetInstallationStatus()
 }
 
 class WatchFaceInstallationRepositoryImpl @Inject constructor(
     private val wearAssetTransmitter: WearAssetTransmitter,
     private val wearDeviceRepository: WearDeviceRepository,
     private val watchFaceCreator: WatchFaceCreator,
+    @ApplicationContext val context: Context,
 ) : WatchFaceInstallationRepository {
     override val connectedDevice = wearDeviceRepository.connectedDevice
 
@@ -69,10 +88,41 @@ class WatchFaceInstallationRepositoryImpl @Inject constructor(
         wearAssetTransmitter.watchFaceInstallationUpdates,
     )
 
-    override suspend fun createAndTransferWatchFace(connectedDevice: ConnectedDevice, bitmap: Bitmap): WatchFaceInstallError {
+    override suspend fun createAndTransferWatchFace(
+        connectedDevice: ConnectedDevice,
+        watchFace: WatchFaceAsset,
+        bitmap: Bitmap,
+    ): WatchFaceInstallError {
         manualStatusUpdates.tryEmit(WatchFaceInstallationStatus.Sending)
-        val watchFacePackage = watchFaceCreator.createWatchFacePackage(bitmap)
+        val watchFacePackage = watchFaceCreator
+            .createWatchFacePackage(watchFaceName = watchFace.id, botBitmap = bitmap)
 
         return wearAssetTransmitter.doTransfer(connectedDevice.nodeId, watchFacePackage)
+    }
+
+    override suspend fun getAvailableWatchFaces(): Result<List<WatchFaceAsset>> {
+        return withContext(Dispatchers.IO) { // Move asset scanning to a background thread
+            try {
+                val assetManager = context.assets
+                val rootFolders = assetManager.list("") ?: emptyArray()
+
+                val watchFaceList = rootFolders.filter { folderName ->
+                    (assetManager.list(folderName)?.contains("res") == true)
+                }.map { watchFaceId ->
+                    WatchFaceAsset(
+                        id = watchFaceId,
+                        previewPath = "file:///android_asset/$watchFaceId/res/drawable/preview.png",
+                    )
+                }
+                Result.success(watchFaceList)
+            } catch (e: Exception) {
+                Result.failure(e)
+            }
+        }
+    }
+
+    override suspend fun resetInstallationStatus() {
+        wearAssetTransmitter.resetTransferId()
+        manualStatusUpdates.tryEmit(WatchFaceInstallationStatus.NotStarted)
     }
 }

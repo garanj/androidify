@@ -37,10 +37,9 @@ interface WatchFaceCreator {
      * the package as res/drawable/bot.png, and can therefore be references in the watchface.xml
      * file, for example as <Image resource="bot"/>.
      * @param watchFaceName The name of the directory within the assets folder containing the watch
-     * face resources, for example, as exported from Watch Face Designer. This defaults to
-     * "androiddigital".
+     * face resources, for example, as exported from Watch Face Designer.
      */
-    fun createWatchFacePackage(botBitmap: Bitmap, watchFaceName: String = "androiddigital"): WatchFacePackage
+    fun createWatchFacePackage(botBitmap: Bitmap, watchFaceName: String): WatchFacePackage
 }
 
 @Singleton
@@ -65,7 +64,7 @@ class WatchFaceCreatorImpl @Inject constructor(
             "drawable",
             "bot.png",
             botBitmap
-                .scale(312, 312)
+                .scale(555, 555)
                 .toByteArray(),
         )
         wfPackage.resources.add(bot)

@@ -13,7 +13,7 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-package com.android.developers.androidify.results
+package com.android.developers.androidify.customize
 
 import android.content.Intent
 import androidx.compose.foundation.layout.Column
@@ -37,47 +37,17 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
+import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.PrimaryButton
 
+
 @Composable
-fun InstallWatchFacePanel(
+fun InstallAndroidifyPanel(
     modifier: Modifier = Modifier,
     deviceName: String,
-    isSendingToWatch: Boolean,
-    onButtonClick: () -> Unit = { },
 ) {
-    WatchFaceActionPanel(
-        callToAction = stringResource(R.string.send_to_watch_cta, deviceName),
-        buttonText = stringResource(R.string.send_to_watch),
-        isSendingToWatch = isSendingToWatch,
-        onButtonClick = onButtonClick,
-    )
-}
-
-@Composable
-fun InstallAndroidifyPanel(modifier: Modifier = Modifier, deviceName: String) {
     val context = LocalContext.current
-    WatchFaceActionPanel(
-        callToAction = stringResource(R.string.install_androidify_cta, deviceName),
-        isSendingToWatch = false,
-        buttonText = stringResource(R.string.install_androidify),
-        onButtonClick = {
-            val uri = "market://details?id=${context.packageName}".toUri()
-            val intent = Intent(Intent.ACTION_VIEW, uri)
-            context.startActivity(intent)
-        },
-    )
-}
-
-@Composable
-fun WatchFaceActionPanel(
-    modifier: Modifier = Modifier,
-    callToAction: String,
-    buttonText: String,
-    isSendingToWatch: Boolean,
-    onButtonClick: () -> Unit = { },
-) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -85,13 +55,17 @@ fun WatchFaceActionPanel(
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         Text(
-            text = callToAction,
+            text = stringResource(R.string.send_to_watch_cta, deviceName),
             style = MaterialTheme.typography.titleMedium,
         )
         Spacer(modifier = Modifier.height(24.dp))
         PrimaryButton(
-            onClick = onButtonClick,
-            loading = isSendingToWatch,
+            onClick = {
+                val uri = "market://details?id=${context.packageName}".toUri()
+                val intent = Intent(Intent.ACTION_VIEW, uri)
+                context.startActivity(intent)
+            },
+            loading = false,
             leadingIcon = {
                 Row {
                     Icon(
@@ -101,7 +75,7 @@ fun WatchFaceActionPanel(
                     Spacer(modifier = Modifier.width(8.dp))
                 }
             },
-            buttonText = buttonText,
+            buttonText = stringResource(R.string.install_androidify),
         )
     }
 }
@@ -113,18 +87,6 @@ private fun InstallAndroidifyPanelPreview() {
     AndroidifyTheme {
         InstallAndroidifyPanel(
             deviceName = "Pixel 3",
-        )
-    }
-}
-
-@OptIn(ExperimentalMaterial3Api::class)
-@Preview(showBackground = true)
-@Composable
-private fun InstallWatchFacePanelPreview() {
-    AndroidifyTheme {
-        InstallWatchFacePanel(
-            deviceName = "Pixel 3",
-            isSendingToWatch = false,
         )
     }
 }

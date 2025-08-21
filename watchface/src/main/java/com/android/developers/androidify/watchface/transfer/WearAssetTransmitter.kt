@@ -56,6 +56,8 @@ interface WearAssetTransmitter {
         nodeId: String,
         watchFacePackage: WatchFacePackage,
     ): WatchFaceInstallError
+
+    fun resetTransferId()
 }
 
 @Singleton
@@ -129,6 +131,10 @@ class WearAssetTransmitterImpl @Inject constructor(
             watchFacePackage.file.delete()
         }
         return WatchFaceInstallError.NO_ERROR
+    }
+
+    override fun resetTransferId() {
+        transferId = generateTransferId()
     }
 
     private suspend fun assetTransferSetup(

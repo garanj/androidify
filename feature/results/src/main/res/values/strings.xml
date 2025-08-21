@@ -53,4 +53,5 @@
     <string name="complete_enjoy_watch_face">Enjoy your watch face!</string>
     <string name="complete_error_headline">Something went wrong</string>
     <string name="complete_error_message">Check your watch is connected and try again</string>
+    <string name="no_watch_faces">"No available watch faces"</string>
 </resources>

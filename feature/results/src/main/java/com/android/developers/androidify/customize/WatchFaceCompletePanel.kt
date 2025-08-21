@@ -15,7 +15,7 @@
  */
 @file:OptIn(ExperimentalMaterial3ExpressiveApi::class)
 
-package com.android.developers.androidify.results
+package com.android.developers.androidify.customize
 
 import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
@@ -43,6 +43,7 @@ import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 
 @Composable

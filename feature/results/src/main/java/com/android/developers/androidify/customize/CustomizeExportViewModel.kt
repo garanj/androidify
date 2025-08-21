@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
+import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepository
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
@@ -58,7 +59,7 @@ class CustomizeExportViewModel @Inject constructor(
             currentState, device, installationStatus ->
         currentState.copy(
             connectedDevice = device,
-            installationStatus = installationStatus,
+            watchFaceInstallationStatus = installationStatus,
         )
     }.stateIn(
         scope = viewModelScope,
@@ -279,19 +280,52 @@ class CustomizeExportViewModel @Inject constructor(
             it.copy(selectedTool = tool)
         }
     }
+
+    fun loadWatchFaces() {
+        if (_state.value.watchFaces.isNotEmpty()) return
+
+        _state.update { it.copy(isLoadingWatchFaces = true) }
+
+        viewModelScope.launch {
+            watchfaceInstallationRepository.getAvailableWatchFaces()
+                .onSuccess { faces ->
+                    _state.update {
+                        it.copy(
+                            isLoadingWatchFaces = false,
+                            watchFaces = faces,
+                            selectedWatchFace = faces.firstOrNull()
+                        )
+                    }
+                }
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            isLoadingWatchFaces = false,
+                        )
+                    }
+                }
+        }
+    }
+
+    fun onWatchFaceSelected(watchFace: WatchFaceAsset) {
+        _state.update { it.copy(selectedWatchFace = watchFace) }
+    }
+
     fun installWatchFace() {
+        val watchFaceToInstall = _state.value.selectedWatchFace ?: return
         transferJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val bitmap = state.value.exportImageCanvas.imageBitmap
                 val device = state.value.connectedDevice
                 if (device != null && bitmap != null) {
                     val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
-                    val response = watchfaceInstallationRepository.createAndTransferWatchFace(device, wfBitmap)
+                    val response = watchfaceInstallationRepository
+                        .createAndTransferWatchFace(device, watchFaceToInstall, wfBitmap)
 
                     if (response != WatchFaceInstallError.NO_ERROR) {
                         _state.update {
                             it.copy(
-                                installationStatus = WatchFaceInstallationStatus.Complete(
+                                watchFaceInstallationStatus = WatchFaceInstallationStatus.Complete(
                                     success = false,
                                     installError = response,
                                     otherNodeId = device.nodeId,
@@ -307,6 +341,8 @@ class CustomizeExportViewModel @Inject constructor(
     fun resetWatchFaceSend() {
         transferJob?.cancel()
         transferJob = null
-        _state.update { it.copy(installationStatus = WatchFaceInstallationStatus.NotStarted) }
+        viewModelScope.launch {
+            watchfaceInstallationRepository.resetInstallationStatus()
+        }
     }
 }

@@ -16,6 +16,7 @@
 package com.android.developers.androidify.watchface.transfer
 
 import android.graphics.Bitmap
+import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.wear.common.ConnectedDevice
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
@@ -34,8 +35,15 @@ class EmptyWatchFaceInstallationRepositoryImpl @Inject constructor() : WatchFace
 
     override suspend fun createAndTransferWatchFace(
         connectedDevice: ConnectedDevice,
+        watchFaceAsset: WatchFaceAsset,
         bitmap: Bitmap,
     ): WatchFaceInstallError {
         return WatchFaceInstallError.WATCH_FACE_INSTALL_ERROR
     }
+
+    override suspend fun getAvailableWatchFaces(): Result<List<WatchFaceAsset>> {
+        return Result.success(emptyList())
+    }
+
+    override suspend fun resetInstallationStatus() { }
 }

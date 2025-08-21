@@ -19,13 +19,8 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
 import androidx.compose.runtime.Composable
-import com.android.developers.androidify.results.AllDonePanel
-import com.android.developers.androidify.results.ErrorPanel
-import com.android.developers.androidify.results.GrantPermissionsPanel
-import com.android.developers.androidify.results.InstallAndroidifyPanel
-import com.android.developers.androidify.results.InstallWatchFacePanel
-import com.android.developers.androidify.results.LongPressPanel
-import com.android.developers.androidify.results.UpdateSettingsPanel
+import androidx.compose.runtime.LaunchedEffect
+import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.wear.common.ConnectedDevice
 import com.android.developers.androidify.wear.common.WatchFaceActivationStrategy
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
@@ -37,8 +32,17 @@ fun WatchFaceModalSheet(
     onWatchFaceInstallClick: (String) -> Unit,
     installationStatus: WatchFaceInstallationStatus,
     sheetState: SheetState,
+    isLoadingWatchFaces: Boolean,
+    watchFaces: List<WatchFaceAsset>,
+    selectedWatchFace: WatchFaceAsset?,
     onDismiss: () -> Unit,
+    onLoad: () -> Unit,
+    onWatchFaceSelect: (WatchFaceAsset) -> Unit
 ) {
+    LaunchedEffect(Unit) {
+        onLoad()
+    }
+
     ModalBottomSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
@@ -75,9 +79,13 @@ fun WatchFaceModalSheet(
                         InstallWatchFacePanel(
                             deviceName = connectedDevice.displayName,
                             isSendingToWatch = installationStatus is WatchFaceInstallationStatus.Sending,
-                            onButtonClick = {
+                            onInstallClick = {
                                 onWatchFaceInstallClick(connectedDevice.nodeId)
                             },
+                            isLoadingWatchFaces = isLoadingWatchFaces,
+                            watchFaces = watchFaces,
+                            selectedWatchFace = selectedWatchFace,
+                            onWatchFaceSelect = onWatchFaceSelect
                         )
                     }
                 }

@@ -88,6 +88,7 @@ import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
+import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.wear.common.ConnectedDevice
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
@@ -136,6 +137,8 @@ fun CustomizeAndExportScreen(
         },
         isMediumWindowSize = isMediumWindowSize,
         snackbarHostState = viewModel.snackbarHostState.collectAsStateWithLifecycle().value,
+        loadWatchFaces = viewModel::loadWatchFaces,
+        onWatchFaceSelect = viewModel::onWatchFaceSelected,
     )
 }
 
@@ -153,6 +156,8 @@ private fun CustomizeExportContents(
     onResetWatchFaceSend: () -> Unit,
     isMediumWindowSize: Boolean,
     snackbarHostState: SnackbarHostState,
+    loadWatchFaces: () -> Unit,
+    onWatchFaceSelect: (WatchFaceAsset) -> Unit,
 ) {
     var showBottomSheet by remember { mutableStateOf(false) }
     val sheetState = rememberModalBottomSheetState()
@@ -253,10 +258,15 @@ private fun CustomizeExportContents(
                         showBottomSheet = false
                     },
                     connectedDevice = device,
-                    installationStatus = state.installationStatus,
+                    installationStatus = state.watchFaceInstallationStatus,
                     onWatchFaceInstallClick = {
                         onInstallWatchFaceClicked()
                     },
+                    onLoad = loadWatchFaces,
+                    watchFaces = state.watchFaces,
+                    selectedWatchFace = state.selectedWatchFace,
+                    onWatchFaceSelect = onWatchFaceSelect,
+                    isLoadingWatchFaces = state.isLoadingWatchFaces
                 )
             }
         }
@@ -500,6 +510,8 @@ fun CustomizeExportPreview() {
                     onSelectedToolStateChanged = {},
                     onInstallWatchFaceClicked = {},
                     onResetWatchFaceSend = {},
+                    loadWatchFaces = {},
+                    onWatchFaceSelect = {},
                 )
             }
         }
@@ -539,6 +551,8 @@ fun CustomizeExportPreviewLarge() {
                     onSelectedToolStateChanged = {},
                     onInstallWatchFaceClicked = {},
                     onResetWatchFaceSend = {},
+                    loadWatchFaces = {},
+                    onWatchFaceSelect = {},
                 )
             }
         }

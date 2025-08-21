@@ -18,14 +18,17 @@ package com.android.developers.androidify
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.lifecycle.lifecycleScope
 import androidx.wear.ambient.AmbientLifecycleObserver
 import com.android.developers.androidify.ui.WatchFaceOnboardingScreen
 import com.android.developers.androidify.ui.theme.AndroidifyWearTheme
 import com.android.developers.androidify.watchfacepush.LAUNCHED_FROM_WATCH_FACE_TRANSFER
+import com.android.developers.androidify.watchfacepush.WatchFaceOnboardingRepository
+import kotlinx.coroutines.launch
 
 class MainActivity : ComponentActivity() {
     val ambientCallback = object : AmbientLifecycleObserver.AmbientLifecycleCallback {
-        override fun onEnterAmbient(ambientDetails: AmbientLifecycleObserver.AmbientDetails) {  }
+        override fun onEnterAmbient(ambientDetails: AmbientLifecycleObserver.AmbientDetails) { }
 
         override fun onExitAmbient() { }
 
@@ -34,8 +37,13 @@ class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
         val launchedFromWatchFaceTransfer = intent.extras?.getBoolean(LAUNCHED_FROM_WATCH_FACE_TRANSFER) ?: false
+
+        // If manually launched and the last time used, the watch face transfer was completed,
+        // reset this state.
+        if (!launchedFromWatchFaceTransfer) {
+            resetWatchFaceTransferStateIfComplete()
+        }
 
         lifecycle.addObserver(AmbientLifecycleObserver(this, ambientCallback))
 
@@ -44,7 +52,8 @@ class MainActivity : ComponentActivity() {
         setContent {
             AndroidifyWearTheme {
                 WatchFaceOnboardingScreen(
-                    launchedFromWatchFaceTransfer = launchedFromWatchFaceTransfer)
+                    launchedFromWatchFaceTransfer = launchedFromWatchFaceTransfer,
+                )
             }
         }
     }
@@ -52,5 +61,12 @@ class MainActivity : ComponentActivity() {
     override fun onDestroy() {
         super.onDestroy()
         lifecycle.removeObserver(AmbientLifecycleObserver(this, ambientCallback))
+    }
+
+    private fun resetWatchFaceTransferStateIfComplete() {
+        val watchFaceOnboardingRepository = WatchFaceOnboardingRepository(this)
+        lifecycleScope.launch {
+            watchFaceOnboardingRepository.resetWatchFaceTransferStateIfComplete()
+        }
     }
 }

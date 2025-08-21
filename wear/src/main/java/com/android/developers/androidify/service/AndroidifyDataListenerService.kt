@@ -1,3 +1,18 @@
+/*
+ * Copyright 2025 The Android Open Source Project
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     https://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 @file:OptIn(ExperimentalAtomicApi::class)
 
 package com.android.developers.androidify.service
@@ -81,7 +96,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
             // the incoming APK matches that which was sent in the initial request.
             val transferState = storedStateManager.watchFaceInstallationStatus.first()
             if (transferState !is WatchFaceInstallationStatus.Receiving ||
-                !channel.path.contains(transferState.transferId)) {
+                !channel.path.contains(transferState.transferId)
+            ) {
                 return@launch
             }
             // This job was set after the initial request in case the phone never followed up with
@@ -102,7 +118,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
                         override fun onInputClosed(
                             channel: ChannelClient.Channel,
                             closeReason: Int,
-                            appErrorCode: Int
+                            appErrorCode: Int,
                         ) {
                             super.onInputClosed(channel, closeReason, appErrorCode)
                             val transferResult = if (closeReason == CLOSE_REASON_NORMAL) {
@@ -123,14 +139,15 @@ class AndroidifyDataListenerService : WearableListenerService() {
                     continuationScope.launch {
                         try {
                             channelClient.registerChannelCallback(channel, callback).await()
-                            channelClient.receiveFile(channel, tempFile.toUri(), /* append */ false)
+                            channelClient.receiveFile(channel, tempFile.toUri(), false)
 
                             val finalResult = resultChannel.receive()
 
                             if (finalResult == WatchFaceInstallError.NO_ERROR) {
-                                installAndSetWatchFace(tempFile,
+                                installAndSetWatchFace(
+                                    tempFile,
                                     transferState.validationToken,
-                                    transferState.activationStrategy
+                                    transferState.activationStrategy,
                                 )
                             }
 
@@ -141,7 +158,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
                             if (continuation.isActive) {
                                 continuation.resume(WatchFaceInstallError.TRANSFER_ERROR)
                             }
-                        }  finally {
+                        } finally {
                             channelClient.unregisterChannelCallback(callback)
                             resultChannel.close()
                         }
@@ -155,7 +172,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
                 validationToken = transferState.validationToken,
                 activationStrategy = transferState.activationStrategy,
                 installError = result,
-                otherNodeId = channel.nodeId
+                otherNodeId = channel.nodeId,
             )
             // Update the local status of the transfer, which is then reflected on the watch UI.
             watchFaceOnboardingRepository.storedStateManager
@@ -185,8 +202,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
                         activationStrategy = strategy,
                         transferId = initialRequest.transferId,
                         validationToken = initialRequest.token,
-                        otherNodeId = nodeId
-                    )
+                        otherNodeId = nodeId,
+                    ),
                 )
 
                 // A timeout job is started in case, having initiated the transfer, the phone
@@ -211,8 +228,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
                     activationStrategy = strategy,
                     transferId = initialRequest.transferId,
                     validationToken = initialRequest.token,
-                    otherNodeId = nodeId
-                )
+                    otherNodeId = nodeId,
+                ),
             )
             isTransferInProgress.store(false)
         }
