@@ -220,7 +220,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
     private suspend fun configureTransferTimeout(initialRequest: InitialRequest, nodeId: String, strategy: WatchFaceActivationStrategy) {
         delay(TRANSFER_TIMEOUT_MS)
         val transferState = storedStateManager.watchFaceInstallationStatus.first()
-        if (transferState is WatchFaceInstallationStatus.Receiving) {
+        if (transferState is WatchFaceInstallationStatus.Receiving &&
+            transferState.transferId == initialRequest.transferId) {
             storedStateManager.setWatchFaceInstallationStatus(
                 WatchFaceInstallationStatus.Complete(
                     success = false,
