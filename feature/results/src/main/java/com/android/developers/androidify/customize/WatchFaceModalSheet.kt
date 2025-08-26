@@ -16,6 +16,10 @@
 package com.android.developers.androidify.customize
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,6 +34,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.SheetValue
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -40,8 +45,10 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.results.R
+import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.wear.common.ConnectedDevice
 import com.android.developers.androidify.wear.common.WatchFaceActivationStrategy
@@ -93,6 +100,7 @@ fun WatchFaceModalSheet(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
+            Spacer(modifier = Modifier.height(4.dp))
             Text(
                 text = stringResource(R.string.send_to_watch_cta, connectedDevice.displayName),
                 style = MaterialTheme.typography.titleMedium,
@@ -102,7 +110,16 @@ fun WatchFaceModalSheet(
                 connectedDevice.hasAndroidify -> {
                     AnimatedContent(
                         targetState = installationStatus,
-                        label = "Animated Content",
+                        transitionSpec = {
+                            ContentTransform(
+                                targetContentEnter = fadeIn(
+                                    animationSpec = tween(durationMillis = 500),
+                                ),
+                                initialContentExit = fadeOut(
+                                    animationSpec = tween(durationMillis = 500),
+                                ),
+                            )
+                        },
                     ) { installationStatus ->
                         when (installationStatus) {
                             is WatchFaceInstallationStatus.Complete -> {
@@ -176,5 +193,41 @@ fun WatchFaceModalSheet(
                 }
             }
         }
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true, showSystemUi = true)
+@Composable
+private fun WatchFaceModalSheetPreview() {
+    val device = ConnectedDevice(
+        nodeId = "1234",
+        displayName = "Pixel Watch",
+        hasAndroidify = true,
+    )
+    val watchface = WatchFaceAsset(
+        id = "watch_face_1",
+        previewPath = R.drawable.watch_face_preview,
+    )
+    val sheetState = SheetState(
+        initialValue = SheetValue.Expanded,
+        skipHiddenState = true,
+        skipPartiallyExpanded = true,
+        positionalThreshold = { 0f },
+        velocityThreshold = { 0f },
+    )
+    AndroidifyTheme {
+        WatchFaceModalSheet(
+            connectedDevice = device,
+            watchFaces = listOf(watchface),
+            selectedWatchFace = watchface,
+            installationStatus = WatchFaceInstallationStatus.NotStarted,
+            isLoadingWatchFaces = false,
+            onWatchFaceSelect = {},
+            onLoad = {},
+            onDismiss = {},
+            onWatchFaceInstallClick = {},
+            sheetState = sheetState,
+        )
     }
 }

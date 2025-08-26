@@ -16,6 +16,7 @@
 package com.android.developers.androidify.customize
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -60,6 +61,7 @@ fun WatchFacePanelButton(
             .heightIn(min = 64.dp)
             .fillMaxWidth()
             .animateContentSize(),
+        border = BorderStroke(2.dp, color = colors.contentColor),
         onClick = onClick,
     ) {
         Row(
