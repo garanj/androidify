@@ -15,7 +15,6 @@
  */
 package com.android.developers.androidify.customize
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,24 +23,19 @@ import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.watchface.WatchFaceAsset
 
 @Composable
-fun InstallAndroidifyPanel(
+fun AllDoneWatchFacePanel(
     modifier: Modifier = Modifier,
+    selectedWatchFace: WatchFaceAsset,
+    onAllDoneClick: () -> Unit = { },
 ) {
-    val context = LocalContext.current
-    val placeholderWatchFace = WatchFaceAsset(
-        id = "watch_face_1",
-        previewPath = R.drawable.watch_app_placeholder,
-    )
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -50,20 +44,15 @@ fun InstallAndroidifyPanel(
             sizer = placeholderWatchFaceRow,
         ) {
             WatchFacesRow(
-                watchFaces = listOf(placeholderWatchFace),
-                selectedWatchFace = placeholderWatchFace,
+                watchFaces = listOf(selectedWatchFace),
+                selectedWatchFace = selectedWatchFace,
             )
         }
-
         Spacer(modifier = Modifier.height(24.dp))
         WatchFacePanelButton(
-            buttonText = stringResource(R.string.install_androidify),
-            iconResId = R.drawable.watch_arrow_24,
-            onClick = {
-                val uri = "market://details?id=${context.packageName}".toUri()
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                context.startActivity(intent)
-            },
+            buttonText = stringResource(R.string.complete_all_done),
+            iconResId = R.drawable.check_24,
+            onClick = onAllDoneClick,
         )
     }
 }
@@ -71,8 +60,14 @@ fun InstallAndroidifyPanel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-private fun InstallAndroidifyPanelPreview() {
+private fun AllDoneWatchFacePanelPreview() {
+    val watchFace1 = WatchFaceAsset(
+        id = "watch_face_1",
+        previewPath = R.drawable.watch_face_preview,
+    )
     AndroidifyTheme {
-        InstallAndroidifyPanel()
+        AllDoneWatchFacePanel(
+            selectedWatchFace = watchFace1,
+        )
     }
 }

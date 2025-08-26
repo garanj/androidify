@@ -21,7 +21,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
@@ -29,7 +28,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
@@ -39,23 +37,23 @@ import com.android.developers.androidify.watchface.WatchFaceAsset
 fun WatchFacePreviewItem(
     watchFace: WatchFaceAsset,
     isSelected: Boolean,
-    onClick: () -> Unit
+    onClick: () -> Unit,
 ) {
     val borderColor = if (isSelected) MaterialTheme.colorScheme.primary else Color.Transparent
 
     Box(
         modifier = Modifier
-            .size(120.dp) // Adjust size as needed
+            .size(160.dp) // Adjust size as needed
             .clip(CircleShape)
             .border(4.dp, borderColor, CircleShape)
-            .clickable(onClick = onClick)
+            .clickable(onClick = onClick),
     ) {
         AsyncImage(
             model = watchFace.previewPath,
             contentDescription = "Preview of ${watchFace.id}",
             contentScale = ContentScale.Crop,
             colorFilter = if (!isSelected) greyScaleFilter else null,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier.fillMaxSize(),
         )
     }
 }

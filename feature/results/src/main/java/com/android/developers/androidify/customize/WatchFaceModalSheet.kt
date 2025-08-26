@@ -15,11 +15,33 @@
  */
 package com.android.developers.androidify.customize
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.ModalBottomSheet
 import androidx.compose.material3.SheetState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.ui.Alignment
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import com.android.developers.androidify.results.R
 import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.wear.common.ConnectedDevice
 import com.android.developers.androidify.wear.common.WatchFaceActivationStrategy
@@ -37,7 +59,7 @@ fun WatchFaceModalSheet(
     selectedWatchFace: WatchFaceAsset?,
     onDismiss: () -> Unit,
     onLoad: () -> Unit,
-    onWatchFaceSelect: (WatchFaceAsset) -> Unit
+    onWatchFaceSelect: (WatchFaceAsset) -> Unit,
 ) {
     LaunchedEffect(Unit) {
         onLoad()
@@ -47,51 +69,111 @@ fun WatchFaceModalSheet(
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {
-        when {
-            connectedDevice.hasAndroidify -> {
-                when (installationStatus) {
-                    is WatchFaceInstallationStatus.Complete -> {
-                        if (installationStatus.success) {
-                            when (installationStatus.activationStrategy) {
-                                WatchFaceActivationStrategy.LONG_PRESS_TO_SET -> {
-                                    LongPressPanel()
-                                }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(bottom = 16.dp, top = 0.dp, start = 16.dp, end = 16.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
+            Box(
+                modifier = Modifier
+                    .size(37.dp)
+                    .clip(CircleShape)
+                    .background(MaterialTheme.colorScheme.secondaryContainer),
+                contentAlignment = Alignment.Center,
+            ) {
+                Icon(
+                    ImageVector.vectorResource(R.drawable.watch_24),
+                    contentDescription = null,
+                )
+            }
+            Spacer(modifier = Modifier.height(8.dp))
+            Text(
+                text = stringResource(R.string.send_to_watch_device, connectedDevice.displayName),
+                style = MaterialTheme.typography.titleMedium,
+                fontWeight = FontWeight.Bold,
+            )
+            Text(
+                text = stringResource(R.string.send_to_watch_cta, connectedDevice.displayName),
+                style = MaterialTheme.typography.titleMedium,
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+            when {
+                connectedDevice.hasAndroidify -> {
+                    AnimatedContent(
+                        targetState = installationStatus,
+                        label = "Animated Content",
+                    ) { installationStatus ->
+                        when (installationStatus) {
+                            is WatchFaceInstallationStatus.Complete -> {
+                                if (installationStatus.success) {
+                                    when (installationStatus.activationStrategy) {
+                                        WatchFaceActivationStrategy.LONG_PRESS_TO_SET -> {
+                                            GuidanceWatchFacePanel(
+                                                selectedWatchFace = selectedWatchFace!!,
+                                                guidanceTextResId = R.string.complete_long_press,
+                                                dismissClick = onDismiss,
+                                            )
+                                        }
 
-                                WatchFaceActivationStrategy.FOLLOW_PROMPT_ON_WATCH -> {
-                                    GrantPermissionsPanel()
-                                }
+                                        WatchFaceActivationStrategy.FOLLOW_PROMPT_ON_WATCH -> {
+                                            GuidanceWatchFacePanel(
+                                                selectedWatchFace = selectedWatchFace!!,
+                                                guidanceTextResId = R.string.complete_permissions,
+                                                dismissClick = onDismiss,
+                                            )
+                                        }
 
-                                WatchFaceActivationStrategy.NO_ACTION_NEEDED,
-                                WatchFaceActivationStrategy.CALL_SET_ACTIVE_NO_USER_ACTION,
-                                -> {
-                                    AllDonePanel()
-                                }
+                                        WatchFaceActivationStrategy.NO_ACTION_NEEDED,
+                                        WatchFaceActivationStrategy.CALL_SET_ACTIVE_NO_USER_ACTION,
+                                        -> {
+                                            AllDoneWatchFacePanel(
+                                                selectedWatchFace = selectedWatchFace!!,
+                                                onAllDoneClick = onDismiss,
+                                            )
+                                        }
 
-                                WatchFaceActivationStrategy.GO_TO_WATCH_SETTINGS -> {
-                                    UpdateSettingsPanel()
+                                        WatchFaceActivationStrategy.GO_TO_WATCH_SETTINGS -> {
+                                            GuidanceWatchFacePanel(
+                                                selectedWatchFace = selectedWatchFace!!,
+                                                guidanceTextResId = R.string.complete_settings,
+                                                dismissClick = onDismiss,
+                                            )
+                                        }
+                                    }
+                                } else {
+                                    ErrorWatchFacePanel(
+                                        selectedWatchFace = selectedWatchFace!!,
+                                        errorTextResId = R.string.complete_error_message,
+                                        onAllDoneClick = onDismiss,
+                                    )
                                 }
                             }
-                        } else {
-                            ErrorPanel()
+
+                            is WatchFaceInstallationStatus.Sending -> {
+                                SendingWatchFacePanel(
+                                    selectedWatchFace = selectedWatchFace!!,
+                                )
+                            }
+
+                            else -> {
+                                InstallWatchFacePanel(
+                                    onInstallClick = {
+                                        onWatchFaceInstallClick(connectedDevice.nodeId)
+                                    },
+                                    isLoadingWatchFaces = isLoadingWatchFaces,
+                                    watchFaces = watchFaces,
+                                    selectedWatchFace = selectedWatchFace,
+                                    onWatchFaceSelect = onWatchFaceSelect,
+                                )
+                            }
                         }
                     }
-                    else -> {
-                        InstallWatchFacePanel(
-                            deviceName = connectedDevice.displayName,
-                            isSendingToWatch = installationStatus is WatchFaceInstallationStatus.Sending,
-                            onInstallClick = {
-                                onWatchFaceInstallClick(connectedDevice.nodeId)
-                            },
-                            isLoadingWatchFaces = isLoadingWatchFaces,
-                            watchFaces = watchFaces,
-                            selectedWatchFace = selectedWatchFace,
-                            onWatchFaceSelect = onWatchFaceSelect
-                        )
-                    }
                 }
-            }
-            else -> {
-                InstallAndroidifyPanel(deviceName = connectedDevice.displayName)
+
+                else -> {
+                    InstallAndroidifyPanel()
+                }
             }
         }
     }

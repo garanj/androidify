@@ -266,7 +266,7 @@ private fun CustomizeExportContents(
                     watchFaces = state.watchFaces,
                     selectedWatchFace = state.selectedWatchFace,
                     onWatchFaceSelect = onWatchFaceSelect,
-                    isLoadingWatchFaces = state.isLoadingWatchFaces
+                    isLoadingWatchFaces = state.isLoadingWatchFaces,
                 )
             }
         }

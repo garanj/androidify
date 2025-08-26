@@ -18,37 +18,40 @@ package com.android.developers.androidify.customize
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.ExperimentalMaterial3Api
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.SubcomposeLayout
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
-import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.watchface.WatchFaceAsset
+
+val placeholderWatchFaceRow = @Composable {
+    val placeholderAsset = WatchFaceAsset(
+        id = "placeholder",
+        previewPath = R.drawable.watch_face_preview,
+    )
+    WatchFacesRow(
+        watchFaces = listOf(placeholderAsset),
+        selectedWatchFace = placeholderAsset,
+        onWatchFaceSelect = {},
+    )
+}
 
 @Composable
 fun InstallWatchFacePanel(
     modifier: Modifier = Modifier,
-    deviceName: String,
-    isSendingToWatch: Boolean,
     isLoadingWatchFaces: Boolean,
     watchFaces: List<WatchFaceAsset>,
     selectedWatchFace: WatchFaceAsset?,
@@ -56,54 +59,32 @@ fun InstallWatchFacePanel(
     onInstallClick: () -> Unit = { },
 ) {
     Column(
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        Text(
-            text = stringResource(R.string.send_to_watch_cta, deviceName),
-            style = MaterialTheme.typography.titleMedium,
-        )
-        Spacer(modifier = Modifier.height(24.dp))
-        if (isLoadingWatchFaces) {
-            CircularProgressIndicator()
-        } else if (watchFaces.isEmpty()) {
-            Text(
-                text = stringResource(R.string.no_watch_faces),
-                color = MaterialTheme.colorScheme.error,
-            )
-        } else {
-            LazyRow(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.spacedBy(12.dp),
-                contentPadding = PaddingValues(horizontal = 8.dp),
-            ) {
-                items(watchFaces, key = { it.id }) { watchFace ->
-                    WatchFacePreviewItem(
-                        watchFace = watchFace,
-                        isSelected = watchFace.id == selectedWatchFace?.id,
-                        onClick = {
-                            onWatchFaceSelect(watchFace)
-                        },
-                    )
-                }
+        val noAvailableWatchFaces = watchFaces.isEmpty() && !isLoadingWatchFaces
+        MatchSize(
+            sizer = placeholderWatchFaceRow,
+        ) {
+            if (noAvailableWatchFaces) {
+                Text(
+                    text = stringResource(R.string.no_watch_faces),
+                    style = MaterialTheme.typography.bodyMedium,
+                )
+            } else {
+                WatchFacesRow(
+                    watchFaces = watchFaces,
+                    selectedWatchFace = selectedWatchFace,
+                    onWatchFaceSelect = onWatchFaceSelect,
+                )
             }
         }
+
         Spacer(modifier = Modifier.height(24.dp))
-        PrimaryButton(
-            onClick = onInstallClick,
-            loading = isSendingToWatch,
-            leadingIcon = {
-                Row {
-                    Icon(
-                        ImageVector.vectorResource(R.drawable.watch_24),
-                        contentDescription = null,
-                    )
-                    Spacer(modifier = Modifier.width(8.dp))
-                }
-            },
+        WatchFacePanelButton(
             buttonText = stringResource(R.string.send_to_watch),
+            iconResId = R.drawable.watch_arrow_24,
+            onClick = onInstallClick,
         )
     }
 }
@@ -122,8 +103,6 @@ private fun InstallWatchFacePanelPreview() {
     )
     AndroidifyTheme {
         InstallWatchFacePanel(
-            deviceName = "Pixel 3",
-            isSendingToWatch = false,
             isLoadingWatchFaces = false,
             watchFaces = listOf(watchFace1, watchFace2),
             selectedWatchFace = watchFace1,
@@ -133,19 +112,69 @@ private fun InstallWatchFacePanelPreview() {
     }
 }
 
+@Composable
+fun WatchFacesRow(
+    watchFaces: List<WatchFaceAsset>,
+    selectedWatchFace: WatchFaceAsset? = null,
+    onWatchFaceSelect: (WatchFaceAsset) -> Unit = {},
+    modifier: Modifier = Modifier,
+) {
+    LazyRow(
+        modifier = Modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        contentPadding = PaddingValues(horizontal = 8.dp),
+    ) {
+        items(watchFaces, key = { it.id }) { watchFace ->
+            WatchFacePreviewItem(
+                watchFace = watchFace,
+                isSelected = watchFace.id == selectedWatchFace?.id,
+                onClick = {
+                    onWatchFaceSelect(watchFace)
+                },
+            )
+        }
+    }
+}
+
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
 private fun InstallWatchFacePanelNoWatchFacesPreview() {
-AndroidifyTheme {
+    AndroidifyTheme {
         InstallWatchFacePanel(
-            deviceName = "Pixel 3",
-            isSendingToWatch = false,
             isLoadingWatchFaces = false,
             watchFaces = listOf(),
             selectedWatchFace = null,
             onWatchFaceSelect = {},
             onInstallClick = {},
         )
+    }
+}
+
+@Composable
+fun MatchSize(
+    modifier: Modifier = Modifier,
+    sizer: @Composable () -> Unit,
+    content: @Composable () -> Unit,
+) {
+    SubcomposeLayout(modifier = modifier) { constraints ->
+        val sizerPlaceables = subcompose("sizer", sizer).map {
+            it.measure(constraints)
+        }
+
+        val maxWidth = sizerPlaceables.maxOfOrNull { it.width } ?: 0
+        val maxHeight = sizerPlaceables.maxOfOrNull { it.height } ?: 0
+
+        val contentPlaceables = subcompose("content", content).map {
+            it.measure(constraints.copy(minWidth = 0, minHeight = 0))
+        }
+
+        layout(maxWidth, maxHeight) {
+            contentPlaceables.forEach { placeable ->
+                val x = (maxWidth - placeable.width) / 2
+                val y = (maxHeight - placeable.height) / 2
+                placeable.placeRelative(x, y)
+            }
+        }
     }
 }

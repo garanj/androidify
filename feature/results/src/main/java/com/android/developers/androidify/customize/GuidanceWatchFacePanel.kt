@@ -15,33 +15,33 @@
  */
 package com.android.developers.androidify.customize
 
-import android.content.Intent
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.watchface.WatchFaceAsset
 
 @Composable
-fun InstallAndroidifyPanel(
+fun GuidanceWatchFacePanel(
     modifier: Modifier = Modifier,
+    selectedWatchFace: WatchFaceAsset,
+    guidanceTextResId: Int,
+    dismissClick: () -> Unit = { },
 ) {
-    val context = LocalContext.current
-    val placeholderWatchFace = WatchFaceAsset(
-        id = "watch_face_1",
-        previewPath = R.drawable.watch_app_placeholder,
-    )
     Column(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -49,21 +49,27 @@ fun InstallAndroidifyPanel(
         MatchSize(
             sizer = placeholderWatchFaceRow,
         ) {
-            WatchFacesRow(
-                watchFaces = listOf(placeholderWatchFace),
-                selectedWatchFace = placeholderWatchFace,
-            )
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
+                WatchFacesRow(
+                    watchFaces = listOf(selectedWatchFace),
+                    selectedWatchFace = selectedWatchFace,
+                )
+                Spacer(modifier = Modifier.width(16.dp))
+                Text(
+                    text = stringResource(guidanceTextResId),
+                    textAlign = TextAlign.Center,
+                )
+            }
         }
 
         Spacer(modifier = Modifier.height(24.dp))
         WatchFacePanelButton(
-            buttonText = stringResource(R.string.install_androidify),
-            iconResId = R.drawable.watch_arrow_24,
-            onClick = {
-                val uri = "market://details?id=${context.packageName}".toUri()
-                val intent = Intent(Intent.ACTION_VIEW, uri)
-                context.startActivity(intent)
-            },
+            buttonText = stringResource(R.string.error_dismiss),
+            iconResId = R.drawable.check_24,
+            onClick = dismissClick,
         )
     }
 }
@@ -71,8 +77,15 @@ fun InstallAndroidifyPanel(
 @OptIn(ExperimentalMaterial3Api::class)
 @Preview(showBackground = true)
 @Composable
-private fun InstallAndroidifyPanelPreview() {
+private fun GuidanceWatchFacePanelPreview() {
+    val watchFace1 = WatchFaceAsset(
+        id = "watch_face_1",
+        previewPath = R.drawable.watch_face_preview,
+    )
     AndroidifyTheme {
-        InstallAndroidifyPanel()
+        GuidanceWatchFacePanel(
+            selectedWatchFace = watchFace1,
+            guidanceTextResId = R.string.complete_long_press,
+        )
     }
 }

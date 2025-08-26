@@ -293,7 +293,7 @@ class CustomizeExportViewModel @Inject constructor(
                         it.copy(
                             isLoadingWatchFaces = false,
                             watchFaces = faces,
-                            selectedWatchFace = faces.firstOrNull()
+                            selectedWatchFace = faces.firstOrNull(),
                         )
                     }
                 }
