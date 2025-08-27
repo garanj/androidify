@@ -100,11 +100,6 @@ fun WatchFaceModalSheet(
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
-            Spacer(modifier = Modifier.height(4.dp))
-            Text(
-                text = stringResource(R.string.send_to_watch_cta, connectedDevice.displayName),
-                style = MaterialTheme.typography.titleMedium,
-            )
             Spacer(modifier = Modifier.height(16.dp))
             when {
                 connectedDevice.hasAndroidify -> {
