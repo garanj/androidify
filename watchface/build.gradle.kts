@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.kotlinx.serialization.protobuf)
     implementation(projects.wear.common)
+    implementation(projects.core.network)
 
     // For testing
     androidTestImplementation(libs.robolectric)

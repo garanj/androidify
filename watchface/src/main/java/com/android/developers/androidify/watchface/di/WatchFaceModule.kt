@@ -17,6 +17,7 @@ package com.android.developers.androidify.watchface.di
 
 import android.content.Context
 import android.os.Build
+import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.watchface.creator.WatchFaceCreator
 import com.android.developers.androidify.watchface.creator.WatchFaceCreatorImpl
 import com.android.developers.androidify.watchface.transfer.EmptyWatchFaceInstallationRepositoryImpl
@@ -66,8 +67,10 @@ class WatchFaceModule {
     fun provideWatchFaceInstallationRepository(
         supportedImpl: WatchFaceInstallationRepositoryImpl,
         noSupportImpl: EmptyWatchFaceInstallationRepositoryImpl,
+        remoteConfigDataSource: RemoteConfigDataSource,
     ): WatchFaceInstallationRepository {
-        return if (Build.VERSION.SDK_INT >= MIN_WATCH_FACE_SDK_VERSION) {
+        val watchFacesEnabled = remoteConfigDataSource.watchfaceFeatureEnabled()
+        return if (Build.VERSION.SDK_INT >= MIN_WATCH_FACE_SDK_VERSION && watchFacesEnabled) {
             supportedImpl
         } else {
             noSupportImpl
