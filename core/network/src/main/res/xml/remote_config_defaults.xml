@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?><defaults>
     <entry>
         <key>watchface_feature_enabled</key>
-        <value>true</value>
+        <value>false</value>
     </entry>
     <entry>
         <key>use_imagen</key>
