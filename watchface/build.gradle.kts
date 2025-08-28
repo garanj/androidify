@@ -44,6 +44,12 @@ android {
             assets.srcDir("src/androidTest/assets")
         }
     }
+    // To avoid packaging conflicts when using bouncycastle
+    packaging {
+        resources {
+            excludes.add("META-INF/versions/9/OSGI-INF/MANIFEST.MF")
+        }
+    }
 }
 
 dependencies {
@@ -70,13 +76,13 @@ dependencies {
     kspAndroidTest(libs.hilt.compiler)
 }
 
-configurations.all {
-    resolutionStrategy {
-        eachDependency {
-            if (requested.group == "com.google.guava" && requested.name == "listenablefuture") {
-                useTarget("com.google.guava:guava:33.3.1-android")
-                because("The main Guava library includes ListenableFuture, avoiding duplication.")
-            }
-        }
-    }
-}
+//configurations.all {
+//    resolutionStrategy {
+//        eachDependency {
+//            if (requested.group == "com.google.guava" && requested.name == "listenablefuture") {
+//                useTarget("com.google.guava:guava:33.3.1-android")
+//                because("The main Guava library includes ListenableFuture, avoiding duplication.")
+//            }
+//        }
+//    }
+//}

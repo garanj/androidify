@@ -70,7 +70,7 @@ class WatchFaceModule {
         remoteConfigDataSource: RemoteConfigDataSource,
     ): WatchFaceInstallationRepository {
         val watchFacesEnabled = remoteConfigDataSource.watchfaceFeatureEnabled()
-        return if (Build.VERSION.SDK_INT >= MIN_WATCH_FACE_SDK_VERSION && watchFacesEnabled || true) {
+        return if (Build.VERSION.SDK_INT >= MIN_WATCH_FACE_SDK_VERSION && watchFacesEnabled) {
             supportedImpl
         } else {
             noSupportImpl

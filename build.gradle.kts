@@ -51,3 +51,17 @@ subprojects {
         }
     }
 }
+
+allprojects {
+    configurations.all {
+        resolutionStrategy.eachDependency {
+            // Check for the conflicting listenablefuture dependency
+            if (requested.group == "com.google.guava" && requested.name == "listenablefuture") {
+                // Replace it with the AndroidX library that provides the same functionality
+                useTarget("com.google.guava:guava:33.3.1-android")
+                because("The standalone listenablefuture library conflicts with the full Guava library. " +
+                        "AndroidX Concurrent Futures is the modern replacement and is compatible.")
+            }
+        }
+    }
+}
