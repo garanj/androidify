@@ -29,9 +29,10 @@ import kotlinx.coroutines.flow.map
 private val Context.dataStore: DataStore<Preferences> by preferencesDataStore(name = "wfp")
 
 /**
- * Storage for various app settings.
+ * Storage for the state of Watch Face Push, namely whether permissions and one-shot APIs have
+ * already been used / set.
  */
-class StoredStateManager(val context: Context) {
+class WatchFacePushStateManager(val context: Context) {
     private val activeWatchFaceApiUsedKey = booleanPreferencesKey("setActiveUsed")
     private val permissionDeniedKey = booleanPreferencesKey("permissionDenied")
 

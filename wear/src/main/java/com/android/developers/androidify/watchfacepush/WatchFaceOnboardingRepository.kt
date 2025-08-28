@@ -17,19 +17,14 @@
 
 package com.android.developers.androidify.watchfacepush
 
-import android.annotation.SuppressLint
 import android.content.Context
-import android.content.Context.POWER_SERVICE
-import android.content.Intent
 import android.content.pm.PackageManager
 import android.os.ParcelFileDescriptor
-import android.os.PowerManager
 import android.util.Log
 import androidx.core.content.ContextCompat
 import androidx.wear.watchfacepush.WatchFacePushManager
 import androidx.wear.watchfacepush.WatchFacePushManagerFactory
-import com.android.developers.androidify.MainActivity
-import com.android.developers.androidify.data.StoredStateManager
+import com.android.developers.androidify.data.WatchFacePushStateManager
 import com.android.developers.androidify.wear.common.WatchFaceActivationStrategy
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
@@ -45,7 +40,7 @@ const val LAUNCHED_FROM_WATCH_FACE_TRANSFER = "launchedFromWatchFaceTransfer"
 
 class WatchFaceOnboardingRepository(
     val context: Context,
-    val storedStateManager: StoredStateManager = StoredStateManager(context),
+    val watchFacePushStateManager: WatchFacePushStateManager = WatchFacePushStateManager(context),
 ) {
     private val messageClient by lazy { Wearable.getMessageClient(context) }
 
@@ -61,10 +56,10 @@ class WatchFaceOnboardingRepository(
      * Full range of options shown in [WatchFaceActivationStrategy].
      */
     suspend fun getWatchFaceActivationStrategy(): WatchFaceActivationStrategy {
-        val apiUsed = storedStateManager.activeWatchFaceApiUsed.first()
+        val apiUsed = watchFacePushStateManager.activeWatchFaceApiUsed.first()
         val hasActiveWatchFace = hasActiveWatchFace()
         val hasPermission = hasSetWatchFacePermission()
-        val canRequestPermission = !storedStateManager.watchFacePermissionDenied.first()
+        val canRequestPermission = !watchFacePushStateManager.watchFacePermissionDenied.first()
 
         return WatchFaceActivationStrategy.fromWatchFaceState(
             hasActiveWatchFace = hasActiveWatchFace,
@@ -73,20 +68,20 @@ class WatchFaceOnboardingRepository(
             hasUsedSetActiveApi = apiUsed,
         )
     }
-    val watchFaceTransferState = storedStateManager.watchFaceInstallationStatus
+    val watchFaceTransferState = watchFacePushStateManager.watchFaceInstallationStatus
 
     suspend fun setWatchFaceTransferState(state: WatchFaceInstallationStatus) {
-        storedStateManager.setWatchFaceInstallationStatus(state)
+        watchFacePushStateManager.setWatchFaceInstallationStatus(state)
     }
 
     suspend fun resetWatchFaceTransferState() {
-        storedStateManager.setWatchFaceInstallationStatus(WatchFaceInstallationStatus.NotStarted)
+        watchFacePushStateManager.setWatchFaceInstallationStatus(WatchFaceInstallationStatus.NotStarted)
     }
 
     suspend fun resetWatchFaceTransferStateIfComplete() {
-        val currentStatus = storedStateManager.watchFaceInstallationStatus.first()
+        val currentStatus = watchFacePushStateManager.watchFaceInstallationStatus.first()
         if (currentStatus is WatchFaceInstallationStatus.Complete) {
-            storedStateManager.setWatchFaceInstallationStatus(WatchFaceInstallationStatus.NotStarted)
+            watchFacePushStateManager.setWatchFaceInstallationStatus(WatchFaceInstallationStatus.NotStarted)
         }
     }
 
@@ -111,7 +106,7 @@ class WatchFaceOnboardingRepository(
 
     suspend fun setActiveWatchFace() {
         val wfpManager = WatchFacePushManagerFactory.createWatchFacePushManager(context)
-        val storedStateManager = StoredStateManager(context)
+        val watchFacePushStateManager = WatchFacePushStateManager(context)
         val response = wfpManager.listWatchFaces()
 
         if (response.installedWatchFaceDetails.isEmpty()) {
@@ -122,7 +117,7 @@ class WatchFaceOnboardingRepository(
         val slotId = response.installedWatchFaceDetails.first().slotId
         wfpManager.setWatchFaceAsActive(slotId)
         // Record that the one-shot API has been used
-        storedStateManager.setActiveWatchFaceApiUsedKey(true)
+        watchFacePushStateManager.setActiveWatchFaceApiUsedKey(true)
     }
 
     /**
@@ -131,8 +126,8 @@ class WatchFaceOnboardingRepository(
      * determine what action the user needs to take to set the active watch face.
      */
     suspend fun updatePermissionStatus(granted: Boolean) {
-        val storedStateManager = StoredStateManager(context)
-        storedStateManager.setWatchFacePermissionDenied(!granted)
+        val watchFacePushStateManager = WatchFacePushStateManager(context)
+        watchFacePushStateManager.setWatchFacePermissionDenied(!granted)
     }
 
     private suspend fun hasActiveWatchFace(): Boolean {

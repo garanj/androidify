@@ -50,34 +50,41 @@ fun WatchFaceOnboardingScreen(
         when (state) {
             is WatchFaceInstallationStatus.Receiving,
             is WatchFaceInstallationStatus.Sending,
-            -> {
+                -> {
                 TransmissionScreen()
             }
+
             is WatchFaceInstallationStatus.Unknown,
             WatchFaceInstallationStatus.NotStarted,
-            -> {
+                -> {
                 if (launchedFromWatchFaceTransfer) {
                     TransmissionScreen()
                 } else {
                     WelcomeToAndroidifyScreen()
                 }
             }
+
             is WatchFaceInstallationStatus.Complete -> {
                 val completeStatus = state as WatchFaceInstallationStatus.Complete
                 if (completeStatus.success) {
                     WatchFaceGuidance(
                         strategy = completeStatus.activationStrategy,
                         onPermissionsChange = { granted, shouldShowRationale ->
-                            viewModel.maybeSendUpdateOnPermissionsChange(granted, shouldShowRationale)
+                            viewModel.maybeSendUpdateOnPermissionsChange(
+                                granted,
+                                shouldShowRationale,
+                            )
                         },
                         onAllDone = {
                             viewModel.resetWatchFaceTransferState()
                         },
                     )
                 } else {
-                    ErrorScreen(onAllDoneClick = {
-                        viewModel.resetWatchFaceTransferState()
-                    })
+                    ErrorScreen(
+                        onAllDoneClick = {
+                            viewModel.resetWatchFaceTransferState()
+                        },
+                    )
                 }
             }
         }
@@ -107,7 +114,10 @@ fun WatchFaceGuidance(
                 if (activePermission.status != previousPermissionStatus ||
                     activePermission.status.shouldShowRationale != previousShouldShowRationale
                 ) {
-                    onPermissionsChange(activePermission.status.isGranted, activePermission.status.shouldShowRationale)
+                    onPermissionsChange(
+                        activePermission.status.isGranted,
+                        activePermission.status.shouldShowRationale,
+                    )
                     previousPermissionStatus = activePermission.status
                     previousShouldShowRationale = activePermission.status.shouldShowRationale
                 }

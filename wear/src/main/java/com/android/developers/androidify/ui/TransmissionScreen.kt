@@ -15,10 +15,6 @@
  */
 package com.android.developers.androidify.ui
 
-import android.app.Activity
-import android.content.Context
-import android.content.ContextWrapper
-import android.view.WindowManager
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.animateFloat
 import androidx.compose.animation.core.infiniteRepeatable
@@ -31,13 +27,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.lerp
 import androidx.compose.ui.keepScreenOn
-import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -105,17 +100,17 @@ fun TransmissionScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun FourColorProgressIndicator() {
-    val colors = listOf(
+    val colors = remember { listOf(
         LimeGreen,
         Primary80,
         Primary90,
         Blue,
-    )
+    ) }
 
     val infiniteTransition = rememberInfiniteTransition(label = "transition")
     val progress by infiniteTransition.animateFloat(
         initialValue = 0f,
-        targetValue = colors.size.toFloat(), // Animate from 0 to 4
+        targetValue = colors.size.toFloat(),
         animationSpec = infiniteRepeatable(
             animation = tween(durationMillis = 4000, easing = LinearEasing),
         ),

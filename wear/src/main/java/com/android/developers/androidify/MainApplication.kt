@@ -16,10 +16,10 @@
 package com.android.developers.androidify
 
 import android.app.Application
-import com.android.developers.androidify.data.StoredStateManager
+import com.android.developers.androidify.data.WatchFacePushStateManager
 import com.android.developers.androidify.watchfacepush.WatchFaceOnboardingRepository
 
 class MainApplication : Application() {
-    val storedStateManager by lazy { StoredStateManager(this) }
+    val watchFacePushStateManager by lazy { WatchFacePushStateManager(this) }
     val watchFaceOnboardingRepository by lazy { WatchFaceOnboardingRepository(this) }
 }

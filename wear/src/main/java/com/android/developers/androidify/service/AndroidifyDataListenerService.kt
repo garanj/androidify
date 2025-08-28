@@ -23,7 +23,7 @@ import android.os.ParcelFileDescriptor
 import android.os.PowerManager
 import androidx.core.net.toUri
 import com.android.developers.androidify.MainActivity
-import com.android.developers.androidify.data.StoredStateManager
+import com.android.developers.androidify.data.WatchFacePushStateManager
 import com.android.developers.androidify.watchfacepush.LAUNCHED_FROM_WATCH_FACE_TRANSFER
 import com.android.developers.androidify.watchfacepush.WatchFaceOnboardingRepository
 import com.android.developers.androidify.wear.common.InitialRequest
@@ -73,7 +73,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
     private var transferTimeoutJob: Job? = null
     private var receiverJob: Job? = null
 
-    private val storedStateManager by lazy { StoredStateManager(this) }
+    private val watchFacePushStateManager by lazy { WatchFacePushStateManager(this) }
     private val watchFaceOnboardingRepository by lazy { WatchFaceOnboardingRepository(this) }
 
     /**
@@ -99,7 +99,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
         receiverJob = serviceScope.launch {
             // Check that the watch is expecting a watch face transfer and that the transfer ID of
             // the incoming APK matches that which was sent in the initial request.
-            val transferState = storedStateManager.watchFaceInstallationStatus.first()
+            val transferState = watchFacePushStateManager.watchFaceInstallationStatus.first()
             if (transferState !is WatchFaceInstallationStatus.Receiving ||
                 !channel.path.contains(transferState.transferId)
             ) {
@@ -180,7 +180,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
                 otherNodeId = channel.nodeId,
             )
             // Update the local status of the transfer, which is then reflected on the watch UI.
-            watchFaceOnboardingRepository.storedStateManager
+            watchFaceOnboardingRepository.watchFacePushStateManager
                 .setWatchFaceInstallationStatus(completedStatus)
             sendInstallResponse(channel.nodeId, completedStatus)
             isTransferInProgress.store(false)
@@ -202,7 +202,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
                 // active watch face or not. So this is determined ahead of time and stored.
                 val strategy = watchFaceOnboardingRepository.getWatchFaceActivationStrategy()
 
-                storedStateManager.setWatchFaceInstallationStatus(
+                watchFacePushStateManager.setWatchFaceInstallationStatus(
                     WatchFaceInstallationStatus.Receiving(
                         activationStrategy = strategy,
                         transferId = initialRequest.transferId,
@@ -224,10 +224,10 @@ class AndroidifyDataListenerService : WearableListenerService() {
 
     private suspend fun configureTransferTimeout(initialRequest: InitialRequest, nodeId: String, strategy: WatchFaceActivationStrategy) {
         delay(TRANSFER_TIMEOUT_MS)
-        val transferState = storedStateManager.watchFaceInstallationStatus.first()
+        val transferState = watchFacePushStateManager.watchFaceInstallationStatus.first()
         if (transferState is WatchFaceInstallationStatus.Receiving &&
             transferState.transferId == initialRequest.transferId) {
-            storedStateManager.setWatchFaceInstallationStatus(
+            watchFacePushStateManager.setWatchFaceInstallationStatus(
                 WatchFaceInstallationStatus.Complete(
                     success = false,
                     installError = WatchFaceInstallError.TRANSFER_TIMEOUT,
