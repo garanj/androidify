@@ -37,7 +37,7 @@ fun AllDoneWatchFacePanel(
     onAllDoneClick: () -> Unit = { },
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MatchSize(

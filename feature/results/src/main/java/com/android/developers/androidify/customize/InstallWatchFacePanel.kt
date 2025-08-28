@@ -57,7 +57,7 @@ fun InstallWatchFacePanel(
     onInstallClick: () -> Unit = { },
 ) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         val noAvailableWatchFaces = watchFaceSelectionState.watchFaces.isEmpty()

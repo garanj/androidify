@@ -322,24 +322,22 @@ class CustomizeExportViewModel @Inject constructor(
     fun installWatchFace() {
         val watchFaceToInstall = _state.value.watchFaceSelectionState.selectedWatchFace ?: return
         transferJob = viewModelScope.launch {
-            withContext(Dispatchers.IO) {
-                val bitmap = state.value.exportImageCanvas.imageBitmap
-                val watch = state.value.connectedWatch
-                if (watch != null && bitmap != null) {
-                    val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
-                    val response = watchfaceInstallationRepository
-                        .createAndTransferWatchFace(watch, watchFaceToInstall, wfBitmap)
+            val bitmap = state.value.exportImageCanvas.imageBitmap
+            val watch = state.value.connectedWatch
+            if (watch != null && bitmap != null) {
+                val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
+                val response = watchfaceInstallationRepository
+                    .createAndTransferWatchFace(watch, watchFaceToInstall, wfBitmap)
 
-                    if (response != WatchFaceInstallError.NO_ERROR) {
-                        _state.update {
-                            it.copy(
-                                watchFaceInstallationStatus = WatchFaceInstallationStatus.Complete(
-                                    success = false,
-                                    installError = response,
-                                    otherNodeId = watch.nodeId,
-                                ),
-                            )
-                        }
+                if (response != WatchFaceInstallError.NO_ERROR) {
+                    _state.update {
+                        it.copy(
+                            watchFaceInstallationStatus = WatchFaceInstallationStatus.Complete(
+                                success = false,
+                                installError = response,
+                                otherNodeId = watch.nodeId,
+                            ),
+                        )
                     }
                 }
             }

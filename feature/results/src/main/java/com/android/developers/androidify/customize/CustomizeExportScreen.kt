@@ -159,8 +159,6 @@ private fun CustomizeExportContents(
     loadWatchFaces: () -> Unit,
     onWatchFaceSelect: (WatchFaceAsset) -> Unit,
 ) {
-    var showBottomSheet by remember { mutableStateOf(false) }
-    val sheetState = rememberModalBottomSheetState()
     Scaffold(
         snackbarHost = {
             SnackbarHost(
@@ -181,6 +179,8 @@ private fun CustomizeExportContents(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
+        var showWatchFaceBottomSheet by remember { mutableStateOf(false) }
+        val watchFaceSheetState = rememberModalBottomSheetState()
         val imageResult = remember(state.showImageEditProgress) {
             movableContentWithReceiverOf<ExportImageCanvas> {
                 val chromeModifier = if (this.showSticker) {
@@ -243,19 +243,19 @@ private fun CustomizeExportContents(
                     onDownloadClicked()
                 },
                 onWearDeviceClick = {
-                    showBottomSheet = true
+                    showWatchFaceBottomSheet = true
                 },
                 hasWearDevice = state.connectedWatch != null,
                 modifier = modifier,
             )
         }
         state.connectedWatch?.let { device ->
-            if (showBottomSheet) {
+            if (showWatchFaceBottomSheet) {
                 WatchFaceModalSheet(
-                    sheetState = sheetState,
+                    sheetState = watchFaceSheetState,
                     onDismiss = {
                         onResetWatchFaceSend()
-                        showBottomSheet = false
+                        showWatchFaceBottomSheet = false
                     },
                     connectedWatch = device,
                     installationStatus = state.watchFaceInstallationStatus,

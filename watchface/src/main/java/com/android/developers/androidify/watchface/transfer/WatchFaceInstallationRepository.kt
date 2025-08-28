@@ -93,11 +93,13 @@ class WatchFaceInstallationRepositoryImpl @Inject constructor(
         watchFace: WatchFaceAsset,
         bitmap: Bitmap,
     ): WatchFaceInstallError {
-        manualStatusUpdates.tryEmit(WatchFaceInstallationStatus.Sending)
-        val watchFacePackage = watchFaceCreator
-            .createWatchFacePackage(watchFaceName = watchFace.id, botBitmap = bitmap)
+        return withContext(Dispatchers.IO) {
+            manualStatusUpdates.tryEmit(WatchFaceInstallationStatus.Sending)
+            val watchFacePackage = watchFaceCreator
+                .createWatchFacePackage(watchFaceName = watchFace.id, botBitmap = bitmap)
 
-        return wearAssetTransmitter.doTransfer(connectedWatch.nodeId, watchFacePackage)
+            wearAssetTransmitter.doTransfer(connectedWatch.nodeId, watchFacePackage)
+        }
     }
 
     override suspend fun getAvailableWatchFaces(): Result<List<WatchFaceAsset>> {

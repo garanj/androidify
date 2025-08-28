@@ -43,7 +43,7 @@ fun InstallAndroidifyPanel(
         previewPath = R.drawable.watch_app_placeholder,
     )
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         MatchSize(

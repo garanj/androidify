@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.repository.FakeImageGenerationRepository
+import com.android.developers.testing.repository.FakeWatchFaceInstallationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -54,6 +55,7 @@ class CustomizeViewModelTest {
         viewModel = CustomizeExportViewModel(
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
         )
     }
@@ -143,6 +145,7 @@ class CustomizeViewModelTest {
         val viewModel = CustomizeExportViewModel(
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
         )
         val values = mutableListOf<CustomizeExportState>()
