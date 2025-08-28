@@ -20,7 +20,6 @@ import java.nio.charset.StandardCharsets
 
 data class PackPackage(
     val androidManifest: String,
-    val combinedPemString: String,
 ) {
     var resources: MutableList<Resource> = mutableListOf()
 
@@ -56,14 +55,10 @@ data class PackPackage(
         }
     }
 
-    fun compileApk(): ByteArray = compilePackage(apk = true)
-
-    private fun compilePackage(apk: Boolean): ByteArray {
+    fun compileApk(): ByteArray {
         val resultBase64 = nativeCompilePackage(
             androidManifest,
             resources.toTypedArray(),
-            combinedPemString,
-            apk,
         )
         return Base64.decode(resultBase64, Base64.DEFAULT)
     }
@@ -77,8 +72,6 @@ data class PackPackage(
         private external fun nativeCompilePackage(
             androidManifest: String,
             resources: Array<Resource>,
-            combinedPemString: String,
-            apk: Boolean,
         ): String
     }
 }

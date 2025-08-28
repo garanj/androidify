@@ -15,10 +15,10 @@
 use base64::{engine::general_purpose, Engine};
 use jni::{
     objects::{JClass, JObject, JObjectArray, JString},
-    sys::{jboolean, jstring},
+    sys::{jstring},
     JNIEnv
 };
-use pack_api::{compile_and_sign_aab, compile_and_sign_apk, FileResource, Keys, Package};
+use pack_api::{compile_apk, FileResource, Package};
 
 // Name (MUST) follow Java_packageName_className_methodName
 /// # Safety
@@ -28,12 +28,9 @@ pub unsafe extern "C" fn Java_com_android_developers_androidify_watchface_creato
     mut env: JNIEnv,
     _this: JClass,
     manifest_jstring: JString,
-    resources: JObjectArray,
-    combined_pem_jstring: JString,
-    apk: jboolean
+    resources: JObjectArray
 ) -> jstring {
     let manifest: String = env.get_string(&manifest_jstring).unwrap().into();
-    let pem: String = env.get_string(&combined_pem_jstring).unwrap().into();
 
     let mut pack_resources = vec![];
     let resource_len = env.get_array_length(&resources).unwrap();
@@ -52,13 +49,8 @@ pub unsafe extern "C" fn Java_com_android_developers_androidify_watchface_creato
         android_manifest: manifest.as_bytes().to_vec(),
         resources: pack_resources
     };
-    let should_compile_apk = apk != 0;
 
-    let finished_package = if should_compile_apk {
-        compile_and_sign_apk(&package, &Keys::from_combined_pem_string(&pem).unwrap()).unwrap()
-    } else {
-        compile_and_sign_aab(&package, &Keys::from_combined_pem_string(&pem).unwrap()).unwrap()
-    };
+    let finished_package = compile_apk(&package).unwrap();
     let pkg_b64 = bytes_to_b64(&finished_package);
 
     env.new_string(pkg_b64).unwrap().into_raw()

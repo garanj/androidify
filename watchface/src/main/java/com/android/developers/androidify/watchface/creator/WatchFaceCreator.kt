@@ -51,7 +51,6 @@ class WatchFaceCreatorImpl @Inject constructor(
         val manifest = readStringAsset("$watchFaceName/AndroidManifest.xml")
 
         val wfPackage = PackPackage(
-            combinedPemString = generateSelfSignedCertificateAndKey().trim(),
             androidManifest = replacePackageName(manifest, watchFacePackageName),
         )
 
@@ -70,9 +69,10 @@ class WatchFaceCreatorImpl @Inject constructor(
         wfPackage.resources.add(bot)
 
         val bytes = wfPackage.compileApk()
+        val signedBytes = signApk(bytes)
         val watchFaceFile = File.createTempFile("watchface", ".apk")
         watchFaceFile.deleteOnExit()
-        watchFaceFile.writeBytes(bytes)
+        watchFaceFile.writeBytes(signedBytes)
 
         val validator = DwfValidatorFactory.create()
         val validationResult = validator.validate(watchFaceFile, context.packageName)

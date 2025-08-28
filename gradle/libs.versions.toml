@@ -15,6 +15,7 @@ accompanist = "0.37.3"
 activityCompose = "1.10.1"
 adaptive = "1.1.0"
 animationAndroid = "1.8.3"
+apksig = "9.0.0-alpha02"
 appcompat = "1.7.1"
 baselineprofile = "1.4.0"
 benchmarkMacroJunit4 = "1.4.0"
@@ -125,6 +126,7 @@ androidx-wear-compose-ui-tooling = { group = "androidx.wear.compose", name = "co
 androidx-wear-remote-interactions = { module = "androidx.wear:wear-remote-interactions", version.ref = "wearRemoteInteractions" }
 androidx-window = { module = "androidx.window:window", version.ref = "window" }
 androidx-window-core = { module = "androidx.window:window-core", version.ref = "window" }
+apksig = { module = "com.android.tools.build:apksig", version.ref = "apksig" }
 bcpkix-jdk18on = { module = "org.bouncycastle:bcpkix-jdk18on", version.ref = "bcpkixJdk18on" }
 coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coilCompose" }
 coil-compose-http = { group = "io.coil-kt.coil3", name = "coil-network-okhttp", version.ref = "coilCompose" }
