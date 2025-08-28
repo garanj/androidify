@@ -56,7 +56,7 @@ class CustomizeExportViewModel @Inject constructor(
         watchfaceInstallationRepository.connectedWatch,
         watchfaceInstallationRepository.watchFaceInstallationUpdates,
     ) {
-            currentState, watch, installationStatus ->
+    currentState, watch, installationStatus ->
         currentState.copy(
             connectedWatch = watch,
             watchFaceInstallationStatus = installationStatus,

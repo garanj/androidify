@@ -26,7 +26,7 @@ class FakeWatchFaceInstallationRepository : WatchFaceInstallationRepository {
 
     private var transferId = generateTransferId()
 
-    private val _connectedWatch = MutableStateFlow(watch)
+    private val _connectedWatch = MutableStateFlow<ConnectedWatch?>(null)
     override val connectedWatch = _connectedWatch.asStateFlow()
 
     private val _watchFaceInstallationStatus =
@@ -61,4 +61,8 @@ class FakeWatchFaceInstallationRepository : WatchFaceInstallationRepository {
     }
 
     private fun generateTransferId() = UUID.randomUUID().toString().take(8)
+
+    public fun setWatchAsConnected() {
+        _connectedWatch.value = watch
+    }
 }

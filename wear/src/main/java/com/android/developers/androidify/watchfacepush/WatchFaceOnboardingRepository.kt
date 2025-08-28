@@ -61,8 +61,6 @@ class WatchFaceOnboardingRepository(
      * Full range of options shown in [WatchFaceActivationStrategy].
      */
     suspend fun getWatchFaceActivationStrategy(): WatchFaceActivationStrategy {
-        val storedStateManager = StoredStateManager(context)
-
         val apiUsed = storedStateManager.activeWatchFaceApiUsed.first()
         val hasActiveWatchFace = hasActiveWatchFace()
         val hasPermission = hasSetWatchFacePermission()
@@ -127,15 +125,6 @@ class WatchFaceOnboardingRepository(
         storedStateManager.setActiveWatchFaceApiUsedKey(true)
     }
 
-    @SuppressLint("WearRecents")
-    fun launchWatchFaceGuidance() {
-        wakeDevice()
-        val intent = Intent(context, MainActivity::class.java)
-        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
-        intent.putExtra(LAUNCHED_FROM_WATCH_FACE_TRANSFER, true)
-        context.startActivity(intent)
-    }
-
     /**
      * If permission has been denied to the SET_PUSHED_WATCH_FACE_AS_ACTIVE permission, then this is
      * stored, as this permission can only be requested and denied once. Keeping track of this helps
@@ -144,30 +133,6 @@ class WatchFaceOnboardingRepository(
     suspend fun updatePermissionStatus(granted: Boolean) {
         val storedStateManager = StoredStateManager(context)
         storedStateManager.setWatchFacePermissionDenied(!granted)
-    }
-
-    /**
-     * Wakes the device. This is important to do when a transfer is incoming as otherwise the UI
-     * will not necessarily show to the user.
-     */
-    private fun wakeDevice() {
-        val powerManager = context.getSystemService(POWER_SERVICE) as PowerManager
-
-        // FULL_WAKE_LOCK and ACQUIRE_CAUSES_WAKEUP are deprecated, but they remain in use as the
-        // approach for achieving screen wakeup across mainstream apps, so are the approach to use
-        // for now.
-        @Suppress("DEPRECATION")
-        val wakeLock = powerManager.newWakeLock(
-            PowerManager.FULL_WAKE_LOCK
-                or PowerManager.ACQUIRE_CAUSES_WAKEUP
-                or PowerManager.ON_AFTER_RELEASE,
-            WAKELOCK_TAG,
-        )
-
-        // Wakelock timeout should not be required as it is being immediately released but
-        // linting guidance recommends one so setting it nonetheless.
-        wakeLock.acquire(WAKELOCK_TIMEOUT_MS)
-        wakeLock.release()
     }
 
     private suspend fun hasActiveWatchFace(): Boolean {
@@ -201,8 +166,6 @@ class WatchFaceOnboardingRepository(
     }
 
     companion object {
-        private const val WAKELOCK_TAG = "androidify:wear"
-        private const val WAKELOCK_TIMEOUT_MS = 1000L
         private val TAG = WatchFaceOnboardingRepository::class.java.simpleName
     }
 }

@@ -17,9 +17,14 @@
 
 package com.android.developers.androidify.service
 
+import android.annotation.SuppressLint
+import android.content.Intent
 import android.os.ParcelFileDescriptor
+import android.os.PowerManager
 import androidx.core.net.toUri
+import com.android.developers.androidify.MainActivity
 import com.android.developers.androidify.data.StoredStateManager
+import com.android.developers.androidify.watchfacepush.LAUNCHED_FROM_WATCH_FACE_TRANSFER
 import com.android.developers.androidify.watchfacepush.WatchFaceOnboardingRepository
 import com.android.developers.androidify.wear.common.InitialRequest
 import com.android.developers.androidify.wear.common.InitialResponse
@@ -189,7 +194,7 @@ class AndroidifyDataListenerService : WearableListenerService() {
 
         val response = runBlocking {
             if (canProceed) {
-                watchFaceOnboardingRepository.launchWatchFaceGuidance()
+                launchWatchFaceGuidance()
 
                 // The activation strategy is determined *before* the watch is transferred and
                 // installed, because installing / changing watch faces can lead to temporary
@@ -258,8 +263,43 @@ class AndroidifyDataListenerService : WearableListenerService() {
         }
     }
 
+    @SuppressLint("WearRecents")
+    private fun launchWatchFaceGuidance() {
+        wakeDevice()
+        val intent = Intent(this, MainActivity::class.java)
+        intent.flags = Intent.FLAG_ACTIVITY_NEW_TASK
+        intent.putExtra(LAUNCHED_FROM_WATCH_FACE_TRANSFER, true)
+        startActivity(intent)
+    }
+
+    /**
+     * Wakes the device. This is important to do when a transfer is incoming as otherwise the UI
+     * will not necessarily show to the user.
+     */
+    private fun wakeDevice() {
+        val powerManager = getSystemService(POWER_SERVICE) as PowerManager
+
+        // FULL_WAKE_LOCK and ACQUIRE_CAUSES_WAKEUP are deprecated, but they remain in use as the
+        // approach for achieving screen wakeup across mainstream apps, so are the approach to use
+        // for now.
+        @Suppress("DEPRECATION")
+        val wakeLock = powerManager.newWakeLock(
+            PowerManager.FULL_WAKE_LOCK
+                    or PowerManager.ACQUIRE_CAUSES_WAKEUP
+                    or PowerManager.ON_AFTER_RELEASE,
+            WAKELOCK_TAG,
+        )
+
+        // Wakelock timeout should not be required as it is being immediately released but
+        // linting guidance recommends one so setting it nonetheless.
+        wakeLock.acquire(WAKELOCK_TIMEOUT_MS)
+        wakeLock.release()
+    }
+
     companion object {
         private val TAG = AndroidifyDataListenerService::class.java.simpleName
         private val isTransferInProgress = AtomicBoolean(false)
+        private const val WAKELOCK_TAG = "androidify:wear"
+        private const val WAKELOCK_TIMEOUT_MS = 1000L
     }
 }
