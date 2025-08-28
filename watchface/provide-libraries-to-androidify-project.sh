@@ -17,6 +17,7 @@ cd pack-java
 cargo build --release --target aarch64-linux-android && \
 cargo build --release --target x86_64-linux-android && \
 cargo build --release --target armv7-linux-androideabi && \
+cargo build --release --target i686-linux-android && \
 \
 mkdir -p ../src/main/jniLibs/arm64-v8a/ && \
 cp ./target/aarch64-linux-android/release/libpack_java.so ../src/main/jniLibs/arm64-v8a/libpack_java.so && \
@@ -24,4 +25,7 @@ mkdir -p ../src/main/jniLibs/x86_64/ && \
 cp ./target/x86_64-linux-android/release/libpack_java.so ../src/main/jniLibs/x86_64/libpack_java.so && \
 mkdir -p ../src/main/jniLibs/armeabi-v7a/ && \
 cp ./target/armv7-linux-androideabi/release/libpack_java.so ../src/main/jniLibs/armeabi-v7a/libpack_java.so && \
-echo "Compiled and saved API for Android ARM32, ARM64 and x86_64"
+mkdir -p ../src/main/jniLibs/x86/ && \
+cp ./target/i686-linux-android/release/libpack_java.so ../src/main/jniLibs/x86/libpack_java.so && \
+\
+echo "Compiled and saved API for Android ARM32, ARM64, x86 and x86_64"
