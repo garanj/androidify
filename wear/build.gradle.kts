@@ -96,7 +96,7 @@ androidComponents.onVariants { variant ->
         val wfTask = project(":wear:watchface").tasks.named("assemble$capsVariant")
         dependsOn(wfTask)
         val buildDir = project(":wear:watchface").layout.buildDirectory.asFileTree.matching {
-            include("**/*.apk")
+            include("**/${variant.name}/**/*.apk")
         }
         from(buildDir)
         into(layout.buildDirectory.dir("intermediates/watchfaceAssets/${variant.name}"))
@@ -142,6 +142,7 @@ abstract class ProcessFilesTask : DefaultTask() {
     @TaskAction
     fun taskAction() {
         val apkFile = inputFile.singleFile.resolve("default_watchface.apk")
+        println("*** $apkFile")
 
         val stdOut = ByteArrayOutputStream()
         val stdErr = ByteArrayOutputStream()

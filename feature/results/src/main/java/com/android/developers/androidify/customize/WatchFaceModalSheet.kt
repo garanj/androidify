@@ -21,9 +21,12 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -71,14 +74,16 @@ fun WatchFaceModalSheet(
     }
 
     ModalBottomSheet(
+        modifier = Modifier.fillMaxWidth(),
         onDismissRequest = onDismiss,
         sheetState = sheetState,
     ) {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
+                .fillMaxHeight(0.5f)
                 .padding(bottom = 16.dp, top = 0.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Bottom
         ) {
             Box(
                 modifier = Modifier

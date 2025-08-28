@@ -180,7 +180,9 @@ private fun CustomizeExportContents(
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
         var showWatchFaceBottomSheet by remember { mutableStateOf(false) }
-        val watchFaceSheetState = rememberModalBottomSheetState()
+        val watchFaceSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true
+        )
         val imageResult = remember(state.showImageEditProgress) {
             movableContentWithReceiverOf<ExportImageCanvas> {
                 val chromeModifier = if (this.showSticker) {
