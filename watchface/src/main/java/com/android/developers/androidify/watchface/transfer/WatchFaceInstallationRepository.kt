@@ -19,7 +19,7 @@ import android.content.Context
 import android.graphics.Bitmap
 import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.watchface.creator.WatchFaceCreator
-import com.android.developers.androidify.wear.common.ConnectedDevice
+import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.qualifiers.ApplicationContext
@@ -39,7 +39,7 @@ interface WatchFaceInstallationRepository {
      * Flow of currently connected device. Only one device is reported - the scenario of having
      * multiple devices connected is not currently supported.
      */
-    val connectedDevice: Flow<ConnectedDevice?>
+    val connectedWatch: Flow<ConnectedWatch?>
 
     /**
      * Flow of status updates from the watch as installation proceeds.
@@ -50,12 +50,12 @@ interface WatchFaceInstallationRepository {
      * Creates and transmits a watch face to the connected device. The bitmap is added into the
      * template watch face.
      *
-     * @param connectedDevice The device to install the watch face on.
+     * @param connectedWatch The device to install the watch face on.
      * @param bitmap The bitmap to add to the watch face.
      * @return The result of the transfer.
      */
     suspend fun createAndTransferWatchFace(
-        connectedDevice: ConnectedDevice,
+        connectedWatch: ConnectedWatch,
         watchFace: WatchFaceAsset,
         bitmap: Bitmap,
     ): WatchFaceInstallError
@@ -76,7 +76,7 @@ class WatchFaceInstallationRepositoryImpl @Inject constructor(
     private val watchFaceCreator: WatchFaceCreator,
     @ApplicationContext val context: Context,
 ) : WatchFaceInstallationRepository {
-    override val connectedDevice = wearDeviceRepository.connectedDevice
+    override val connectedWatch = wearDeviceRepository.connectedWatch
 
     private val manualStatusUpdates = MutableSharedFlow<WatchFaceInstallationStatus>(
         replay = 1,
@@ -89,7 +89,7 @@ class WatchFaceInstallationRepositoryImpl @Inject constructor(
     )
 
     override suspend fun createAndTransferWatchFace(
-        connectedDevice: ConnectedDevice,
+        connectedWatch: ConnectedWatch,
         watchFace: WatchFaceAsset,
         bitmap: Bitmap,
     ): WatchFaceInstallError {
@@ -97,7 +97,7 @@ class WatchFaceInstallationRepositoryImpl @Inject constructor(
         val watchFacePackage = watchFaceCreator
             .createWatchFacePackage(watchFaceName = watchFace.id, botBitmap = bitmap)
 
-        return wearAssetTransmitter.doTransfer(connectedDevice.nodeId, watchFacePackage)
+        return wearAssetTransmitter.doTransfer(connectedWatch.nodeId, watchFacePackage)
     }
 
     override suspend fun getAvailableWatchFaces(): Result<List<WatchFaceAsset>> {

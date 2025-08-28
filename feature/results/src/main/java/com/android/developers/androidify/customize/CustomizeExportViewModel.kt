@@ -53,12 +53,12 @@ class CustomizeExportViewModel @Inject constructor(
     private val _state = MutableStateFlow(CustomizeExportState())
     val state: StateFlow<CustomizeExportState> = combine(
         _state,
-        watchfaceInstallationRepository.connectedDevice,
+        watchfaceInstallationRepository.connectedWatch,
         watchfaceInstallationRepository.watchFaceInstallationUpdates,
     ) {
-            currentState, device, installationStatus ->
+            currentState, watch, installationStatus ->
         currentState.copy(
-            connectedDevice = device,
+            connectedWatch = watch,
             watchFaceInstallationStatus = installationStatus,
         )
     }.stateIn(
@@ -282,25 +282,29 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     fun loadWatchFaces() {
-        if (_state.value.watchFaces.isNotEmpty()) return
+        if (_state.value.watchFaceSelectionState.watchFaces.isNotEmpty()) return
 
-        _state.update { it.copy(isLoadingWatchFaces = true) }
+        _state.update { it.copy(watchFaceSelectionState = it.watchFaceSelectionState.copy(isLoadingWatchFaces = true)) }
 
         viewModelScope.launch {
             watchfaceInstallationRepository.getAvailableWatchFaces()
                 .onSuccess { faces ->
                     _state.update {
                         it.copy(
-                            isLoadingWatchFaces = false,
-                            watchFaces = faces,
-                            selectedWatchFace = faces.firstOrNull(),
+                            watchFaceSelectionState = WatchFaceSelectionState(
+                                watchFaces = faces,
+                                isLoadingWatchFaces = false,
+                                selectedWatchFace = faces.firstOrNull()
+                            )
                         )
                     }
                 }
                 .onFailure { error ->
                     _state.update {
                         it.copy(
-                            isLoadingWatchFaces = false,
+                            watchFaceSelectionState = it.watchFaceSelectionState.copy(
+                                isLoadingWatchFaces = false,
+                            )
                         )
                     }
                 }
@@ -308,19 +312,23 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     fun onWatchFaceSelected(watchFace: WatchFaceAsset) {
-        _state.update { it.copy(selectedWatchFace = watchFace) }
+        _state.update { it.copy(
+            watchFaceSelectionState = it.watchFaceSelectionState.copy(
+                selectedWatchFace = watchFace,
+            )
+        ) }
     }
 
     fun installWatchFace() {
-        val watchFaceToInstall = _state.value.selectedWatchFace ?: return
+        val watchFaceToInstall = _state.value.watchFaceSelectionState.selectedWatchFace ?: return
         transferJob = viewModelScope.launch {
             withContext(Dispatchers.IO) {
                 val bitmap = state.value.exportImageCanvas.imageBitmap
-                val device = state.value.connectedDevice
-                if (device != null && bitmap != null) {
+                val watch = state.value.connectedWatch
+                if (watch != null && bitmap != null) {
                     val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
                     val response = watchfaceInstallationRepository
-                        .createAndTransferWatchFace(device, watchFaceToInstall, wfBitmap)
+                        .createAndTransferWatchFace(watch, watchFaceToInstall, wfBitmap)
 
                     if (response != WatchFaceInstallError.NO_ERROR) {
                         _state.update {
@@ -328,7 +336,7 @@ class CustomizeExportViewModel @Inject constructor(
                                 watchFaceInstallationStatus = WatchFaceInstallationStatus.Complete(
                                     success = false,
                                     installError = response,
-                                    otherNodeId = device.nodeId,
+                                    otherNodeId = watch.nodeId,
                                 ),
                             )
                         }

@@ -19,6 +19,7 @@ dependencyResolutionManagement {
         maven {
             url = uri("https://jitpack.io")
             content {
+                // This is required to use com.google.android.wearable.watchface.validator
                 includeGroup("com.github.xgouchet")
             }
         }

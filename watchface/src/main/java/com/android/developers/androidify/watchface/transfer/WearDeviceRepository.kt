@@ -18,7 +18,7 @@
 package com.android.developers.androidify.watchface.transfer
 
 import android.content.Context
-import com.android.developers.androidify.wear.common.ConnectedDevice
+import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_INSTALLED
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Node
@@ -34,7 +34,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 interface WearDeviceRepository {
-    val connectedDevice: Flow<ConnectedDevice?>
+    val connectedWatch: Flow<ConnectedWatch?>
 }
 
 @Singleton
@@ -44,7 +44,7 @@ class WearDeviceRepositoryImpl @Inject constructor(
     private val nodeClient: NodeClient by lazy { Wearable.getNodeClient(context) }
     private val capabilityClient: CapabilityClient by lazy { Wearable.getCapabilityClient(context) }
 
-    override val connectedDevice = callbackFlow {
+    override val connectedWatch = callbackFlow {
         val allDevices = nodeClient.connectedNodes.await().toSet()
         val reachableCapability =
             capabilityClient.getCapability(ANDROIDIFY_INSTALLED, CapabilityClient.FILTER_REACHABLE)
@@ -66,21 +66,21 @@ class WearDeviceRepositoryImpl @Inject constructor(
     }
 
     /**
-     * Selects a [com.android.developers.androidify.wear.common.ConnectedDevice] if one is available, prioritizing devices with Androidify.
+     * Selects a [com.android.developers.androidify.wear.common.ConnectedWatch] if one is available, prioritizing devices with Androidify.
      * Returns null where no device at all is available.
      */
     private fun selectConnectedDevice(
         installedDevices: Set<Node>,
         allDevices: Set<Node>,
-    ): ConnectedDevice? {
+    ): ConnectedWatch? {
         return if (installedDevices.isNotEmpty()) {
-            ConnectedDevice(
+            ConnectedWatch(
                 nodeId = installedDevices.first().id,
                 displayName = installedDevices.first().displayName,
                 hasAndroidify = true,
             )
         } else if (allDevices.isNotEmpty()) {
-            ConnectedDevice(
+            ConnectedWatch(
                 nodeId = allDevices.first().id,
                 displayName = allDevices.first().displayName,
                 hasAndroidify = false,

@@ -15,7 +15,7 @@
  */
 package com.android.developers.androidify.wear.common
 
-data class ConnectedDevice(
+data class ConnectedWatch(
     val nodeId: String,
     val displayName: String,
     val hasAndroidify: Boolean,

@@ -36,6 +36,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.lerp
+import androidx.compose.ui.keepScreenOn
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -60,9 +61,9 @@ import kotlin.math.floor
 
 @Composable
 fun TransmissionScreen(modifier: Modifier = Modifier) {
-    KeepScreenOn()
     val listState = rememberTransformingLazyColumnState()
     ScreenScaffold(
+        modifier = modifier.keepScreenOn(),
         scrollState = listState,
         // Use Horologist for now to get correct top and bottom padding in list.
         contentPadding = rememberResponsiveColumnPadding(
@@ -100,25 +101,6 @@ fun TransmissionScreen(modifier: Modifier = Modifier) {
             }
         }
     }
-}
-
-@Composable
-fun KeepScreenOn() {
-    val view = LocalView.current
-    DisposableEffect(Unit) {
-        val window = view.context.findActivity()?.window
-        window?.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
-        onDispose {
-            window?.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-        }
-    }
-}
-
-private fun Context.findActivity(): Activity? = when (this) {
-    is Activity -> this
-    is ContextWrapper -> baseContext.findActivity()
-    else -> null
 }
 
 @Composable

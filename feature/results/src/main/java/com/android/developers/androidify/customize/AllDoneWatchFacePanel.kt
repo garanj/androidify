@@ -33,7 +33,7 @@ import com.android.developers.androidify.watchface.WatchFaceAsset
 @Composable
 fun AllDoneWatchFacePanel(
     modifier: Modifier = Modifier,
-    selectedWatchFace: WatchFaceAsset,
+    selectedWatchFace: WatchFaceAsset?,
     onAllDoneClick: () -> Unit = { },
 ) {
     Column(
@@ -44,7 +44,7 @@ fun AllDoneWatchFacePanel(
             sizer = placeholderWatchFaceRow,
         ) {
             WatchFacesRow(
-                watchFaces = listOf(selectedWatchFace),
+                watchFaces = listOfNotNull(selectedWatchFace),
                 selectedWatchFace = selectedWatchFace,
             )
         }

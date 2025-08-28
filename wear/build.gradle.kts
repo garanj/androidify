@@ -15,7 +15,6 @@
  */
 import java.io.ByteArrayOutputStream
 import java.util.regex.Pattern
-import com.android.developers.androidify.Versions
 
 evaluationDependsOn(":wear:watchface")
 
@@ -36,8 +35,8 @@ android {
         applicationId = "com.android.developers.androidify"
         targetSdk = 36
         // Ensure Wear OS app has its own version space
-        versionCode = 60_000_000 + Versions.appVersionCode
-        versionName = Versions.appVersionName
+        versionCode = 60_000_000 + libs.versions.appVersionCode.get().toInt()
+        versionName = libs.versions.appVersionName.get()
     }
 
     compileOptions {

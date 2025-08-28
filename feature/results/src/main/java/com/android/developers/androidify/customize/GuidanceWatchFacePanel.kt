@@ -38,7 +38,7 @@ import com.android.developers.androidify.watchface.WatchFaceAsset
 @Composable
 fun GuidanceWatchFacePanel(
     modifier: Modifier = Modifier,
-    selectedWatchFace: WatchFaceAsset,
+    selectedWatchFace: WatchFaceAsset?,
     guidanceTextResId: Int,
     dismissClick: () -> Unit = { },
 ) {
@@ -54,7 +54,7 @@ fun GuidanceWatchFacePanel(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 WatchFacesRow(
-                    watchFaces = listOf(selectedWatchFace),
+                    watchFaces = listOfNotNull(selectedWatchFace),
                     selectedWatchFace = selectedWatchFace,
                 )
                 Spacer(modifier = Modifier.width(16.dp))

@@ -89,7 +89,7 @@ import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
 import com.android.developers.androidify.watchface.WatchFaceAsset
-import com.android.developers.androidify.wear.common.ConnectedDevice
+import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -245,11 +245,11 @@ private fun CustomizeExportContents(
                 onWearDeviceClick = {
                     showBottomSheet = true
                 },
-                hasWearDevice = state.connectedDevice != null,
+                hasWearDevice = state.connectedWatch != null,
                 modifier = modifier,
             )
         }
-        state.connectedDevice?.let { device ->
+        state.connectedWatch?.let { device ->
             if (showBottomSheet) {
                 WatchFaceModalSheet(
                     sheetState = sheetState,
@@ -257,16 +257,14 @@ private fun CustomizeExportContents(
                         onResetWatchFaceSend()
                         showBottomSheet = false
                     },
-                    connectedDevice = device,
+                    connectedWatch = device,
                     installationStatus = state.watchFaceInstallationStatus,
                     onWatchFaceInstallClick = {
                         onInstallWatchFaceClicked()
                     },
                     onLoad = loadWatchFaces,
-                    watchFaces = state.watchFaces,
-                    selectedWatchFace = state.selectedWatchFace,
+                    watchFaceSelectionState = state.watchFaceSelectionState,
                     onWatchFaceSelect = onWatchFaceSelect,
-                    isLoadingWatchFaces = state.isLoadingWatchFaces,
                 )
             }
         }
@@ -489,14 +487,14 @@ fun CustomizeExportPreview() {
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
                 val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-                val connectedDevice = ConnectedDevice(
+                val connectedWatch = ConnectedWatch(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",
                     hasAndroidify = true,
                 )
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
-                    connectedDevice = connectedDevice,
+                    connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
                     state = state,
@@ -526,7 +524,7 @@ fun CustomizeExportPreviewLarge() {
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
                 val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
-                val connectedDevice = ConnectedDevice(
+                val connectedWatch = ConnectedWatch(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",
                     hasAndroidify = true,
@@ -537,7 +535,7 @@ fun CustomizeExportPreviewLarge() {
                         aspectRatioOption = SizeOption.Square,
                     ),
                     selectedTool = CustomizeTool.Background,
-                    connectedDevice = connectedDevice,
+                    connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
                     state = state,

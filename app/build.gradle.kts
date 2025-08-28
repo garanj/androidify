@@ -13,7 +13,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-import com.android.developers.androidify.Versions
 import com.google.firebase.crashlytics.buildtools.gradle.CrashlyticsExtension
 
 plugins {
@@ -38,8 +37,8 @@ android {
         applicationId = "com.android.developers.androidify"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
-        versionCode = Versions.appVersionCode
-        versionName = Versions.appVersionName
+        versionCode = libs.versions.appVersionCode.get().toInt()
+        versionName = libs.versions.appVersionName.get()
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }

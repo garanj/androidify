@@ -17,7 +17,7 @@ package com.android.developers.androidify.watchface.transfer
 
 import android.graphics.Bitmap
 import com.android.developers.androidify.watchface.WatchFaceAsset
-import com.android.developers.androidify.wear.common.ConnectedDevice
+import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import kotlinx.coroutines.flow.flowOf
@@ -27,14 +27,14 @@ import javax.inject.Inject
 const val MIN_WATCH_FACE_SDK_VERSION = 28
 
 class EmptyWatchFaceInstallationRepositoryImpl @Inject constructor() : WatchFaceInstallationRepository {
-    override val connectedDevice = flowOf<ConnectedDevice?>(null)
+    override val connectedWatch = flowOf<ConnectedWatch?>(null)
 
     override val watchFaceInstallationUpdates = flowOf<WatchFaceInstallationStatus>(
         WatchFaceInstallationStatus.NotStarted,
     )
 
     override suspend fun createAndTransferWatchFace(
-        connectedDevice: ConnectedDevice,
+        connectedWatch: ConnectedWatch,
         watchFaceAsset: WatchFaceAsset,
         bitmap: Bitmap,
     ): WatchFaceInstallError {

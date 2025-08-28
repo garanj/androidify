@@ -35,7 +35,7 @@ import com.android.developers.androidify.watchface.WatchFaceAsset
 @Composable
 fun SendingWatchFacePanel(
     modifier: Modifier = Modifier,
-    selectedWatchFace: WatchFaceAsset,
+    selectedWatchFace: WatchFaceAsset?,
 ) {
     Column(
         modifier = Modifier.fillMaxSize(),
@@ -45,7 +45,7 @@ fun SendingWatchFacePanel(
             sizer = placeholderWatchFaceRow,
         ) {
             WatchFacesRow(
-                watchFaces = listOf(selectedWatchFace),
+                watchFaces = listOfNotNull(selectedWatchFace),
                 selectedWatchFace = selectedWatchFace,
             )
         }

@@ -39,7 +39,7 @@ import com.android.developers.androidify.watchface.WatchFaceAsset
 @Composable
 fun ErrorWatchFacePanel(
     modifier: Modifier = Modifier,
-    selectedWatchFace: WatchFaceAsset,
+    selectedWatchFace: WatchFaceAsset?,
     errorTextResId: Int,
     onAllDoneClick: () -> Unit = { },
 ) {
@@ -55,7 +55,7 @@ fun ErrorWatchFacePanel(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 WatchFacesRow(
-                    watchFaces = listOf(selectedWatchFace),
+                    watchFaces = listOfNotNull(selectedWatchFace),
                     selectedWatchFace = selectedWatchFace,
                 )
                 Spacer(modifier = Modifier.width(16.dp))

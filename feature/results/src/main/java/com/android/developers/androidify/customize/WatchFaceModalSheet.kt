@@ -50,20 +50,18 @@ import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.watchface.WatchFaceAsset
-import com.android.developers.androidify.wear.common.ConnectedDevice
+import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.android.developers.androidify.wear.common.WatchFaceActivationStrategy
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun WatchFaceModalSheet(
-    connectedDevice: ConnectedDevice,
+    connectedWatch: ConnectedWatch,
     onWatchFaceInstallClick: (String) -> Unit,
     installationStatus: WatchFaceInstallationStatus,
     sheetState: SheetState,
-    isLoadingWatchFaces: Boolean,
-    watchFaces: List<WatchFaceAsset>,
-    selectedWatchFace: WatchFaceAsset?,
+    watchFaceSelectionState: WatchFaceSelectionState,
     onDismiss: () -> Unit,
     onLoad: () -> Unit,
     onWatchFaceSelect: (WatchFaceAsset) -> Unit,
@@ -84,7 +82,7 @@ fun WatchFaceModalSheet(
         ) {
             Box(
                 modifier = Modifier
-                    .size(37.dp)
+                    .size(36.dp)
                     .clip(CircleShape)
                     .background(MaterialTheme.colorScheme.secondaryContainer),
                 contentAlignment = Alignment.Center,
@@ -96,13 +94,13 @@ fun WatchFaceModalSheet(
             }
             Spacer(modifier = Modifier.height(8.dp))
             Text(
-                text = stringResource(R.string.send_to_watch_device, connectedDevice.displayName),
+                text = stringResource(R.string.send_to_watch_device, connectedWatch.displayName),
                 style = MaterialTheme.typography.titleMedium,
                 fontWeight = FontWeight.Bold,
             )
             Spacer(modifier = Modifier.height(16.dp))
             when {
-                connectedDevice.hasAndroidify -> {
+                connectedWatch.hasAndroidify -> {
                     AnimatedContent(
                         targetState = installationStatus,
                         transitionSpec = {
@@ -122,7 +120,7 @@ fun WatchFaceModalSheet(
                                     when (installationStatus.activationStrategy) {
                                         WatchFaceActivationStrategy.LONG_PRESS_TO_SET -> {
                                             GuidanceWatchFacePanel(
-                                                selectedWatchFace = selectedWatchFace!!,
+                                                selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                                                 guidanceTextResId = R.string.complete_long_press,
                                                 dismissClick = onDismiss,
                                             )
@@ -130,7 +128,7 @@ fun WatchFaceModalSheet(
 
                                         WatchFaceActivationStrategy.FOLLOW_PROMPT_ON_WATCH -> {
                                             GuidanceWatchFacePanel(
-                                                selectedWatchFace = selectedWatchFace!!,
+                                                selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                                                 guidanceTextResId = R.string.complete_permissions,
                                                 dismissClick = onDismiss,
                                             )
@@ -140,14 +138,14 @@ fun WatchFaceModalSheet(
                                         WatchFaceActivationStrategy.CALL_SET_ACTIVE_NO_USER_ACTION,
                                         -> {
                                             AllDoneWatchFacePanel(
-                                                selectedWatchFace = selectedWatchFace!!,
+                                                selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                                                 onAllDoneClick = onDismiss,
                                             )
                                         }
 
                                         WatchFaceActivationStrategy.GO_TO_WATCH_SETTINGS -> {
                                             GuidanceWatchFacePanel(
-                                                selectedWatchFace = selectedWatchFace!!,
+                                                selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                                                 guidanceTextResId = R.string.complete_settings,
                                                 dismissClick = onDismiss,
                                             )
@@ -155,7 +153,7 @@ fun WatchFaceModalSheet(
                                     }
                                 } else {
                                     ErrorWatchFacePanel(
-                                        selectedWatchFace = selectedWatchFace!!,
+                                        selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                                         errorTextResId = R.string.complete_error_message,
                                         onAllDoneClick = onDismiss,
                                     )
@@ -164,18 +162,16 @@ fun WatchFaceModalSheet(
 
                             is WatchFaceInstallationStatus.Sending -> {
                                 SendingWatchFacePanel(
-                                    selectedWatchFace = selectedWatchFace!!,
+                                    selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                                 )
                             }
 
                             else -> {
                                 InstallWatchFacePanel(
                                     onInstallClick = {
-                                        onWatchFaceInstallClick(connectedDevice.nodeId)
+                                        onWatchFaceInstallClick(connectedWatch.nodeId)
                                     },
-                                    isLoadingWatchFaces = isLoadingWatchFaces,
-                                    watchFaces = watchFaces,
-                                    selectedWatchFace = selectedWatchFace,
+                                    watchFaceSelectionState = watchFaceSelectionState,
                                     onWatchFaceSelect = onWatchFaceSelect,
                                 )
                             }
@@ -195,7 +191,7 @@ fun WatchFaceModalSheet(
 @Preview(showBackground = true, showSystemUi = true)
 @Composable
 private fun WatchFaceModalSheetPreview() {
-    val device = ConnectedDevice(
+    val device = ConnectedWatch(
         nodeId = "1234",
         displayName = "Pixel Watch",
         hasAndroidify = true,
@@ -211,13 +207,16 @@ private fun WatchFaceModalSheetPreview() {
         positionalThreshold = { 0f },
         velocityThreshold = { 0f },
     )
+    val watchFaceSelectionState = WatchFaceSelectionState(
+        watchFaces = listOf(watchface),
+        selectedWatchFace = watchface,
+        isLoadingWatchFaces = false
+    )
     AndroidifyTheme {
         WatchFaceModalSheet(
-            connectedDevice = device,
-            watchFaces = listOf(watchface),
-            selectedWatchFace = watchface,
+            connectedWatch = device,
             installationStatus = WatchFaceInstallationStatus.NotStarted,
-            isLoadingWatchFaces = false,
+            watchFaceSelectionState = watchFaceSelectionState,
             onWatchFaceSelect = {},
             onLoad = {},
             onDismiss = {},

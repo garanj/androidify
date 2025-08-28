@@ -52,9 +52,7 @@ val placeholderWatchFaceRow = @Composable {
 @Composable
 fun InstallWatchFacePanel(
     modifier: Modifier = Modifier,
-    isLoadingWatchFaces: Boolean,
-    watchFaces: List<WatchFaceAsset>,
-    selectedWatchFace: WatchFaceAsset?,
+    watchFaceSelectionState: WatchFaceSelectionState,
     onWatchFaceSelect: (WatchFaceAsset) -> Unit,
     onInstallClick: () -> Unit = { },
 ) {
@@ -62,7 +60,8 @@ fun InstallWatchFacePanel(
         modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val noAvailableWatchFaces = watchFaces.isEmpty() && !isLoadingWatchFaces
+        val noAvailableWatchFaces = watchFaceSelectionState.watchFaces.isEmpty()
+                && !watchFaceSelectionState.isLoadingWatchFaces
         MatchSize(
             sizer = placeholderWatchFaceRow,
         ) {
@@ -73,8 +72,8 @@ fun InstallWatchFacePanel(
                 )
             } else {
                 WatchFacesRow(
-                    watchFaces = watchFaces,
-                    selectedWatchFace = selectedWatchFace,
+                    watchFaces = watchFaceSelectionState.watchFaces,
+                    selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
                     onWatchFaceSelect = onWatchFaceSelect,
                 )
             }
@@ -101,11 +100,14 @@ private fun InstallWatchFacePanelPreview() {
         id = "watch_face_2",
         previewPath = R.drawable.watch_face_preview,
     )
+    val watchFaceSelectionState = WatchFaceSelectionState(
+        watchFaces = listOf(watchFace1, watchFace2),
+        selectedWatchFace = watchFace1,
+        isLoadingWatchFaces = false
+    )
     AndroidifyTheme {
         InstallWatchFacePanel(
-            isLoadingWatchFaces = false,
-            watchFaces = listOf(watchFace1, watchFace2),
-            selectedWatchFace = watchFace1,
+            watchFaceSelectionState = watchFaceSelectionState,
             onWatchFaceSelect = {},
             onInstallClick = {},
         )
@@ -140,11 +142,14 @@ fun WatchFacesRow(
 @Preview(showBackground = true)
 @Composable
 private fun InstallWatchFacePanelNoWatchFacesPreview() {
+    val watchFaceSelectionState = WatchFaceSelectionState(
+        isLoadingWatchFaces = false,
+        watchFaces = listOf(),
+        selectedWatchFace = null
+    )
     AndroidifyTheme {
         InstallWatchFacePanel(
-            isLoadingWatchFaces = false,
-            watchFaces = listOf(),
-            selectedWatchFace = null,
+            watchFaceSelectionState = watchFaceSelectionState,
             onWatchFaceSelect = {},
             onInstallClick = {},
         )

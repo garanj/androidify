@@ -15,13 +15,12 @@
  */
 package com.android.developers.androidify.ui
 
-import android.app.Activity
 import android.content.Intent
 import android.net.Uri
 import android.provider.Settings
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import com.android.developers.androidify.R
@@ -32,7 +31,7 @@ import com.android.developers.androidify.ui.theme.AndroidifyWearTheme
  */
 @Composable
 fun OpenSettingsScreen(modifier: Modifier = Modifier) {
-    val context = LocalContext.current
+    val activity = LocalActivity.current
     CallToActionScreen(
         callToActionText = stringResource(R.string.open_settings_prompt),
         buttonText = stringResource(R.string.open_settings_button_text),
@@ -40,9 +39,9 @@ fun OpenSettingsScreen(modifier: Modifier = Modifier) {
             val intent =
                 Intent().apply {
                     action = Settings.ACTION_APPLICATION_DETAILS_SETTINGS
-                    data = Uri.fromParts("package", context.packageName, null)
+                    data = Uri.fromParts("package", activity?.packageName, null)
                 }
-            (context as Activity).startActivity(intent)
+            activity?.startActivity(intent)
         },
     )
 }

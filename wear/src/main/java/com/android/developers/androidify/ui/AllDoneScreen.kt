@@ -15,10 +15,9 @@
  */
 package com.android.developers.androidify.ui
 
-import android.app.Activity
+import androidx.activity.compose.LocalActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.wear.compose.ui.tooling.preview.WearPreviewDevices
 import com.android.developers.androidify.R
@@ -29,10 +28,11 @@ fun AllDoneScreen(
     onAllDone: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val context = LocalContext.current
+    val activity = LocalActivity.current
     val finalAction = {
         onAllDone()
-        (context as Activity).finishAndRemoveTask()
+        activity?.finishAndRemoveTask()
+        Unit
     }
 
     CallToActionScreen(
