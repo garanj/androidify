@@ -19,8 +19,10 @@ import android.content.Context
 import android.graphics.Bitmap
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import androidx.test.filters.SdkSuppress
 import com.android.developers.androidify.watchface.creator.WatchFaceCreatorImpl
 import com.android.developers.androidify.watchface.creator.WatchFacePackage
+import com.android.developers.androidify.watchface.transfer.MIN_WATCH_FACE_SDK_VERSION
 import junit.framework.TestCase.assertFalse
 import junit.framework.TestCase.assertNotNull
 import junit.framework.TestCase.assertNull
@@ -34,6 +36,7 @@ import java.io.File
 import java.io.IOException
 
 @RunWith(AndroidJUnit4::class)
+@SdkSuppress(minSdkVersion = MIN_WATCH_FACE_SDK_VERSION)
 class WatchFaceCreatorImplTest {
     private lateinit var context: Context
     private lateinit var watchFaceCreator: WatchFaceCreatorImpl
