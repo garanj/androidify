@@ -75,6 +75,7 @@ dependencies {
     implementation(libs.androidx.media3.exoplayer)
     implementation(libs.androidx.media3.ui.compose)
     implementation(libs.androidx.media3.ui) // for string resources only
+    implementation(libs.androidx.xr.compose)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.ui.tooling)
@@ -82,6 +83,7 @@ dependencies {
 
     implementation(projects.core.theme)
     implementation(projects.core.util)
+    implementation(projects.core.xr)
     implementation(projects.data)
     implementation(projects.feature.results)
     testImplementation(libs.hilt.android.testing)
