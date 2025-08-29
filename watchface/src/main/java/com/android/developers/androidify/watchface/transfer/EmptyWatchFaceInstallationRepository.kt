@@ -35,7 +35,7 @@ class EmptyWatchFaceInstallationRepositoryImpl @Inject constructor() : WatchFace
 
     override suspend fun createAndTransferWatchFace(
         connectedWatch: ConnectedWatch,
-        watchFaceAsset: WatchFaceAsset,
+        watchFace: WatchFaceAsset,
         bitmap: Bitmap,
     ): WatchFaceInstallError {
         return WatchFaceInstallError.WATCH_FACE_INSTALL_ERROR

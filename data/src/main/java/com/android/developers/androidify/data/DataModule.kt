@@ -15,23 +15,12 @@
  */
 package com.android.developers.androidify.data
 
-import android.os.Build
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.RemoteConfigDataSourceImpl
 import com.android.developers.androidify.util.LocalFileProvider
 import com.android.developers.androidify.util.LocalFileProviderImpl
 import com.android.developers.androidify.vertexai.FirebaseAiDataSource
 import com.android.developers.androidify.vertexai.FirebaseAiDataSourceImpl
-import com.android.developers.androidify.watchface.creator.WatchFaceCreator
-import com.android.developers.androidify.watchface.creator.WatchFaceCreatorImpl
-import com.android.developers.androidify.watchface.transfer.EmptyWatchFaceInstallationRepositoryImpl
-import com.android.developers.androidify.watchface.transfer.MIN_WATCH_FACE_SDK_VERSION
-import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepository
-import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepositoryImpl
-import com.android.developers.androidify.watchface.transfer.WearAssetTransmitter
-import com.android.developers.androidify.watchface.transfer.WearAssetTransmitterImpl
-import com.android.developers.androidify.watchface.transfer.WearDeviceRepository
-import com.android.developers.androidify.watchface.transfer.WearDeviceRepositoryImpl
 import dagger.Binds
 import dagger.Module
 import dagger.Provides
