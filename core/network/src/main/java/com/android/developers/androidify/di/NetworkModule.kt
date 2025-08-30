@@ -24,6 +24,9 @@ import coil3.network.okhttp.OkHttpNetworkFetcherFactory
 import coil3.request.CachePolicy
 import coil3.request.crossfade
 import com.android.developers.androidify.network.BuildConfig
+import com.android.developers.androidify.ondevice.LocalSegmentationDataSource
+import com.android.developers.androidify.ondevice.LocalSegmentationDataSourceImpl
+import com.google.android.gms.common.moduleinstall.ModuleInstallClient
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -92,6 +95,10 @@ internal class NetworkModule @Inject constructor() {
             .crossfade(true)
             .build()
 
+    @Provides
+    fun segmentationDataSource(moduleInstallClient: ModuleInstallClient): LocalSegmentationDataSource {
+        return LocalSegmentationDataSourceImpl(moduleInstallClient)
+    }
     companion object {
         private const val TIMEOUT_SECONDS: Long = 120
     }

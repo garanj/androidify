@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.data.ImageDescriptionFailedGenerationException
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.data.ImageValidationError
@@ -48,6 +49,7 @@ class CreationViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val textGenerationRepository: TextGenerationRepository,
     val fileProvider: LocalFileProvider,
+    val dropBehaviourFactory: DropBehaviourFactory,
     @ApplicationContext
     val context: Context,
 ) : ViewModel() {
@@ -177,6 +179,7 @@ class CreationViewModel @Inject constructor(
                     else -> context.getString(R.string.error_image_generation_other)
                 }
             }
+
             is InsufficientInformationException -> context.getString(R.string.error_provide_more_descriptive_bot)
             is NoInternetException -> context.getString(R.string.error_connectivity)
             is ImageDescriptionFailedGenerationException -> context.getString(R.string.error_image_validation)
@@ -214,14 +217,28 @@ class CreationViewModel @Inject constructor(
             ScreenState.LOADING -> {
                 cancelInProgressTask()
             }
+
             ScreenState.RESULT -> {
                 _uiState.update {
                     it.copy(screenState = ScreenState.EDIT, resultBitmap = null)
                 }
             }
+
             ScreenState.EDIT -> {
                 // do nothing, back press handled outside
             }
+
+            ScreenState.CUSTOMIZE -> {
+                _uiState.update {
+                    it.copy(screenState = ScreenState.RESULT)
+                }
+            }
+        }
+    }
+
+    fun customizeExportClicked() {
+        _uiState.update {
+            it.copy(screenState = ScreenState.CUSTOMIZE)
         }
     }
 }
@@ -242,6 +259,7 @@ enum class ScreenState {
     EDIT,
     LOADING,
     RESULT,
+    CUSTOMIZE,
 }
 
 data class BotColor(

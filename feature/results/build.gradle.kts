@@ -57,6 +57,8 @@ dependencies {
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.coil.compose)
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.lifecycle.process)
+    implementation(libs.mlkit.segmentation)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.ui.tooling)

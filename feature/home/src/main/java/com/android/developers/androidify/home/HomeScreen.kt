@@ -75,6 +75,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onLayoutRectChanged
 import androidx.compose.ui.layout.onVisibilityChanged
 import androidx.compose.ui.platform.LocalContext
@@ -456,11 +457,19 @@ private fun DancingBot(
     dancingBotLink: String?,
     modifier: Modifier,
 ) {
-    AsyncImage(
-        model = dancingBotLink,
-        modifier = modifier,
-        contentDescription = null,
-    )
+    if (LocalInspectionMode.current) {
+        Image(
+            painter = painterResource(id = R.drawable.dancing_droid_gif_placeholder),
+            contentDescription = null,
+            modifier = modifier,
+        )
+    } else {
+        AsyncImage(
+            model = dancingBotLink,
+            modifier = modifier,
+            contentDescription = null,
+        )
+    }
 }
 
 @Composable
@@ -520,64 +529,72 @@ private fun VideoPlayer(
     videoLink: String?,
     modifier: Modifier = Modifier,
 ) {
-    if (LocalInspectionMode.current) return // Layoutlib does not support ExoPlayer
-
-    val context = LocalContext.current
-    var player by remember { mutableStateOf<Player?>(null) }
-    LifecycleStartEffect(videoLink) {
-        if (videoLink != null) {
-            player = ExoPlayer.Builder(context).build().apply {
-                setMediaItem(MediaItem.fromUri(videoLink))
-                repeatMode = Player.REPEAT_MODE_ONE
-                prepare()
+    if (LocalInspectionMode.current) {
+        Image(
+            painter = painterResource(id = R.drawable.promo_video_placeholder),
+            contentDescription = null,
+            contentScale = ContentScale.Crop,
+            modifier = modifier,
+        )
+        return
+    } else {
+        val context = LocalContext.current
+        var player by remember { mutableStateOf<Player?>(null) }
+        LifecycleStartEffect(videoLink) {
+            if (videoLink != null) {
+                player = ExoPlayer.Builder(context).build().apply {
+                    setMediaItem(MediaItem.fromUri(videoLink))
+                    repeatMode = Player.REPEAT_MODE_ONE
+                    prepare()
+                }
+            }
+            onStopOrDispose {
+                player?.release()
+                player = null
             }
         }
-        onStopOrDispose {
-            player?.release()
-            player = null
-        }
-    }
 
-    var videoFullyOnScreen by remember { mutableStateOf(false) }
-    val isWindowOccluded  = LocalOcclusion.current
-    Box(
-        Modifier
-            .background(MaterialTheme.colorScheme.surfaceContainerLowest)
-            .onVisibilityChanged(
-                minDurationMs = 100,
-                minFractionVisible = 1f,
-            ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
-            .then(modifier),
-    ) {
-        player?.let { currentPlayer ->
-            LaunchedEffect(videoFullyOnScreen, LocalOcclusion.current.value) {
-                if (videoFullyOnScreen && !isWindowOccluded.value) currentPlayer.play() else currentPlayer.pause()
-            }
+        var videoFullyOnScreen by remember { mutableStateOf(false) }
+        val isWindowOccluded = LocalOcclusion.current
+        Box(
+            Modifier
+                .background(MaterialTheme.colorScheme.surfaceContainerLowest)
+                .onVisibilityChanged(
+                    minDurationMs = 100,
+                    minFractionVisible = 1f,
+                ) { fullyVisible -> videoFullyOnScreen = fullyVisible }
+                .then(modifier),
+        ) {
+            player?.let { currentPlayer ->
+                LaunchedEffect(videoFullyOnScreen, LocalOcclusion.current.value) {
+                    if (videoFullyOnScreen && !isWindowOccluded.value) currentPlayer.play() else currentPlayer.pause()
+                }
 
-            // Render the video
-            PlayerSurface(currentPlayer, surfaceType = SURFACE_TYPE_TEXTURE_VIEW)
+                // Render the video
+                PlayerSurface(currentPlayer, surfaceType = SURFACE_TYPE_TEXTURE_VIEW)
 
-            // Show a play / pause button
-            val playPauseButtonState = rememberPlayPauseButtonState(currentPlayer)
-            OutlinedIconButton(
-                onClick = playPauseButtonState::onClick,
-                enabled = playPauseButtonState.isEnabled,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(16.dp),
-                colors = IconButtonDefaults.outlinedIconButtonColors(
-                    containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                    disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                ),
-            ) {
-                val icon =
-                    if (playPauseButtonState.showPlay) R.drawable.rounded_play_arrow_24 else R.drawable.rounded_pause_24
-                val contentDescription =
-                    if (playPauseButtonState.showPlay) R.string.play else R.string.pause
-                Icon(
-                    painterResource(icon),
-                    stringResource(contentDescription),
-                )
+                // Show a play / pause button
+                val playPauseButtonState = rememberPlayPauseButtonState(currentPlayer)
+                OutlinedIconButton(
+                    onClick = playPauseButtonState::onClick,
+                    enabled = playPauseButtonState.isEnabled,
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .padding(16.dp),
+                    colors = IconButtonDefaults.outlinedIconButtonColors(
+                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                        disabledContainerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+                    ),
+                ) {
+                    val icon =
+                        if (playPauseButtonState.showPlay) R.drawable.rounded_play_arrow_24 else R.drawable.rounded_pause_24
+                    val contentDescription =
+                        if (playPauseButtonState.showPlay) R.string.play else R.string.pause
+                    Icon(
+                        painterResource(icon),
+                        stringResource(contentDescription),
+                    )
+                }
             }
         }
     }

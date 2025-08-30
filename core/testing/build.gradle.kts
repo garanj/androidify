@@ -58,6 +58,8 @@ dependencies {
     implementation(projects.data)
     implementation(projects.core.network)
     implementation(projects.core.util)
+    implementation(projects.feature.results)
+
     ksp(libs.hilt.compiler)
 
     androidTestImplementation(platform(libs.androidx.compose.bom))

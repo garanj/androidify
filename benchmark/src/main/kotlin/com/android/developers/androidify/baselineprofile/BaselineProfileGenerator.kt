@@ -45,9 +45,9 @@ class BaselineProfileGenerator {
         ) {
             uiAutomator {
                 startApp(packageName = packageName)
-                onView { textAsString() == "Let's Go" }.click()
-                onView { textAsString() == "Prompt" }.click()
-                onView { isEditable }.apply {
+                onElement { textAsString() == "Let's Go" }.click()
+                onElement { textAsString() == "Prompt" }.click()
+                onElement { isEditable }.apply {
                     click()
                     text =
                         "wearing brown sneakers, a red t-shirt, " +

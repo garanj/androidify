@@ -54,6 +54,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Matrix
 import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.LayoutDirection
@@ -63,7 +64,6 @@ import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.circle
 import androidx.graphics.shapes.rectangle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
-import com.android.developers.androidify.util.skipToLookaheadPlacement
 import kotlin.math.max
 
 sealed interface SharedElementKey {
@@ -75,6 +75,10 @@ sealed interface SharedElementKey {
 @OptIn(ExperimentalSharedTransitionApi::class)
 val LocalSharedTransitionScope = compositionLocalOf<SharedTransitionScope> {
     throw IllegalStateException("No SharedTransitionScope provided")
+}
+
+val LocalAnimateBoundsScope = compositionLocalOf<LookaheadScope?> {
+    null
 }
 
 @OptIn(
@@ -118,7 +122,7 @@ fun Modifier.sharedBoundsReveal(
                 renderInOverlayDuringTransition = renderInOverlayDuringTransition,
             )
             .skipToLookaheadSize()
-            .skipToLookaheadPlacement(sharedTransitionScope)
+            .skipToLookaheadPosition()
     }
 }
 
@@ -196,7 +200,7 @@ fun Modifier.sharedBoundsRevealWithShapeMorph(
         val modifier = if (keepChildrenSizePlacement) {
             Modifier
                 .skipToLookaheadSize()
-                .skipToLookaheadPlacement(sharedTransitionScope)
+                .skipToLookaheadPosition()
         } else {
             Modifier
         }

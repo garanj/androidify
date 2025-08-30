@@ -26,6 +26,7 @@ plugins {
     alias(libs.plugins.crashlytics)
     alias(libs.plugins.baselineprofile)
     id("com.google.android.gms.oss-licenses-plugin")
+    id("org.spdx.sbom") version "0.9.0"
 }
 
 android {
@@ -36,8 +37,8 @@ android {
         applicationId = "com.android.developers.androidify"
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.1.1"
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -47,7 +48,9 @@ android {
     }
 
     buildTypes {
-        debug {}
+        debug {
+            versionNameSuffix = "-debug"
+        }
         create("benchmark") {
             initWith(buildTypes.getByName("release"))
             matchingFallbacks += listOf("release")
@@ -61,13 +64,24 @@ android {
                 getDefaultProguardFile("proguard-android-optimize.txt"),
                 "proguard-rules.pro",
             )
-            baselineProfile.automaticGenerationDuringBuild = true
+            baselineProfile.automaticGenerationDuringBuild = false
             configure<CrashlyticsExtension> {
                 mappingFileUploadEnabled = true
             }
-            // To publish on the Play store a private signing key is required, but to allow anyone
-            // who clones the code to sign and run the release variant, use the debug signing key.
-            signingConfig = signingConfigs.named("debug").get()
+            // Conditionally apply signingConfig for release builds
+            // If the 'CI_BUILD' project property is set to 'true', do not assign a signingConfig.
+            // Otherwise, (e.g., for local Android Studio builds), sign with the debug key.
+            if (project.findProperty("CI_BUILD")?.toString()?.toBoolean() == true) {
+                // For CI builds, we want an unsigned artifact.
+                // No signingConfig is assigned here.
+                // The bundleRelease task will produce an unsigned AAB.
+                println("CI_BUILD property detected. Release build will be unsigned by Gradle.")
+            } else {
+                // For local builds (not CI), sign with the debug key to allow easy deployment.
+                // This ensures you can select the "release" variant in Android Studio and run it.
+                println("Not a CI_BUILD or CI_BUILD property not set. Signing release build with debug key.")
+                signingConfig = signingConfigs.getByName("debug")
+            }
         }
     }
     compileOptions {
@@ -88,6 +102,16 @@ baselineProfile() {
     dexLayoutOptimization = true
 }
 
+spdxSbom {
+    targets {
+        // create a target named "release",
+        // this is used for the task name (spdxSbomForRelease)
+        // and output file (release.spdx.json)
+        create("release") {
+            configurations.set(listOf("releaseRuntimeClasspath"))
+        }
+    }
+}
 dependencies {
     debugImplementation(libs.leakcanary.android)
     implementation(libs.androidx.app.startup)
@@ -144,3 +168,4 @@ androidComponents {
         variantBuilder.enableAndroidTest = false
     }
 }
+
