@@ -61,7 +61,7 @@ class WatchFaceCreatorImpl @Inject constructor(
 
         val bot = PackPackage.Resource.Companion.fromByteArrayContents(
             "drawable",
-            "bot.png",
+            "bot.webp",
             botBitmap
                 .scale(555, 555)
                 .toByteArray(),
@@ -136,7 +136,7 @@ class WatchFaceCreatorImpl @Inject constructor(
             // '-' is not allowed in valid package names, but is present in UUIDs.
             .replace("-", "").take(12)
 
-    private fun Bitmap.toByteArray(format: Bitmap.CompressFormat = Bitmap.CompressFormat.PNG, quality: Int = 80): ByteArray {
+    private fun Bitmap.toByteArray(format: Bitmap.CompressFormat = Bitmap.CompressFormat.WEBP, quality: Int = 85): ByteArray {
         val stream = ByteArrayOutputStream()
         this.compress(format, quality, stream)
         return stream.toByteArray()
