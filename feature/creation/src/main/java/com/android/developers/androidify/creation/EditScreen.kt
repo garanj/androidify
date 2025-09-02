@@ -46,20 +46,23 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draganddrop.DragAndDropEvent
 import androidx.compose.ui.draganddrop.DragAndDropTarget
 import androidx.compose.ui.unit.dp
+import com.android.developers.androidify.creation.xr.EditScreenSpatial
 import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.SharedElementContextPreview
 import com.android.developers.androidify.theme.components.AboutButton
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.SquiggleBackground
-import com.android.developers.androidify.util.AdaptivePreview
-import com.android.developers.androidify.util.isAtLeastMedium
+import com.android.developers.androidify.util.LargeScreensPreview
+import com.android.developers.androidify.util.PhonePreview
+import com.android.developers.androidify.xr.RequestFullSpaceIconButton
+import com.android.developers.androidify.xr.couldRequestFullSpace
 
 @Composable
 fun EditScreen(
     snackbarHostState: SnackbarHostState,
     dropBehaviourFactory: DropBehaviourFactory,
-    isExpanded: Boolean = isAtLeastMedium(),
+    layoutType: EditScreenLayoutType,
     onCameraPressed: () -> Unit,
     onBackPressed: () -> Unit,
     onAboutPressed: () -> Unit,
@@ -72,47 +75,9 @@ fun EditScreen(
     onStartClicked: () -> Unit,
     onDropCallback: (Uri) -> Unit = {},
 ) {
-    EditScreenScaffold(
-        snackbarHostState,
-        topBar = {
-            AndroidifyTopAppBar(
-                backEnabled = true,
-                isMediumWindowSize = isExpanded,
-                onBackPressed = onBackPressed,
-                expandedCenterButtons = {
-                    PromptTypeToolbar(
-                        uiState.selectedPromptOption,
-                        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
-                        onOptionSelected = onPromptOptionSelected,
-                    )
-                },
-                actions = {
-                    AboutButton { onAboutPressed() }
-                }
-            )
-        },
-    ) { contentPadding ->
-        SquiggleBackground(offsetHeightFraction = 0.5f)
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding)
-                .imePadding(),
-        ) {
-            if (isExpanded) {
-                EditScreenContentsMedium(
-                    dropBehaviourFactory,
-                    onCameraPressed,
-                    uiState,
-                    onChooseImageClicked,
-                    onPromptOptionSelected,
-                    onUndoPressed,
-                    onPromptGenerationPressed,
-                    onBotColorSelected,
-                    onStartClicked,
-                    onDropCallback,
-                )
-            } else {
+    when (layoutType) {
+        EditScreenLayoutType.Compact ->
+            EditScreenScaffoldWithAppBar(snackbarHostState, layoutType, onBackPressed, onAboutPressed, uiState, onPromptOptionSelected) {
                 EditScreenContentsCompact(
                     dropBehaviourFactory,
                     onCameraPressed,
@@ -126,6 +91,81 @@ fun EditScreen(
                     onDropCallback,
                 )
             }
+        EditScreenLayoutType.Medium ->
+            EditScreenScaffoldWithAppBar(snackbarHostState, layoutType, onBackPressed, onAboutPressed, uiState, onPromptOptionSelected) {
+                EditScreenContentsMedium(
+                    dropBehaviourFactory,
+                    onCameraPressed,
+                    uiState,
+                    onChooseImageClicked,
+                    onPromptOptionSelected,
+                    onUndoPressed,
+                    onPromptGenerationPressed,
+                    onBotColorSelected,
+                    onStartClicked,
+                    onDropCallback,
+                )
+            }
+        EditScreenLayoutType.Spatial ->
+            EditScreenSpatial(
+                dropBehaviourFactory,
+                onCameraPressed,
+                onBackPressed,
+                onAboutPressed,
+                uiState,
+                snackbarHostState,
+                onChooseImageClicked,
+                onPromptOptionSelected,
+                onUndoPressed,
+                onPromptGenerationPressed,
+                onBotColorSelected,
+                onStartClicked,
+                onDropCallback,
+            )
+    }
+}
+
+@Composable
+fun EditScreenScaffoldWithAppBar(
+    snackbarHostState: SnackbarHostState,
+    layoutType: EditScreenLayoutType,
+    onBackPressed: () -> Unit,
+    onAboutPressed: () -> Unit,
+    uiState: CreationState,
+    onPromptOptionSelected: (PromptType) -> Unit,
+    contents: @Composable () -> Unit,
+) {
+    EditScreenScaffold(
+        snackbarHostState,
+        topBar = {
+            AndroidifyTopAppBar(
+                backEnabled = true,
+                isMediumWindowSize = layoutType == EditScreenLayoutType.Medium,
+                onBackPressed = onBackPressed,
+                expandedCenterButtons = {
+                    PromptTypeToolbar(
+                        uiState.selectedPromptOption,
+                        modifier = Modifier.padding(start = 16.dp, end = 16.dp),
+                        onOptionSelected = onPromptOptionSelected,
+                    )
+                },
+                actions = {
+                    AboutButton { onAboutPressed() }
+                    if (couldRequestFullSpace()) {
+                        RequestFullSpaceIconButton()
+                    }
+                },
+            )
+        },
+    ) { contentPadding ->
+        SquiggleBackground(offsetHeightFraction = 0.5f)
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(contentPadding)
+                .imePadding(),
+        ) {
+            contents()
         }
     }
 }
@@ -156,9 +196,9 @@ fun EditScreenScaffold(
     )
 }
 
+@PhonePreview
 @Composable
-@AdaptivePreview
-private fun EditScreenPreview() {
+private fun HomeScreenPhonePreview() {
     AndroidifyTheme {
         SharedElementContextPreview {
             EditScreen(
@@ -175,8 +215,32 @@ private fun EditScreenPreview() {
                 onDropCallback = {},
                 onBackPressed = {},
                 onAboutPressed = {},
+                layoutType = EditScreenLayoutType.Compact,
             )
         }
+    }
+}
+
+@LargeScreensPreview
+@Composable
+private fun HomeScreenLargeScreensPreview() {
+    SharedElementContextPreview {
+        EditScreen(
+            snackbarHostState = SnackbarHostState(),
+            dropBehaviourFactory = fakeDropBehaviourFactory,
+            onCameraPressed = { },
+            uiState = CreationState(),
+            onChooseImageClicked = {},
+            onPromptOptionSelected = {},
+            onUndoPressed = {},
+            onPromptGenerationPressed = {},
+            onBotColorSelected = {},
+            onStartClicked = {},
+            onDropCallback = {},
+            onBackPressed = {},
+            onAboutPressed = {},
+            layoutType = EditScreenLayoutType.Medium,
+        )
     }
 }
 

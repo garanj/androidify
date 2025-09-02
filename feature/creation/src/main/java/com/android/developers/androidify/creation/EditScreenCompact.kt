@@ -237,7 +237,7 @@ private fun EditScreenPreview() {
                 onDropCallback = {},
                 onBackPressed = {},
                 onAboutPressed = {},
-                isExpanded = false,
+                layoutType = EditScreenLayoutType.Compact,
             )
         }
     }

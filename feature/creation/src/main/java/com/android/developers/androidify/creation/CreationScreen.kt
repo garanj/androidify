@@ -39,18 +39,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.developers.androidify.customize.CustomizeAndExportScreen
 import com.android.developers.androidify.customize.CustomizeExportViewModel
 import com.android.developers.androidify.results.ResultsScreen
-import com.android.developers.androidify.util.isAtLeastMedium
 
 @Composable
 fun CreationScreen(
     fileName: String? = null,
     creationViewModel: CreationViewModel = hiltViewModel(),
-    isMedium: Boolean = isAtLeastMedium(),
     onCameraPressed: () -> Unit = {},
     onBackPressed: () -> Unit,
     onAboutPressed: () -> Unit,
 ) {
     val uiState by creationViewModel.uiState.collectAsStateWithLifecycle()
+    val layoutType = calculateLayoutType(uiState.xrEnabled)
     BackHandler(
         enabled = uiState.screenState != ScreenState.EDIT,
     ) {
@@ -74,7 +73,7 @@ fun CreationScreen(
             EditScreen(
                 snackbarHostState = snackbarHostState,
                 dropBehaviourFactory = creationViewModel.dropBehaviourFactory,
-                isExpanded = isMedium,
+                layoutType = layoutType,
                 onCameraPressed = onCameraPressed,
                 onBackPressed = onBackPressed,
                 onAboutPressed = onAboutPressed,
