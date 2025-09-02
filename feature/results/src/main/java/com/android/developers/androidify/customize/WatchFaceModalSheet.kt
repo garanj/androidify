@@ -80,7 +80,7 @@ fun WatchFaceModalSheet(
         Column(
             modifier = Modifier
                 .fillMaxHeight(0.5f)
-                .padding(bottom = 16.dp, top = 0.dp, start = 16.dp, end = 16.dp),
+                .padding(bottom = 16.dp, top = 0.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Bottom,
         ) {

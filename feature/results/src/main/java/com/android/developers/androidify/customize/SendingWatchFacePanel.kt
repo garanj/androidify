@@ -22,6 +22,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.MaterialTheme
@@ -58,6 +59,7 @@ fun SendingWatchFacePanel(
         }
         Spacer(modifier = Modifier.height(24.dp))
         WatchFacePanelButton(
+            modifier = modifier.padding(horizontal = 16.dp),
             buttonText = stringResource(R.string.sending_to_watch),
             isSending = true,
             colors = ButtonDefaults.buttonColors(
