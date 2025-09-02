@@ -25,7 +25,6 @@ import com.android.developers.testing.repository.FakeWatchFaceInstallationReposi
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
@@ -70,26 +69,26 @@ class CustomizeViewModelTest {
         )
     }
 
-        @Test
-        fun setArgumentsWithOriginalImage() = runTest {
-            val initialState = viewModel.state.value
+    @Test
+    fun setArgumentsWithOriginalImage() = runTest {
+        val initialState = viewModel.state.value
 
-            viewModel.setArguments(
-                fakeBitmap,
-                originalFakeUri,
-            )
-            // Ensure state has changed - view model uses combine to combine state flows so state
-            // update is not immediate
-            val newState = viewModel.state.first { it != initialState }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
+        // Ensure state has changed - view model uses combine to combine state flows so state
+        // update is not immediate
+        val newState = viewModel.state.first { it != initialState }
 
-            assertEquals(
-                CustomizeExportState(
-                    exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
-                    originalImageUrl = originalFakeUri,
-                ),
-                newState,
-            )
-        }
+        assertEquals(
+            CustomizeExportState(
+                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                originalImageUrl = originalFakeUri,
+            ),
+            newState,
+        )
+    }
 
     @Test
     fun setArgumentsWithPrompt() = runTest {

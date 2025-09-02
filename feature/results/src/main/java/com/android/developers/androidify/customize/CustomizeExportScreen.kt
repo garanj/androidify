@@ -181,7 +181,7 @@ private fun CustomizeExportContents(
     ) { paddingValues ->
         var showWatchFaceBottomSheet by remember { mutableStateOf(false) }
         val watchFaceSheetState = rememberModalBottomSheetState(
-            skipPartiallyExpanded = true
+            skipPartiallyExpanded = true,
         )
         val imageResult = remember(state.showImageEditProgress) {
             movableContentWithReceiverOf<ExportImageCanvas> {

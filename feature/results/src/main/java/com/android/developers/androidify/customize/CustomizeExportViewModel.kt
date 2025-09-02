@@ -30,7 +30,6 @@ import com.android.developers.androidify.watchface.transfer.WatchFaceInstallatio
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -39,7 +38,6 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import javax.inject.Inject
 
 @HiltViewModel
@@ -56,7 +54,7 @@ class CustomizeExportViewModel @Inject constructor(
         watchfaceInstallationRepository.connectedWatch,
         watchfaceInstallationRepository.watchFaceInstallationUpdates,
     ) {
-    currentState, watch, installationStatus ->
+            currentState, watch, installationStatus ->
         currentState.copy(
             connectedWatch = watch,
             watchFaceInstallationStatus = installationStatus,
@@ -294,8 +292,8 @@ class CustomizeExportViewModel @Inject constructor(
                             watchFaceSelectionState = WatchFaceSelectionState(
                                 watchFaces = faces,
                                 isLoadingWatchFaces = false,
-                                selectedWatchFace = faces.firstOrNull()
-                            )
+                                selectedWatchFace = faces.firstOrNull(),
+                            ),
                         )
                     }
                 }
@@ -304,7 +302,7 @@ class CustomizeExportViewModel @Inject constructor(
                         it.copy(
                             watchFaceSelectionState = it.watchFaceSelectionState.copy(
                                 isLoadingWatchFaces = false,
-                            )
+                            ),
                         )
                     }
                 }
@@ -312,11 +310,13 @@ class CustomizeExportViewModel @Inject constructor(
     }
 
     fun onWatchFaceSelected(watchFace: WatchFaceAsset) {
-        _state.update { it.copy(
-            watchFaceSelectionState = it.watchFaceSelectionState.copy(
-                selectedWatchFace = watchFace,
+        _state.update {
+            it.copy(
+                watchFaceSelectionState = it.watchFaceSelectionState.copy(
+                    selectedWatchFace = watchFace,
+                ),
             )
-        ) }
+        }
     }
 
     fun installWatchFace() {

@@ -39,7 +39,6 @@ import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.watchface.WatchFaceAsset
 
-
 @Composable
 fun InstallWatchFacePanel(
     modifier: Modifier = Modifier,
@@ -51,8 +50,8 @@ fun InstallWatchFacePanel(
         modifier = modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
-        val noAvailableWatchFaces = watchFaceSelectionState.watchFaces.isEmpty()
-                && !watchFaceSelectionState.isLoadingWatchFaces
+        val noAvailableWatchFaces = watchFaceSelectionState.watchFaces.isEmpty() &&
+            !watchFaceSelectionState.isLoadingWatchFaces
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -65,7 +64,7 @@ fun InstallWatchFacePanel(
                     modifier = Modifier.weight(1f),
                     text = stringResource(R.string.no_watch_faces),
                     style = MaterialTheme.typography.bodyMedium,
-                    textAlign = TextAlign.Center
+                    textAlign = TextAlign.Center,
                 )
             } else {
                 WatchFacesRow(
@@ -100,7 +99,7 @@ private fun InstallWatchFacePanelPreview() {
     val watchFaceSelectionState = WatchFaceSelectionState(
         watchFaces = listOf(watchFace1, watchFace2),
         selectedWatchFace = watchFace1,
-        isLoadingWatchFaces = false
+        isLoadingWatchFaces = false,
     )
     AndroidifyTheme {
         InstallWatchFacePanel(
@@ -142,7 +141,7 @@ private fun InstallWatchFacePanelNoWatchFacesPreview() {
     val watchFaceSelectionState = WatchFaceSelectionState(
         isLoadingWatchFaces = false,
         watchFaces = listOf(),
-        selectedWatchFace = null
+        selectedWatchFace = null,
     )
     AndroidifyTheme {
         InstallWatchFacePanel(

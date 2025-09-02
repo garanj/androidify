@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -83,7 +82,7 @@ fun WatchFaceModalSheet(
                 .fillMaxHeight(0.5f)
                 .padding(bottom = 16.dp, top = 0.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Bottom
+            verticalArrangement = Arrangement.Bottom,
         ) {
             Box(
                 modifier = Modifier
@@ -215,7 +214,7 @@ private fun WatchFaceModalSheetPreview() {
     val watchFaceSelectionState = WatchFaceSelectionState(
         watchFaces = listOf(watchface),
         selectedWatchFace = watchface,
-        isLoadingWatchFaces = false
+        isLoadingWatchFaces = false,
     )
     AndroidifyTheme {
         WatchFaceModalSheet(
