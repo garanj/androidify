@@ -48,13 +48,15 @@ fun SendingWatchFacePanel(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .weight(1f),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            WatchFacesRow(
-                watchFaces = listOfNotNull(selectedWatchFace),
-                selectedWatchFace = selectedWatchFace,
+            WatchFacePreviewItem(
+                watchFace = selectedWatchFace,
+                isSelected = true,
+                onClick = { },
             )
         }
         Spacer(modifier = Modifier.height(24.dp))

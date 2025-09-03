@@ -51,24 +51,21 @@ fun GuidanceWatchFacePanel(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .weight(1f),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                WatchFacesRow(
-                    watchFaces = listOfNotNull(selectedWatchFace),
-                    selectedWatchFace = selectedWatchFace,
-                )
-                Spacer(modifier = Modifier.width(16.dp))
-                Text(
-                    text = stringResource(guidanceTextResId),
-                    textAlign = TextAlign.Center,
-                )
-            }
+            WatchFacePreviewItem(
+                watchFace = selectedWatchFace,
+                isSelected = true,
+                onClick = { },
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Text(
+                text = stringResource(guidanceTextResId),
+                textAlign = TextAlign.Center,
+            )
         }
 
         Spacer(modifier = Modifier.height(24.dp))

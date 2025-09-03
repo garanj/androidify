@@ -52,33 +52,30 @@ fun ErrorWatchFacePanel(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .weight(1f),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
+            WatchFacePreviewItem(
+                watchFace = selectedWatchFace,
+                isSelected = true,
+                onClick = { },
+            )
+            Spacer(modifier = Modifier.width(16.dp))
+            Column(
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                WatchFacesRow(
-                    watchFaces = listOfNotNull(selectedWatchFace),
-                    selectedWatchFace = selectedWatchFace,
+                Text(
+                    text = stringResource(R.string.complete_error_headline),
+                    fontWeight = FontWeight.Bold,
+                    textAlign = TextAlign.Center,
                 )
-                Spacer(modifier = Modifier.width(16.dp))
-                Column(
-                    horizontalAlignment = Alignment.CenterHorizontally,
-                ) {
-                    Text(
-                        text = stringResource(R.string.complete_error_headline),
-                        fontWeight = FontWeight.Bold,
-                        textAlign = TextAlign.Center,
-                    )
-                    Spacer(modifier = Modifier.height(8.dp))
-                    Text(
-                        text = stringResource(errorTextResId),
-                        textAlign = TextAlign.Center,
-                    )
-                }
+                Spacer(modifier = Modifier.height(8.dp))
+                Text(
+                    text = stringResource(errorTextResId),
+                    textAlign = TextAlign.Center,
+                )
             }
         }
 

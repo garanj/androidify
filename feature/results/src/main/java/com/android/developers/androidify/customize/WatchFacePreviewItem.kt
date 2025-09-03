@@ -31,11 +31,12 @@ import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import coil3.compose.AsyncImage
+import com.android.developers.androidify.watchface.R
 import com.android.developers.androidify.watchface.WatchFaceAsset
 
 @Composable
 fun WatchFacePreviewItem(
-    watchFace: WatchFaceAsset,
+    watchFace: WatchFaceAsset?,
     isSelected: Boolean,
     onClick: () -> Unit,
 ) {
@@ -49,8 +50,8 @@ fun WatchFacePreviewItem(
             .clickable(onClick = onClick),
     ) {
         AsyncImage(
-            model = watchFace.previewPath,
-            contentDescription = "Preview of ${watchFace.id}",
+            model = watchFace?.previewPath ?: com.android.developers.androidify.results.R.drawable.watch_face_preview,
+            contentDescription = "Preview of ${watchFace?.id}",
             contentScale = ContentScale.Crop,
             colorFilter = if (!isSelected) greyScaleFilter else null,
             modifier = Modifier.fillMaxSize(),

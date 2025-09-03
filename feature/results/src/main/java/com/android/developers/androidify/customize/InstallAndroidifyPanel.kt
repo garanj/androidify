@@ -53,13 +53,15 @@ fun InstallAndroidifyPanel(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
+                .padding(horizontal = 16.dp)
                 .weight(1f),
             horizontalArrangement = Arrangement.Center,
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            WatchFacesRow(
-                watchFaces = listOf(placeholderWatchFace),
-                selectedWatchFace = placeholderWatchFace,
+            WatchFacePreviewItem(
+                watchFace = placeholderWatchFace,
+                isSelected = false,
+                onClick = { },
             )
         }
 
