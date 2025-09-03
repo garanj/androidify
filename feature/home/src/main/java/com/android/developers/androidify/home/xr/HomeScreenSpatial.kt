@@ -38,7 +38,6 @@ import androidx.compose.ui.unit.dp
 import androidx.xr.compose.spatial.ContentEdge
 import androidx.xr.compose.spatial.Orbiter
 import androidx.xr.compose.spatial.OrbiterOffsetType
-import androidx.xr.compose.spatial.Subspace
 import androidx.xr.compose.subspace.SpatialPanel
 import androidx.xr.compose.subspace.layout.SpatialAlignment
 import androidx.xr.compose.subspace.layout.SubspaceModifier
@@ -56,7 +55,6 @@ import com.android.developers.androidify.home.VideoPlayer
 import com.android.developers.androidify.theme.SharedElementContextPreview
 import com.android.developers.androidify.theme.components.AboutButton
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
-import com.android.developers.androidify.theme.components.SquiggleBackgroundFull
 import com.android.developers.androidify.util.TabletPreview
 import com.android.developers.androidify.xr.DisableSharedTransition
 import com.android.developers.androidify.xr.MainPanelWorkaround
@@ -71,7 +69,7 @@ fun HomeScreenContentsSpatial(
     onAboutClicked: () -> Unit,
 ) {
     DisableSharedTransition {
-        SquiggleBackgroundSubspace {
+        SquiggleBackgroundSubspace(minimumHeight = 600.dp) {
             MainPanelWorkaround()
             Orbiter(
                 position = ContentEdge.Top,
@@ -118,7 +116,6 @@ private fun HomeScreenSpatialMainContent(
         mutableStateOf(IntOffset.Zero)
     }
     Box {
-        SquiggleBackgroundFull()
         Column(
             modifier = Modifier
                 .fillMaxWidth(0.55f)
