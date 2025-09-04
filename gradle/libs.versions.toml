@@ -175,6 +175,7 @@ validator-push-android = { module = "com.google.android.wearable.watchface.valid
 validator-push-cli = { module = "com.google.android.wearable.watchface.validator:validator-push-cli", version.ref = "validatorPush" }
 watchface-push = { group = "androidx.wear.watchfacepush", name="watchfacepush", version.ref = "watchFacePush" }
 play-services-base = { group = "com.google.android.gms", name = "play-services-base", version.ref = "playServicesBase" }
+google-firebase-appcheck-debug = { group = "com.google.firebase", name = "firebase-appcheck-debug"}
 [plugins]
 android-application = { id = "com.android.application", version.ref = "agp" }
 android-library = { id = "com.android.library", version.ref = "agp" }
