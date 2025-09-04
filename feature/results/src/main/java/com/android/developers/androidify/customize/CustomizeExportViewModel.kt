@@ -57,10 +57,10 @@ class CustomizeExportViewModel @AssistedInject constructor(
 ) : AndroidViewModel(application) {
 
     @AssistedFactory
-    interface Factory{
+    interface Factory {
         fun create(
             @Assisted("resultImageUrl") resultImageUrl: Uri,
-            @Assisted("originalImageUrl")originalImageUrl: Uri?
+            @Assisted("originalImageUrl")originalImageUrl: Uri?,
         ): CustomizeExportViewModel
     }
 
@@ -400,7 +400,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 val bitmap = localFileProvider.loadBitmapFromUri(uri)
                 _state.update {
                     it.copy(
-                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap)
+                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap),
                     )
                 }
             } catch (e: Exception) {

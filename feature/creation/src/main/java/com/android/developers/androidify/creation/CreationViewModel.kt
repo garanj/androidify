@@ -43,7 +43,6 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = CreationViewModel.Factory::class)
 class CreationViewModel @AssistedInject constructor(
@@ -164,7 +163,7 @@ class CreationViewModel @AssistedInject constructor(
                     _uiState.update {
                         it.copy(
                             resultBitmapUri = imageGenerationRepository.saveImage(bitmap),
-                            screenState = ScreenState.EDIT
+                            screenState = ScreenState.EDIT,
                         )
                     }
                 } catch (e: Exception) {
