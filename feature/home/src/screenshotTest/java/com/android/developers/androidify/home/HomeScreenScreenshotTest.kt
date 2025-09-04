@@ -31,7 +31,7 @@ class HomeScreenScreenshotTest {
         AndroidifyTheme {
             SharedElementContextPreview {
                 HomeScreenContents(
-                    isMediumWindowSize = isAtLeastMedium(),
+                    layoutType = calculateLayoutType(enableXr = false),
                     onClickLetsGo = { },
                     onAboutClicked = {},
                     videoLink = "",
