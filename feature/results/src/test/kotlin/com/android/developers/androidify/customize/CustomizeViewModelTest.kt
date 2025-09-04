@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
+import com.android.developers.testing.data.bitmapSample
 import com.android.developers.testing.network.TestRemoteConfigDataSource
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.repository.FakeWatchFaceInstallationRepository
@@ -49,11 +50,9 @@ class CustomizeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: CustomizeExportViewModel
-
-    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
-    val fakeUri = Uri.parse("content://test/image.jpg")
+    private val fakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
     @Before
     fun setup() {
@@ -72,28 +71,21 @@ class CustomizeViewModelTest {
     }
 
     @Test
-    fun stateInitialEmpty() = runTest {
-        assertEquals(
-            CustomizeExportState(),
-            viewModel.state.value,
+    fun stateResultUri_NotNull() = runTest {
+        assertNotNull(
+            viewModel.state.value.exportImageCanvas.imageUri,
         )
     }
 
     @Test
     fun setArgumentsWithOriginalImage() = runTest {
         val initialState = viewModel.state.value
-
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
-
         // Ensure state has changed - view model uses combine to combine state flows so state
         // update is not immediate
         val newState = viewModel.state.first { it != initialState }
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
                 originalImageUrl = originalFakeUri,
             ),
             newState,
@@ -116,19 +108,13 @@ class CustomizeViewModelTest {
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             remoteConfigDataSource = remoteConfigDataSource,
         )
-
-        viewModel.setArguments(
-            fakeUri,
-            null,
-        )
-
         // Ensure state has changed - view model uses combine to combine state flows so state
         // update is not immediate
         val newState = viewModel.state.first { it != initialState }
 
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
                 originalImageUrl = null,
             ),
             newState,
@@ -144,10 +130,6 @@ class CustomizeViewModelTest {
             }
         }
 
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
 
         viewModel.downloadClicked()
         assertNotNull(values.last().externalOriginalSavedUri)
@@ -166,10 +148,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.shareClicked()
         // Ensure all coroutines on the test scheduler complete
@@ -181,7 +159,7 @@ class CustomizeViewModelTest {
     fun changeBackground_NotNull() = runTest {
         val viewModel = CustomizeExportViewModel(
             fakeUri,
-            originalFakeUri,
+            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
@@ -196,10 +174,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -226,10 +200,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -262,12 +232,6 @@ class CustomizeViewModelTest {
         )
 
         val initialState = viewModel.state.value
-
-        viewModel.setArguments(
-            fakeUri,
-            null,
-        )
-
         val newState = viewModel.state.first { it != initialState }
         val toolState = newState.toolState[CustomizeTool.Background] as BackgroundToolState
 

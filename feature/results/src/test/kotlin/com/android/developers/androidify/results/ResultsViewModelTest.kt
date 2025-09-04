@@ -34,25 +34,14 @@ class ResultsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
-    private lateinit var viewModel: ResultsViewModel
-
-    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val fakePromptText = "Pink Hair, plaid shirt, jeans"
     private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
     private val fakeUri = Uri.parse("content://test/image.jpg")
 
-    @Before
-    fun setup() {
-        viewModel = ResultsViewModel(
-            fakeUri,
-            originalFakeUri,
-            fakePromptText
-        )
-    }
-
     @Test
     fun stateInitialEmpty() = runTest {
+        val viewModel = ResultsViewModel(null,null,null)
         assertEquals(
             ResultState(),
             viewModel.state.value,
@@ -60,7 +49,8 @@ class ResultsViewModelTest {
     }
 
     @Test
-    fun setArgumentsWithOriginalImage() = runTest {
+    fun setArgumentsWithOriginalImage_isCorrect() = runTest {
+        val viewModel = ResultsViewModel(fakeUri,originalFakeUri,null)
         assertEquals(
             ResultState(
                 resultImageUri = fakeUri,
@@ -71,7 +61,8 @@ class ResultsViewModelTest {
     }
 
     @Test
-    fun setArgumentsWithPrompt() = runTest {
+    fun initialState_withPrompt_isCorrect() = runTest {
+        val viewModel = ResultsViewModel(fakeUri,null,fakePromptText)
         assertEquals(
             ResultState(
                 resultImageUri = fakeUri,

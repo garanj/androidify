@@ -490,7 +490,7 @@ fun CustomizeExportPreview() {
                     displayName = "Pixel Watch 3",
                     hasAndroidify = true,
                 )
-                val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+                val imageUri = getPlaceholderBotUri()
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(imageUri = imageUri),
                     connectedWatch = connectedWatch,
@@ -522,7 +522,7 @@ fun CustomizeExportPreviewLarge() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+                val imageUri = getPlaceholderBotUri()
                 val connectedWatch = ConnectedWatch(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",

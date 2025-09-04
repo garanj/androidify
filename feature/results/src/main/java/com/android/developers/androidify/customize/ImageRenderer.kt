@@ -17,7 +17,6 @@
 
 package com.android.developers.androidify.customize
 
-import android.content.ContentResolver
 import androidx.compose.animation.ExperimentalSharedTransitionApi
 import androidx.compose.animation.animateBounds
 import androidx.compose.animation.core.animateFloatAsState
@@ -42,13 +41,10 @@ import androidx.compose.ui.graphics.ImageBitmap
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.layout
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.util.fastRoundToInt
-import androidx.core.net.toUri
 import coil3.compose.AsyncImage
-import com.android.developers.androidify.results.R
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LocalAnimateBoundsScope
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
@@ -212,7 +208,7 @@ private fun Modifier.safeAnimateBounds(): Modifier {
 @Preview
 @Composable
 private fun ImageRendererPreviewSquare() {
-    val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+    val imageUri = getPlaceholderBotUri()
 
     AndroidifyTheme {
         ImageResult(
@@ -235,7 +231,7 @@ private fun ImageRendererPreviewSquare() {
 @Preview
 @Composable
 private fun ImageRendererPreviewBanner() {
-    val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+    val imageUri = getPlaceholderBotUri()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
@@ -257,7 +253,7 @@ private fun ImageRendererPreviewBanner() {
 @Preview
 @Composable
 private fun ImageRendererPreviewWallpaper() {
-    val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+    val imageUri = getPlaceholderBotUri()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
@@ -279,7 +275,7 @@ private fun ImageRendererPreviewWallpaper() {
 @Preview(widthDp = 1280, heightDp = 800)
 @Composable
 private fun ImageRendererPreviewWallpaperTablet() {
-    val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+    val imageUri = getPlaceholderBotUri()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
@@ -301,7 +297,7 @@ private fun ImageRendererPreviewWallpaperTablet() {
 @Preview
 @Composable
 private fun ImageRendererPreviewWallpaperSocial() {
-    val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+    val imageUri = getPlaceholderBotUri()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
@@ -323,7 +319,7 @@ private fun ImageRendererPreviewWallpaperSocial() {
 @Preview
 @Composable
 fun ImageRendererPreviewWallpaperIO() {
-    val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+    val imageUri = getPlaceholderBotUri()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
