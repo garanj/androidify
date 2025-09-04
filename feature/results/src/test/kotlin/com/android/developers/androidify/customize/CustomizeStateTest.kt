@@ -53,7 +53,7 @@ class CustomizeStateTest {
                 SizeOption.WallpaperTablet,
                 SizeOption.Banner,
                 SizeOption.SocialHeader,
-                SizeOption.Sticker
+                SizeOption.Sticker,
             ),
             state.options,
         )
@@ -87,7 +87,7 @@ class CustomizeStateTest {
     @Test
     fun exportImageCanvas_defaultValues() {
         val canvas = ExportImageCanvas()
-        Assert.assertNull(canvas.imageBitmap)
+        Assert.assertNull(canvas.imageUri)
         Assert.assertEquals(SizeOption.Square, canvas.aspectRatioOption)
         Assert.assertEquals(Size(1000f, 1000f), canvas.canvasSize)
         Assert.assertNull(canvas.mainImageUri)
