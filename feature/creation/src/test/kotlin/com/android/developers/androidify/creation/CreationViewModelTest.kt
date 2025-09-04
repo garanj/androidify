@@ -50,10 +50,10 @@ class CreationViewModelTest {
 
     private val internetConnectivityManager = TestInternetConnectivityManager(true)
     private val imageGenerationRepository = FakeImageGenerationRepository()
+    private val fakeUri = Uri.parse("content://test/image.jpg")
 
     @Before
     fun setup() {
-        val fakeUri = Uri.parse("content://test/image.jpg")
         viewModel = CreationViewModel(
             originalImageUrl = fakeUri,
             internetConnectivityManager,
@@ -66,18 +66,36 @@ class CreationViewModelTest {
     }
 
     @Test
-    fun stateInitialEdit() = runTest {
+    fun stateInitialEdit_WithImage() = runTest {
         assertEquals(
             ScreenState.EDIT,
             viewModel.uiState.value.screenState,
         )
         assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
-        assertEquals(null, viewModel.uiState.value.imageUri)
+        assertEquals( fakeUri, viewModel.uiState.value.imageUri)
+    }
+
+    @Test
+    fun stateInitialEdit_WithOutImage() = runTest {
+        viewModel = CreationViewModel(
+            originalImageUrl = null,
+            internetConnectivityManager,
+            imageGenerationRepository,
+            TestTextGenerationRepository(),
+            TestFileProvider(),
+            FakeDropImageFactory(),
+            context = RuntimeEnvironment.getApplication(),
+        )
+        assertEquals(
+            ScreenState.EDIT,
+            viewModel.uiState.value.screenState,
+        )
+        assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
+        assertEquals( null, viewModel.uiState.value.imageUri)
     }
 
     @Test
     fun onImageSelected_updatesUiState() = runTest {
-        val fakeUri = Uri.parse("content://test/image.jpg")
         viewModel.onImageSelected(fakeUri)
 
         assertEquals(fakeUri, viewModel.uiState.value.imageUri)
