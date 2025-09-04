@@ -79,10 +79,10 @@ dependencies {
     implementation(libs.firebase.app.check)
     implementation(libs.firebase.config)
     implementation(projects.core.util)
-    implementation(libs.firebase.config.ktx)
     implementation(libs.mlkit.segmentation)
     implementation(libs.mlkit.common)
     implementation(libs.play.services.base)
+    implementation(libs.google.firebase.appcheck.debug)
     ksp(libs.hilt.compiler)
 
     testImplementation(libs.play.services.base.testing)

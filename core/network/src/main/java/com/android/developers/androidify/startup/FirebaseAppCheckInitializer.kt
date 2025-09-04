@@ -17,6 +17,7 @@ package com.android.developers.androidify.startup
 
 import android.annotation.SuppressLint
 import android.content.Context
+import android.util.Log
 import androidx.startup.Initializer
 import com.android.developers.androidify.network.BuildConfig
 import com.google.firebase.Firebase
@@ -35,13 +36,13 @@ class FirebaseAppCheckInitializer : Initializer<FirebaseAppCheck> {
             if (BuildConfig.DEBUG) {
                 Log.i("AndroidifyAppCheck", "Firebase debug")
                 installAppCheckProviderFactory(
-                    DebugAppCheckProviderFactory.getInstance(),
+                    DebugAppCheckProviderFactory.getInstance()
                 )
             } else {
                 Log.i("AndroidifyAppCheck", "Play integrity")
                 installAppCheckProviderFactory(
                     PlayIntegrityAppCheckProviderFactory.getInstance(),
-                )
+                    )
             }
         }
     }
