@@ -17,9 +17,10 @@
 
 package com.android.developers.androidify.customize
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
+import com.android.developers.testing.data.TestFileProvider
+import com.android.developers.testing.data.bitmapSample
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.repository.FakeWatchFaceInstallationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
@@ -47,25 +48,27 @@ class CustomizeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: CustomizeExportViewModel
-
-    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
+
+    private val fakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
     @Before
     fun setup() {
         viewModel = CustomizeExportViewModel(
+            fakeUri,
+            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
         )
     }
 
     @Test
-    fun stateInitialEmpty() = runTest {
-        assertEquals(
-            CustomizeExportState(),
-            viewModel.state.value,
+    fun stateResultUri_NotNull() = runTest {
+        assertNotNull(
+            viewModel.state.value.exportImageCanvas.imageUri,
         )
     }
 
@@ -73,17 +76,13 @@ class CustomizeViewModelTest {
     fun setArgumentsWithOriginalImage() = runTest {
         val initialState = viewModel.state.value
 
-        viewModel.setArguments(
-            fakeBitmap,
-            originalFakeUri,
-        )
         // Ensure state has changed - view model uses combine to combine state flows so state
         // update is not immediate
         val newState = viewModel.state.first { it != initialState }
 
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
                 originalImageUrl = originalFakeUri,
             ),
             newState,
@@ -94,17 +93,23 @@ class CustomizeViewModelTest {
     fun setArgumentsWithPrompt() = runTest {
         val initialState = viewModel.state.value
 
-        viewModel.setArguments(
-            fakeBitmap,
+        val viewModel = CustomizeExportViewModel(
+            fakeUri,
             null,
+            FakeImageGenerationRepository(),
+            composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
         )
+
         // Ensure state has changed - view model uses combine to combine state flows so state
         // update is not immediate
         val newState = viewModel.state.first { it != initialState }
 
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
                 originalImageUrl = null,
             ),
             newState,
@@ -119,11 +124,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-
-        viewModel.setArguments(
-            fakeBitmap,
-            originalFakeUri,
-        )
 
         viewModel.downloadClicked()
         assertNotNull(values.last().externalOriginalSavedUri)
@@ -142,10 +142,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeBitmap,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.shareClicked()
         // Ensure all coroutines on the test scheduler complete
@@ -156,10 +152,13 @@ class CustomizeViewModelTest {
     @Test
     fun changeBackground_NotNull() = runTest {
         val viewModel = CustomizeExportViewModel(
+            fakeUri,
+            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
         )
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
@@ -168,10 +167,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeBitmap,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -198,10 +193,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeBitmap,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
