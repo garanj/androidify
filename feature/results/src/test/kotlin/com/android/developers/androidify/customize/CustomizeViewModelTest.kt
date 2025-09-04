@@ -67,6 +67,9 @@ class CustomizeViewModelTest {
 
     @Test
     fun stateResultUri_NotNull() = runTest {
+        val initialState = viewModel.state.value
+
+        val newState = viewModel.state.first { it != initialState }
         assertNotNull(
             viewModel.state.value.exportImageCanvas.imageUri,
         )
