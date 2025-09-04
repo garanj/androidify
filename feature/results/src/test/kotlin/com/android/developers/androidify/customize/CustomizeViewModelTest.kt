@@ -21,6 +21,7 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
+import com.android.developers.testing.data.bitmapSample
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
@@ -46,11 +47,9 @@ class CustomizeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: CustomizeExportViewModel
-
-    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
-    val fakeUri = Uri.parse("content://test/image.jpg")
+    private val fakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
     @Before
     fun setup() {
@@ -60,27 +59,22 @@ class CustomizeViewModelTest {
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
-            localFileProvider = TestFileProvider()
+            localFileProvider = TestFileProvider(),
         )
     }
 
     @Test
-    fun stateInitialEmpty() = runTest {
-        assertEquals(
-            CustomizeExportState(),
-            viewModel.state.value,
+    fun stateResultUri_NotNull() = runTest {
+        assertNotNull(
+            viewModel.state.value.exportImageCanvas.imageUri,
         )
     }
 
     @Test
     fun setArgumentsWithOriginalImage() = runTest {
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
                 originalImageUrl = originalFakeUri,
             ),
             viewModel.state.value,
@@ -89,13 +83,17 @@ class CustomizeViewModelTest {
 
     @Test
     fun setArgumentsWithPrompt() = runTest {
-        viewModel.setArguments(
+        val viewModel = CustomizeExportViewModel(
             fakeUri,
             null,
+            FakeImageGenerationRepository(),
+            composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
         )
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
+                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
                 originalImageUrl = null,
             ),
             viewModel.state.value,
@@ -111,10 +109,6 @@ class CustomizeViewModelTest {
             }
         }
 
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
 
         viewModel.downloadClicked()
         assertNotNull(values.last().externalOriginalSavedUri)
@@ -133,10 +127,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.shareClicked()
         // Ensure all coroutines on the test scheduler complete
@@ -148,11 +138,11 @@ class CustomizeViewModelTest {
     fun changeBackground_NotNull() = runTest {
         val viewModel = CustomizeExportViewModel(
             fakeUri,
-            originalFakeUri,
+            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
-            localFileProvider = TestFileProvider()
+            localFileProvider = TestFileProvider(),
         )
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
@@ -161,10 +151,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -191,10 +177,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-        viewModel.setArguments(
-            fakeUri,
-            originalFakeUri,
-        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(

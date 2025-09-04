@@ -426,7 +426,7 @@ fun CustomizeExportPreview() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+                val imageUri = getPlaceholderBotUri()
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(imageUri = imageUri),
                 )
@@ -453,7 +453,7 @@ fun CustomizeExportPreviewLarge() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+                val imageUri = getPlaceholderBotUri()
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
                         imageUri = imageUri,

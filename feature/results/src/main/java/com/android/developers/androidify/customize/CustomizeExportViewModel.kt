@@ -77,18 +77,6 @@ class CustomizeExportViewModel @AssistedInject constructor(
         super.onCleared()
     }
 
-    fun setArguments(
-        resultImageUrl: Uri,
-        originalImageUrl: Uri?,
-    ) {
-        _state.update {
-            CustomizeExportState(
-                originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
-            )
-        }
-    }
-
     fun shareClicked() {
         viewModelScope.launch {
             val exportImageCanvas = state.value.exportImageCanvas

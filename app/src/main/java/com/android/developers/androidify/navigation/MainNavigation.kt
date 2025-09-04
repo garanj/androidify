@@ -105,11 +105,11 @@ fun MainNavigation() {
             }
             entry<Create> { createKey ->
                 val creationViewModel = hiltViewModel<CreationViewModel, CreationViewModel.Factory>(
-                    creationCallback = {    factory ->
+                    creationCallback = { factory ->
                         factory.create(
-                            originalImageUrl = createKey.fileName
+                            originalImageUrl = createKey.fileName,
                         )
-                    }
+                    },
                 )
                 CreationScreen(
                     onCameraPressed = {
@@ -123,16 +123,16 @@ fun MainNavigation() {
                         backStack.add(About)
                     },
                     onImageCreated = { resultImageUri, prompt, originalImageUri ->
-                        backStack.removeAll{ it is Result}
+                        backStack.removeAll { it is Result }
                         backStack.add(
                             Result(
                                 resultImageUri = resultImageUri,
                                 prompt = prompt,
-                                originalImageUri = originalImageUri
-                            )
+                                originalImageUri = originalImageUri,
+                            ),
                         )
                     },
-                    creationViewModel = creationViewModel
+                    creationViewModel = creationViewModel,
                 )
             }
             entry<Result> { resultKey ->
@@ -141,18 +141,17 @@ fun MainNavigation() {
                         factory.create(
                             resultImageUrl = resultKey.resultImageUri,
                             originalImageUrl = resultKey.originalImageUri,
-                            promptText = resultKey.prompt
+                            promptText = resultKey.prompt,
                         )
-                    }
+                    },
                 )
                 ResultsScreen(
                     onNextPress = { resultImageUri, originalImageUri ->
-                        backStack.removeAll{ it is Result}
                         backStack.add(
                             CustomizeExport(
                                 resultImageUri = resultImageUri,
-                                originalImageUri = originalImageUri
-                            )
+                                originalImageUri = originalImageUri,
+                            ),
                         )
                     },
                     onAboutPress = {
@@ -161,7 +160,7 @@ fun MainNavigation() {
                     onBackPress = {
                         backStack.removeLastOrNull()
                     },
-                    viewModel = resultsViewModel
+                    viewModel = resultsViewModel,
                 )
             }
             entry<CustomizeExport> { shareKey ->
@@ -169,9 +168,9 @@ fun MainNavigation() {
                     creationCallback = { factory ->
                         factory.create(
                             resultImageUrl = shareKey.resultImageUri,
-                            originalImageUrl = shareKey.originalImageUri
+                            originalImageUrl = shareKey.originalImageUri,
                         )
-                    }
+                    },
                 )
                 CustomizeAndExportScreen(
                     onBackPress = {
@@ -180,7 +179,7 @@ fun MainNavigation() {
                     onInfoPress = {
                         backStack.add(About)
                     },
-                    viewModel = customizeExportViewModel
+                    viewModel = customizeExportViewModel,
                 )
             }
             entry<About> {
