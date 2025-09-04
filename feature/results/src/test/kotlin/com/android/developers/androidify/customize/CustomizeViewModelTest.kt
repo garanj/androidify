@@ -17,7 +17,6 @@
 
 package com.android.developers.androidify.customize
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
@@ -108,7 +107,6 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
-
 
         viewModel.downloadClicked()
         assertNotNull(values.last().externalOriginalSavedUri)

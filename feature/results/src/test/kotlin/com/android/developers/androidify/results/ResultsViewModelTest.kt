@@ -17,13 +17,11 @@
 
 package com.android.developers.androidify.results
 
-import android.graphics.Bitmap
 import android.net.Uri
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
-import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -41,7 +39,7 @@ class ResultsViewModelTest {
 
     @Test
     fun stateInitialEmpty() = runTest {
-        val viewModel = ResultsViewModel(null,null,null)
+        val viewModel = ResultsViewModel(null, null, null)
         assertEquals(
             ResultState(),
             viewModel.state.value,
@@ -50,7 +48,7 @@ class ResultsViewModelTest {
 
     @Test
     fun setArgumentsWithOriginalImage_isCorrect() = runTest {
-        val viewModel = ResultsViewModel(fakeUri,originalFakeUri,null)
+        val viewModel = ResultsViewModel(fakeUri, originalFakeUri, null)
         assertEquals(
             ResultState(
                 resultImageUri = fakeUri,
@@ -62,7 +60,7 @@ class ResultsViewModelTest {
 
     @Test
     fun initialState_withPrompt_isCorrect() = runTest {
-        val viewModel = ResultsViewModel(fakeUri,null,fakePromptText)
+        val viewModel = ResultsViewModel(fakeUri, null, fakePromptText)
         assertEquals(
             ResultState(
                 resultImageUri = fakeUri,

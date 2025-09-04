@@ -29,7 +29,7 @@ data object Home : NavigationRoute
 @Serializable
 data class Create(
     @Serializable(with = UriSerializer::class) val fileName: Uri? = null,
-    val prompt: String? = null
+    val prompt: String? = null,
 ) : NavigationRoute
 
 @Serializable
@@ -49,7 +49,7 @@ object About : NavigationRoute
 data class Result(
     @Serializable(with = UriSerializer::class) val resultImageUri: Uri,
     @Serializable(with = UriSerializer::class) val originalImageUri: Uri? = null,
-    val prompt: String? = null
+    val prompt: String? = null,
 ) : NavigationRoute
 
 /**
@@ -61,5 +61,5 @@ data class Result(
 @Serializable
 data class CustomizeExport(
     @Serializable(with = UriSerializer::class) val resultImageUri: Uri,
-    @Serializable(with = UriSerializer::class) val originalImageUri: Uri?
+    @Serializable(with = UriSerializer::class) val originalImageUri: Uri?,
 ) : NavigationRoute
