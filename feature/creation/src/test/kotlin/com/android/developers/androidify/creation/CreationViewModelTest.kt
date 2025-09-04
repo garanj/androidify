@@ -50,11 +50,10 @@ class CreationViewModelTest {
 
     private val internetConnectivityManager = TestInternetConnectivityManager(true)
     private val imageGenerationRepository = FakeImageGenerationRepository()
+    private val fakeUri = Uri.parse("content://test/image.jpg")
 
-    private val fakeUri = Uri.parse("test.jpeg")
     @Before
     fun setup() {
-        val fakeUri = Uri.parse("content://test/image.jpg")
         viewModel = CreationViewModel(
             originalImageUrl = fakeUri,
             internetConnectivityManager,
@@ -81,6 +80,7 @@ class CreationViewModelTest {
     @Test
     fun stateInitialEdit_WithOutImage() = runTest {
         viewModel = CreationViewModel(
+            null,
             internetConnectivityManager,
             imageGenerationRepository,
             TestTextGenerationRepository(),
@@ -93,7 +93,7 @@ class CreationViewModelTest {
             viewModel.uiState.value.screenState,
         )
         assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
-        assertEquals(null, viewModel.uiState.value.imageUri)
+        assertEquals( null, viewModel.uiState.value.imageUri)
     }
 
     @Test
