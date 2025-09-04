@@ -26,6 +26,10 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
+import com.android.developers.androidify.watchface.WatchFaceAsset
+import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepository
+import com.android.developers.androidify.wear.common.WatchFaceInstallError
+import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject

@@ -18,8 +18,6 @@
 package com.android.developers.androidify.customize
 
 import android.Manifest
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -486,7 +484,7 @@ fun CustomizeExportPreview() {
                     hasAndroidify = true,
                 )
                 val state = CustomizeExportState(
-                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
+                    exportImageCanvas = ExportImageCanvas(imageUri = imageUri),
                     connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
