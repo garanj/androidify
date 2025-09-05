@@ -26,8 +26,8 @@ import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.data.ImageGenerationRepository
+import com.android.developers.androidify.util.LocalFileProvider
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -78,8 +78,6 @@ class CustomizeExportViewModel @Inject constructor(
 
         _state.update {
             CustomizeExportState(
-                originalImageUrl = originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
                 toolState = mapOf(
                     CustomizeTool.Size to AspectRatioToolState(),
                     CustomizeTool.Background to BackgroundToolState(
