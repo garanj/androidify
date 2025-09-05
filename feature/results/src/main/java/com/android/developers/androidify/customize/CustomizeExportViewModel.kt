@@ -88,7 +88,6 @@ class CustomizeExportViewModel @Inject constructor(
         }
     }
 
-
     override fun onCleared() {
         super.onCleared()
     }
@@ -152,7 +151,7 @@ class CustomizeExportViewModel @Inject constructor(
                 snackbarHostState.value.showSnackbar("Background removal failed")
                 _state.update {
                     val aspectRatioToolState = (it.toolState[CustomizeTool.Size] as AspectRatioToolState)
-                        .copy(selectedToolOption =  previousSizeOption)
+                        .copy(selectedToolOption = previousSizeOption)
                     it.copy(
                         toolState = it.toolState + (CustomizeTool.Size to aspectRatioToolState),
                         showImageEditProgress = false,
@@ -193,7 +192,7 @@ class CustomizeExportViewModel @Inject constructor(
             is SizeOption -> {
                 val selectedSizeOption = toolState.selectedToolOption as SizeOption
                 val needsBackgroundRemoval = selectedSizeOption == SizeOption.Sticker &&
-                        state.value.exportImageCanvas.imageBitmapRemovedBackground == null
+                    state.value.exportImageCanvas.imageBitmapRemovedBackground == null
 
                 val imageBitmap = state.value.exportImageCanvas.imageBitmap
                 if (needsBackgroundRemoval && imageBitmap != null) {
@@ -246,7 +245,8 @@ class CustomizeExportViewModel @Inject constructor(
             _state.update { it.copy(showImageEditProgress = true) }
             try {
                 val bitmap = imageGenerationRepository.addBackgroundToBot(
-                    image, backgroundOption.prompt,
+                    image,
+                    backgroundOption.prompt,
                 )
                 _state.update {
                     it.copy(

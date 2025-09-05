@@ -100,7 +100,8 @@ class CustomizeViewModelTest {
         )
         viewModel.setArguments(
             fakeBitmap,
-            null)
+            null,
+        )
         assertEquals(
             CustomizeExportState(
                 exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
@@ -160,7 +161,7 @@ class CustomizeViewModelTest {
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
             remoteConfigDataSource = TestRemoteConfigDataSource(false),
-            )
+        )
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
         backgroundScope.launch(UnconfinedTestDispatcher()) {
@@ -229,8 +230,10 @@ class CustomizeViewModelTest {
             localFileProvider = TestFileProvider(),
             remoteConfigDataSource = remoteConfigDataSource,
         )
-        viewModel.setArguments(fakeBitmap,
-            null)
+        viewModel.setArguments(
+            fakeBitmap,
+            null,
+        )
         val state = viewModel.state.value.toolState[CustomizeTool.Background] as BackgroundToolState
 
         assertTrue(state.options.size > 5)
