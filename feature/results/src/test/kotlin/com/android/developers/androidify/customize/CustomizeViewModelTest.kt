@@ -56,8 +56,6 @@ class CustomizeViewModelTest {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = false
         viewModel = CustomizeExportViewModel(
-            fakeUri,
-            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
@@ -94,15 +92,15 @@ class CustomizeViewModelTest {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = false
         val viewModel = CustomizeExportViewModel(
-        viewModel.setArguments(
-            fakeBitmap,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
             remoteConfigDataSource = remoteConfigDataSource,
         )
+        viewModel.setArguments(
+            fakeBitmap,
+            null)
         assertEquals(
             CustomizeExportState(
                 exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
@@ -225,14 +223,14 @@ class CustomizeViewModelTest {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = true
         val viewModel = CustomizeExportViewModel(
-            fakeBitmap,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
             remoteConfigDataSource = remoteConfigDataSource,
         )
+        viewModel.setArguments(fakeBitmap,
+            null)
         val state = viewModel.state.value.toolState[CustomizeTool.Background] as BackgroundToolState
 
         assertTrue(state.options.size > 5)
