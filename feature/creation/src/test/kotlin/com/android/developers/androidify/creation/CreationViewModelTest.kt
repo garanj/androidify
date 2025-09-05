@@ -50,7 +50,6 @@ class CreationViewModelTest {
 
     private val internetConnectivityManager = TestInternetConnectivityManager(true)
     private val imageGenerationRepository = FakeImageGenerationRepository()
-    private val fakeUri = Uri.parse("content://test/image.jpg")
 
     @Before
     fun setup() {
