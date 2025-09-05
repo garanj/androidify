@@ -24,6 +24,7 @@ interface RemoteConfigDataSource {
     fun isAppInactive(): Boolean
     fun textModelName(): String
     fun imageModelName(): String
+    fun isBackgroundVibesFeatureEnabled(): Boolean
     fun promptTextVerify(): String
     fun promptImageValidation(): String
     fun promptImageDescription(): String
@@ -60,6 +61,10 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
 
     override fun imageModelName(): String {
         return remoteConfig.getString("image_model_name")
+    }
+
+    override fun isBackgroundVibesFeatureEnabled(): Boolean {
+        return remoteConfig.getBoolean("background_vibes_feature_enabled")
     }
 
     override fun promptTextVerify(): String {

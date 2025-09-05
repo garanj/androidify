@@ -21,6 +21,7 @@ import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
 import com.android.developers.testing.data.bitmapSample
+import com.android.developers.testing.network.TestRemoteConfigDataSource
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.repository.FakeWatchFaceInstallationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
@@ -54,6 +55,8 @@ class CustomizeViewModelTest {
 
     @Before
     fun setup() {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = false
         viewModel = CustomizeExportViewModel(
             fakeUri,
             originalFakeUri,
@@ -62,6 +65,7 @@ class CustomizeViewModelTest {
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = remoteConfigDataSource,
         )
     }
 
@@ -94,6 +98,8 @@ class CustomizeViewModelTest {
 
     @Test
     fun setArgumentsWithPrompt() = runTest {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = false
         val initialState = viewModel.state.value
 
         val viewModel = CustomizeExportViewModel(
@@ -104,6 +110,7 @@ class CustomizeViewModelTest {
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
+            remoteConfigDataSource = remoteConfigDataSource,
         )
 
         // Ensure state has changed - view model uses combine to combine state flows so state
@@ -162,6 +169,7 @@ class CustomizeViewModelTest {
             watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = TestRemoteConfigDataSource(false),
         )
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
@@ -210,5 +218,29 @@ class CustomizeViewModelTest {
         advanceUntilIdle()
         assertTrue { !values[values.lastIndex].showImageEditProgress }
         assertNull(values.last().exportImageCanvas.imageWithEdit)
+    }
+
+    @Test
+    fun remoteConfigDataSource_BackgroundVibesFeatureEnabled_ContainsVibeList() = runTest {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = true
+        val viewModel = CustomizeExportViewModel(
+            fakeUri,
+            null,
+            FakeImageGenerationRepository(),
+            composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
+            remoteConfigDataSource = remoteConfigDataSource,
+        )
+
+        val initialState = viewModel.state.value
+        val newState = viewModel.state.first { it != initialState }
+
+        val toolState = newState.toolState[CustomizeTool.Background] as BackgroundToolState
+
+        assertTrue(toolState.options.size > 5)
+        assertTrue(toolState.options.any { it.aiBackground })
     }
 }

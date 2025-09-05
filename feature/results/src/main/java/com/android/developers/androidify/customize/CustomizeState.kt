@@ -66,16 +66,6 @@ data class BackgroundToolState(
         BackgroundOption.Plain,
         BackgroundOption.Lightspeed,
         BackgroundOption.IO,
-        BackgroundOption.MusicLover,
-        BackgroundOption.PoolMaven,
-        BackgroundOption.SoccerFanatic,
-        BackgroundOption.StarGazer,
-        BackgroundOption.FitnessBuff,
-        BackgroundOption.Fandroid,
-        BackgroundOption.GreenThumb,
-        BackgroundOption.Gamer,
-        BackgroundOption.Jetsetter,
-        BackgroundOption.Chef,
     ),
 ) : ToolState
 
