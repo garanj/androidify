@@ -30,12 +30,9 @@ The app combines a variety of different Google technologies, such as:
    generate a `google-services.json` file.
    Place the file in the app folder: `app/google-services.json`. Be sure to enable [Vertex AI API](https://console.cloud.google.com/apis/library/aiplatform.googleapis.com).
    Ensure to also enable [AppCheck](https://console.firebase.google.com/project/_/appcheck) on your Firebase project to prevent API abuse.
-
-3. This project makes use of remote config on Firebase too, you can import the [Firebase Remote config](https://firebase.google.com/docs/remote-config) settings from 
+3. In [`remote_config_defaults.xml`](core/network/src/main/res/xml/remote_config_defaults.xml), update the value of [`use_imagen`](core/network/src/main/res/xml/remote_config_defaults.xml#L40) to `true`. 
+4. This project makes use of remote config on Firebase too, you can import the [Firebase Remote config](https://firebase.google.com/docs/remote-config) settings from 
 [`remote_config_defaults.xml`](core/network/src/main/res/xml/remote_config_defaults.xml)
-
-4. In [`remote_config_defaults.xml`](core/network/src/main/res/xml/remote_config_defaults.xml), update the value of [`use_imagen`](core/network/src/main/res/xml/remote_config_defaults.xml#L40) to `true`. 
-
 5. If you'd like to change the font that the app renders with, an optional spec can be placed in
    `~/.gradle/gradle.properties` file:
 
