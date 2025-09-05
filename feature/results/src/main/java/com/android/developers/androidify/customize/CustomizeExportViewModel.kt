@@ -95,9 +95,9 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 toolState = mapOf(
                     CustomizeTool.Size to AspectRatioToolState(),
                     CustomizeTool.Background to BackgroundToolState(
-                        options = backgrounds
+                        options = backgrounds,
                     ),
-                )
+                ),
             )
         }
         loadInitialBitmap(resultImageUrl)

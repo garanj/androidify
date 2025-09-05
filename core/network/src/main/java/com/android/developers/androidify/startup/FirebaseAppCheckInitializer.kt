@@ -36,13 +36,13 @@ class FirebaseAppCheckInitializer : Initializer<FirebaseAppCheck> {
             if (BuildConfig.DEBUG) {
                 Log.i("AndroidifyAppCheck", "Firebase debug")
                 installAppCheckProviderFactory(
-                    DebugAppCheckProviderFactory.getInstance()
+                    DebugAppCheckProviderFactory.getInstance(),
                 )
             } else {
                 Log.i("AndroidifyAppCheck", "Play integrity")
                 installAppCheckProviderFactory(
                     PlayIntegrityAppCheckProviderFactory.getInstance(),
-                    )
+                )
             }
         }
     }

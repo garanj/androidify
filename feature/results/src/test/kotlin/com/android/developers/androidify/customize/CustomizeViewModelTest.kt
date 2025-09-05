@@ -21,6 +21,7 @@ import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
 import com.android.developers.testing.data.bitmapSample
+import com.android.developers.testing.network.TestRemoteConfigDataSource
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
@@ -52,6 +53,8 @@ class CustomizeViewModelTest {
 
     @Before
     fun setup() {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = false
         viewModel = CustomizeExportViewModel(
             fakeUri,
             originalFakeUri,
@@ -59,6 +62,7 @@ class CustomizeViewModelTest {
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = remoteConfigDataSource,
         )
     }
 
@@ -82,6 +86,8 @@ class CustomizeViewModelTest {
 
     @Test
     fun setArgumentsWithPrompt() = runTest {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = false
         val viewModel = CustomizeExportViewModel(
             fakeUri,
             null,
@@ -89,6 +95,7 @@ class CustomizeViewModelTest {
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = remoteConfigDataSource,
         )
         assertEquals(
             CustomizeExportState(
@@ -141,6 +148,7 @@ class CustomizeViewModelTest {
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = TestRemoteConfigDataSource(false),
         )
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
@@ -189,5 +197,24 @@ class CustomizeViewModelTest {
         advanceUntilIdle()
         assertTrue { !values[values.lastIndex].showImageEditProgress }
         assertNull(values.last().exportImageCanvas.imageWithEdit)
+    }
+
+    @Test
+    fun remoteConfigDataSource_BackgroundVibesFeatureEnabled_ContainsVibeList() = runTest {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = true
+        val viewModel = CustomizeExportViewModel(
+            fakeUri,
+            null,
+            FakeImageGenerationRepository(),
+            composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = remoteConfigDataSource,
+        )
+        val state = viewModel.state.value.toolState[CustomizeTool.Background] as BackgroundToolState
+
+        assertTrue(state.options.size > 5)
+        assertTrue(state.options.any { it.aiBackground })
     }
 }

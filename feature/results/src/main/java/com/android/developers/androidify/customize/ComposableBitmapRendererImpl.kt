@@ -22,7 +22,6 @@ import android.content.Context.DISPLAY_SERVICE
 import android.graphics.Bitmap
 import android.graphics.SurfaceTexture
 import android.hardware.display.DisplayManager
-import android.hardware.display.VirtualDisplay
 import android.view.Display
 import android.view.Surface
 import android.view.ViewGroup

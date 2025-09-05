@@ -493,8 +493,8 @@ private fun MainCreationPane(
                     // Workaround for https://issuetracker.google.com/432431393
                     val showTextPrompt by remember {
                         derivedStateOf {
-                            pagerState.currentPage == PromptType.TEXT.ordinal
-                                    && pagerState.targetPage == pagerState.currentPage
+                            pagerState.currentPage == PromptType.TEXT.ordinal &&
+                                pagerState.targetPage == pagerState.currentPage
                         }
                     }
                     if (showTextPrompt) {

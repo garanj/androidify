@@ -60,7 +60,7 @@ data class BackgroundToolState(
         BackgroundOption.None,
         BackgroundOption.Plain,
         BackgroundOption.Lightspeed,
-        BackgroundOption.IO
+        BackgroundOption.IO,
     ),
 ) : ToolState
 
