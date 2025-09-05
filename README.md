@@ -34,7 +34,7 @@ The app combines a variety of different Google technologies, such as:
 1. This project makes use of remote config on Firebase too, you can import the [Firebase Remote config](https://firebase.google.com/docs/remote-config) settings from 
 [`remote_config_defaults.xml`](core/network/src/main/res/xml/remote_config_defaults.xml)
 
-1. In [`remote_config_defaults.xml`](core/network/src/main/res/xml/remote_config_defaults.xml), update the value of `use_imagen`[core/network/src/main/res/xml/remote_config_defaults.xml#L40] to `true`. 
+1. In [`remote_config_defaults.xml`](core/network/src/main/res/xml/remote_config_defaults.xml), update the value of [`use_imagen`](core/network/src/main/res/xml/remote_config_defaults.xml#L40) to `true`. 
 
 1. If you'd like to change the font that the app renders with, an optional spec can be placed in
    `~/.gradle/gradle.properties` file:
