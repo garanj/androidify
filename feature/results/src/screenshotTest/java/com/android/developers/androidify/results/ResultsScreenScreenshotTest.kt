@@ -29,7 +29,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.core.net.toUri
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.util.AdaptivePreview
 import com.android.developers.androidify.util.SmallPhonePreview
@@ -44,7 +43,7 @@ class ResultsScreenScreenshotTest {
         val state = remember {
             mutableStateOf(
                 ResultState(
-                    resultImageUri = "test://mockbitmap/${mockBitmap.hashCode()}".toUri(),
+                    resultImageBitmap = mockBitmap,
                     promptText = "wearing a hat with straw hair",
                 ),
             )
@@ -69,7 +68,7 @@ class ResultsScreenScreenshotTest {
         val state = remember {
             mutableStateOf(
                 ResultState(
-                    resultImageUri = "test://mockbitmap/${mockBitmap.hashCode()}".toUri(),
+                    resultImageBitmap = mockBitmap,
                     promptText = "wearing a hat with straw hair",
                 ),
             )
@@ -93,7 +92,7 @@ class ResultsScreenScreenshotTest {
         val state = remember {
             mutableStateOf(
                 ResultState(
-                    resultImageUri = "test://mockbitmap/${mockBitmap.hashCode()}".toUri(),
+                    resultImageBitmap = mockBitmap,
                     promptText = "wearing a hat with straw hair",
                 ),
             )

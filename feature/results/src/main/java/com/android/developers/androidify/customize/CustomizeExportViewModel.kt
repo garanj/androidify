@@ -27,34 +27,22 @@ import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
-class CustomizeExportViewModel @AssistedInject constructor(
-    @Assisted("resultImageUrl") val resultImageUrl: Uri,
-    @Assisted("originalImageUrl") val originalImageUrl: Uri?,
+@HiltViewModel
+class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
     val localFileProvider: LocalFileProvider,
     val remoteConfigDataSource: RemoteConfigDataSource,
     application: Application,
 ) : AndroidViewModel(application) {
-
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted("resultImageUrl") resultImageUrl: Uri,
-            @Assisted("originalImageUrl")originalImageUrl: Uri?,
-        ): CustomizeExportViewModel
-    }
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state = _state.asStateFlow()
@@ -89,9 +77,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
         }
 
         _state.update {
-            it.copy(
-                originalImageUrl = originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
+            CustomizeExportState(
                 toolState = mapOf(
                     CustomizeTool.Size to AspectRatioToolState(),
                     CustomizeTool.Background to BackgroundToolState(
@@ -100,11 +86,22 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 ),
             )
         }
-        loadInitialBitmap(resultImageUrl)
     }
 
     override fun onCleared() {
         super.onCleared()
+    }
+
+    fun setArguments(
+        resultImageUrl: Bitmap,
+        originalImageUrl: Uri?,
+    ) {
+        _state.update {
+            _state.value.copy(
+                originalImageUrl,
+                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl),
+            )
+        }
     }
 
     fun shareClicked() {
@@ -239,6 +236,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 }
                 return@launch
             }
+
             val image = state.value.exportImageCanvas.imageBitmap
             if (image == null) {
                 return@launch
@@ -294,21 +292,6 @@ class CustomizeExportViewModel @AssistedInject constructor(
     fun changeSelectedTool(tool: CustomizeTool) {
         _state.update {
             it.copy(selectedTool = tool)
-        }
-    }
-
-    private fun loadInitialBitmap(uri: Uri) {
-        viewModelScope.launch {
-            try {
-                val bitmap = localFileProvider.loadBitmapFromUri(uri)
-                _state.update {
-                    it.copy(
-                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap),
-                    )
-                }
-            } catch (e: Exception) {
-                _snackbarHostState.value.showSnackbar("Could not load image.")
-            }
         }
     }
 }

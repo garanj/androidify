@@ -17,10 +17,10 @@
 
 package com.android.developers.androidify.customize
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
-import com.android.developers.testing.data.bitmapSample
 import com.android.developers.testing.network.TestRemoteConfigDataSource
 import com.android.developers.testing.repository.FakeImageGenerationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
@@ -47,17 +47,15 @@ class CustomizeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: CustomizeExportViewModel
-    private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
-    private val fakeUri = Uri.parse("content://com.example.app/images/original.jpg")
+    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
     @Before
     fun setup() {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = false
         viewModel = CustomizeExportViewModel(
-            fakeUri,
-            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
@@ -67,17 +65,22 @@ class CustomizeViewModelTest {
     }
 
     @Test
-    fun stateResultUri_NotNull() = runTest {
-        assertNotNull(
-            viewModel.state.value.exportImageCanvas.imageUri,
+    fun stateInitialEmpty() = runTest {
+        assertEquals(
+            CustomizeExportState(),
+            viewModel.state.value,
         )
     }
 
     @Test
     fun setArgumentsWithOriginalImage() = runTest {
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
+                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
                 originalImageUrl = originalFakeUri,
             ),
             viewModel.state.value,
@@ -89,17 +92,19 @@ class CustomizeViewModelTest {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = false
         val viewModel = CustomizeExportViewModel(
-            fakeUri,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
             remoteConfigDataSource = remoteConfigDataSource,
         )
+        viewModel.setArguments(
+            fakeBitmap,
+            null,
+        )
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
+                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
                 originalImageUrl = null,
             ),
             viewModel.state.value,
@@ -114,6 +119,11 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
 
         viewModel.downloadClicked()
         assertNotNull(values.last().externalOriginalSavedUri)
@@ -132,6 +142,10 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         advanceUntilIdle()
         viewModel.shareClicked()
         // Ensure all coroutines on the test scheduler complete
@@ -142,8 +156,6 @@ class CustomizeViewModelTest {
     @Test
     fun changeBackground_NotNull() = runTest {
         val viewModel = CustomizeExportViewModel(
-            fakeUri,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
@@ -157,6 +169,10 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -183,6 +199,10 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -204,13 +224,15 @@ class CustomizeViewModelTest {
         val remoteConfigDataSource = TestRemoteConfigDataSource(true)
         remoteConfigDataSource.backgroundVibeEnabled = true
         val viewModel = CustomizeExportViewModel(
-            fakeUri,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
             remoteConfigDataSource = remoteConfigDataSource,
+        )
+        viewModel.setArguments(
+            fakeBitmap,
+            null,
         )
         val state = viewModel.state.value.toolState[CustomizeTool.Background] as BackgroundToolState
 
