@@ -24,6 +24,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
 import dagger.assisted.Assisted
@@ -43,6 +44,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
     val localFileProvider: LocalFileProvider,
+    val remoteConfigDataSource: RemoteConfigDataSource,
     application: Application,
 ) : AndroidViewModel(application) {
 
@@ -63,10 +65,39 @@ class CustomizeExportViewModel @AssistedInject constructor(
         get() = _snackbarHostState
 
     init {
+        val enableBackgroundVibes = remoteConfigDataSource.isBackgroundVibesFeatureEnabled()
+        var backgrounds = mutableListOf(
+            BackgroundOption.None,
+            BackgroundOption.Plain,
+            BackgroundOption.Lightspeed,
+            BackgroundOption.IO,
+        )
+        if (enableBackgroundVibes) {
+            val backgroundVibes = listOf(
+                BackgroundOption.MusicLover,
+                BackgroundOption.PoolMaven,
+                BackgroundOption.SoccerFanatic,
+                BackgroundOption.StarGazer,
+                BackgroundOption.FitnessBuff,
+                BackgroundOption.Fandroid,
+                BackgroundOption.GreenThumb,
+                BackgroundOption.Gamer,
+                BackgroundOption.Jetsetter,
+                BackgroundOption.Chef,
+            )
+            backgrounds.addAll(backgroundVibes)
+        }
+
         _state.update {
             it.copy(
                 originalImageUrl = originalImageUrl,
                 exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
+                toolState = mapOf(
+                    CustomizeTool.Size to AspectRatioToolState(),
+                    CustomizeTool.Background to BackgroundToolState(
+                        options = backgrounds,
+                    ),
+                ),
             )
         }
         loadInitialBitmap(resultImageUrl)

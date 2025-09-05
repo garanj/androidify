@@ -72,7 +72,7 @@ class CreationViewModelTest {
             viewModel.uiState.value.screenState,
         )
         assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
-        assertEquals( fakeUri, viewModel.uiState.value.imageUri)
+        assertEquals(fakeUri, viewModel.uiState.value.imageUri)
     }
 
     @Test
@@ -91,7 +91,7 @@ class CreationViewModelTest {
             viewModel.uiState.value.screenState,
         )
         assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
-        assertEquals( null, viewModel.uiState.value.imageUri)
+        assertEquals(null, viewModel.uiState.value.imageUri)
     }
 
     @Test
