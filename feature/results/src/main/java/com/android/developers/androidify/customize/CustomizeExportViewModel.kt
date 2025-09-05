@@ -97,7 +97,7 @@ class CustomizeExportViewModel @Inject constructor(
         originalImageUrl: Uri?,
     ) {
         _state.update {
-            CustomizeExportState(
+            _state.value.copy(
                 originalImageUrl,
                 exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl),
             )
