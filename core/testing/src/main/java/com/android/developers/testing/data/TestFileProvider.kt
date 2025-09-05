@@ -66,6 +66,6 @@ class TestFileProvider : LocalFileProvider {
     }
 
     override suspend fun loadBitmapFromUri(uri: Uri): Bitmap? {
-        return bitmapSample
+        TODO("Not yet implemented")
     }
 }
