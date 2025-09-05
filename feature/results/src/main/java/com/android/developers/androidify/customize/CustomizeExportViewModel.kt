@@ -16,7 +16,6 @@
 package com.android.developers.androidify.customize
 
 import android.app.Application
-import android.graphics.Bitmap
 import android.net.Uri
 import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
@@ -31,11 +30,13 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
 class CustomizeExportViewModel @AssistedInject constructor(
@@ -89,7 +90,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
         }
 
         _state.update {
-            it.copy(
+            CustomizeExportState(
                 originalImageUrl = originalImageUrl,
                 exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
                 toolState = mapOf(
@@ -100,7 +101,6 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 ),
             )
         }
-        loadInitialBitmap(resultImageUrl)
     }
 
 
@@ -252,7 +252,8 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 }
                 return@launch
             }
-            val image = state.value.exportImageCanvas.imageBitmap
+
+            val image = state.value.exportImageCanvas.imageUri?.let { uri -> localFileProvider.loadBitmapFromUri(uri) }
             if (image == null) {
                 return@launch
             }
@@ -306,21 +307,6 @@ class CustomizeExportViewModel @AssistedInject constructor(
     fun changeSelectedTool(tool: CustomizeTool) {
         _state.update {
             it.copy(selectedTool = tool)
-        }
-    }
-
-    private fun loadInitialBitmap(uri: Uri) {
-        viewModelScope.launch {
-            try {
-                val bitmap = localFileProvider.loadBitmapFromUri(uri)
-                _state.update {
-                    it.copy(
-                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap)
-                    )
-                }
-            } catch (e: Exception) {
-                _snackbarHostState.value.showSnackbar("Could not load image.")
-            }
         }
     }
 }
