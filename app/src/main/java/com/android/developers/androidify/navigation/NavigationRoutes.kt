@@ -33,9 +33,3 @@ object Camera : NavigationRoute
 
 @Serializable
 object About : NavigationRoute
-
-@Serializable
-data class ImageResult(val originalImageUri: String? = null, val prompt: String? = null, val result: String) : NavigationRoute
-
-@Serializable
-data class ShareResult(val resultUri: String, val originalImageUri: String?) : NavigationRoute

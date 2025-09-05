@@ -135,7 +135,7 @@ class CreationViewModelTest {
         viewModel.onSelectedPromptOptionChanged(PromptType.PHOTO)
         viewModel.startClicked()
         assertEquals(ScreenState.RESULT, viewModel.uiState.value.screenState)
-        assertNotNull(viewModel.uiState.value.resultBitmapUri)
+        assertNotNull(viewModel.uiState.value.resultBitmap)
     }
 
     @Test
@@ -196,7 +196,7 @@ class CreationViewModelTest {
         }
         viewModel.startClicked()
         assertEquals(ScreenState.RESULT, viewModel.uiState.value.screenState)
-        assertNotNull(viewModel.uiState.value.resultBitmapUri)
+        assertNotNull(viewModel.uiState.value.resultBitmap)
     }
 
     @Test
