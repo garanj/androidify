@@ -30,6 +30,10 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
         TODO("Not yet implemented")
     }
 
+    override fun isBackgroundVibesFeatureEnabled(): Boolean {
+        return true
+    }
+
     override fun promptTextVerify(): String {
         TODO("Not yet implemented")
     }
