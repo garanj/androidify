@@ -93,16 +93,20 @@ import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
 import com.google.accompanist.permissions.shouldShowRationale
 import com.android.developers.androidify.theme.R as ThemeR
-import android.content.ContentResolver
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomizeAndExportScreen(
+    resultImageUri: Uri,
+    originalImageUri: Uri?,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
     isMediumWindowSize: Boolean = isAtLeastMedium(),
-    viewModel: CustomizeExportViewModel,
+    viewModel: CustomizeExportViewModel = hiltViewModel<CustomizeExportViewModel>(),
 ) {
+    LaunchedEffect(resultImageUri, originalImageUri) {
+        viewModel.setArguments(resultImageUri, originalImageUri)
+    }
     val state = viewModel.state.collectAsStateWithLifecycle()
     val context = LocalContext.current
     LaunchedEffect(state.value.savedUri) {
@@ -426,7 +430,7 @@ fun CustomizeExportPreview() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+                val imageUri = ("android.resource://com.android.developers.androidify.results/" + R.drawable.placeholderbot).toUri()
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(imageUri = imageUri),
                 )
@@ -453,7 +457,7 @@ fun CustomizeExportPreviewLarge() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+                val imageUri = ("android.resource://com.android.developers.androidify.results/" + R.drawable.placeholderbot).toUri()
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
                         imageUri = imageUri,

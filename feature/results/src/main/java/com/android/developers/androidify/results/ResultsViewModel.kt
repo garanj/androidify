@@ -19,9 +19,6 @@ import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
@@ -29,21 +26,9 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = ResultsViewModel.Factory::class)
-class ResultsViewModel @AssistedInject constructor(
-    @Assisted("resultImageUrl") val resultImageUrl: Uri?,
-    @Assisted("originalImageUrl") val originalImageUrl: Uri?,
-    @Assisted("promptText") val promptText: String?
-) : ViewModel() {
+@HiltViewModel
+class ResultsViewModel @Inject constructor() : ViewModel() {
 
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted("resultImageUrl") resultImageUrl: Uri?,
-            @Assisted("originalImageUrl") originalImageUrl: Uri?,
-            @Assisted("promptText") promptText: String?,
-        ): ResultsViewModel
-    }
     private val _state = MutableStateFlow(ResultState())
     val state = _state.asStateFlow()
 
@@ -52,7 +37,11 @@ class ResultsViewModel @AssistedInject constructor(
     val snackbarHostState: StateFlow<SnackbarHostState>
         get() = _snackbarHostState
 
-    init{
+    fun setArguments(
+        resultImageUrl: Uri?,
+        originalImageUrl: Uri?,
+        promptText: String?,
+    ) {
         _state.update {
             ResultState(resultImageUrl, originalImageUrl, promptText = promptText)
         }

@@ -17,7 +17,6 @@
 
 package com.android.developers.androidify.navigation
 
-import android.net.Uri
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.Serializable
 
@@ -27,10 +26,7 @@ sealed interface NavigationRoute
 data object Home : NavigationRoute
 
 @Serializable
-data class Create(
-    @Serializable(with = UriSerializer::class) val fileName: Uri? = null,
-    val prompt: String? = null
-) : NavigationRoute
+data class Create(val fileName: String? = null, val prompt: String? = null) : NavigationRoute
 
 @Serializable
 object Camera : NavigationRoute
@@ -38,28 +34,8 @@ object Camera : NavigationRoute
 @Serializable
 object About : NavigationRoute
 
-/**
- * Represents the result of an image generation process, used for navigation.
- *
- * @param resultImageUri The URI of the generated image.
- * @param originalImageUri The URI of the original image used as a base for generation, if any.
- * @param prompt The text prompt used to generate the image, if any.
- */
 @Serializable
-data class Result(
-    @Serializable(with = UriSerializer::class) val resultImageUri: Uri,
-    @Serializable(with = UriSerializer::class) val originalImageUri: Uri? = null,
-    val prompt: String? = null
-) : NavigationRoute
+data class ImageResult(val originalImageUri: String? = null, val prompt: String? = null, val result: String) : NavigationRoute
 
-/**
- * Represents the navigation route to the screen for customizing and exporting a generated image.
- *
- * @param resultImageUri The URI of the generated image to be customized.
- * @param originalImageUri The URI of the original image, passed along for context.
- */
 @Serializable
-data class CustomizeExport(
-    @Serializable(with = UriSerializer::class) val resultImageUri: Uri,
-    @Serializable(with = UriSerializer::class) val originalImageUri: Uri?
-) : NavigationRoute
+data class ShareResult(val resultUri: String, val originalImageUri: String?) : NavigationRoute

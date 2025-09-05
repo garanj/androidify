@@ -33,9 +33,6 @@ import com.android.developers.androidify.data.InternetConnectivityManager
 import com.android.developers.androidify.data.NoInternetException
 import com.android.developers.androidify.data.TextGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
-import dagger.assisted.Assisted
-import dagger.assisted.AssistedFactory
-import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -45,9 +42,8 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = CreationViewModel.Factory::class)
-class CreationViewModel @AssistedInject constructor(
-    @Assisted("originalImageUrl") originalImageUrl: Uri?,
+@HiltViewModel
+class CreationViewModel @Inject constructor(
     val internetConnectivityManager: InternetConnectivityManager,
     val imageGenerationRepository: ImageGenerationRepository,
     val textGenerationRepository: TextGenerationRepository,
@@ -57,9 +53,11 @@ class CreationViewModel @AssistedInject constructor(
     val context: Context,
 ) : ViewModel() {
 
-    @AssistedFactory
-    interface Factory {
-        fun create(@Assisted("originalImageUrl") originalImageUrl: Uri?): CreationViewModel
+    init {
+        viewModelScope.launch {
+            imageGenerationRepository.initialize()
+            textGenerationRepository.initialize()
+        }
     }
 
     private var _uiState = MutableStateFlow(CreationState())
@@ -74,14 +72,6 @@ class CreationViewModel @AssistedInject constructor(
 
     private var promptGenerationJob: Job? = null
     private var imageGenerationJob: Job? = null
-
-    init {
-        onImageSelected(originalImageUrl)
-        viewModelScope.launch {
-            imageGenerationRepository.initialize()
-            textGenerationRepository.initialize()
-        }
-    }
 
     fun onImageSelected(uri: Uri?) {
         _uiState.update {
@@ -162,10 +152,7 @@ class CreationViewModel @AssistedInject constructor(
                         )
                     }
                     _uiState.update {
-                        it.copy(
-                            resultBitmapUri = imageGenerationRepository.saveImage(bitmap),
-                            screenState = ScreenState.EDIT
-                        )
+                        it.copy(resultBitmapUri = imageGenerationRepository.saveImage(bitmap), screenState = ScreenState.RESULT)
                     }
                 } catch (e: Exception) {
                     handleImageGenerationError(e)
@@ -230,15 +217,15 @@ class CreationViewModel @AssistedInject constructor(
                 cancelInProgressTask()
             }
 
+            ScreenState.RESULT -> {
+                _uiState.update {
+                    it.copy(screenState = ScreenState.EDIT, resultBitmapUri = null)
+                }
+            }
+
             ScreenState.EDIT -> {
                 // do nothing, back press handled outside
             }
-        }
-    }
-
-    fun onResultDisplayed() {
-        _uiState.update {
-            it.copy(resultBitmapUri = null)
         }
     }
 }
@@ -258,6 +245,7 @@ data class CreationState(
 enum class ScreenState {
     EDIT,
     LOADING,
+    RESULT,
 }
 
 data class BotColor(

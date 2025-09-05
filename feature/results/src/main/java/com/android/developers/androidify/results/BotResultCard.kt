@@ -66,11 +66,11 @@ fun BotResultCard(
         flippableState = flippableState,
         onFlipStateChanged = onFlipStateChanged,
         front = {
-            FrontCard(resultImageUri)
+            ImageCard(resultImageUri, isBack = false)
         },
         back = {
             if (originalImageUrl != null) {
-                BackCard(originalImageUrl)
+                ImageCard(originalImageUrl, isBack = true)
             } else {
                 BackCardPrompt(promptText!!)
             }
@@ -79,24 +79,10 @@ fun BotResultCard(
 }
 
 @Composable
-private fun FrontCard(resultImageUri: Uri) {
-    AsyncImage(
-        model = resultImageUri,
-        contentDescription = stringResource(R.string.resultant_android_bot),
-        contentScale = ContentScale.Crop,
-        modifier = Modifier
-            .fillMaxSize()
-            .aspectRatio(BOT_ASPECT_RATIO)
-            .shadow(8.dp, shape = MaterialTheme.shapes.large)
-            .clip(MaterialTheme.shapes.large),
-    )
-}
-
-@Composable
-private fun BackCard(originalImageUrl: Uri) {
+private fun ImageCard(originalImageUrl: Uri, isBack: Boolean) {
     AsyncImage(
         model = originalImageUrl,
-        contentDescription = stringResource(R.string.original_image),
+        contentDescription = if (isBack)stringResource(R.string.original_image) else stringResource(R.string.resultant_android_bot),
         contentScale = ContentScale.Crop,
         modifier = Modifier
             .fillMaxSize()

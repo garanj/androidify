@@ -17,7 +17,6 @@
 
 package com.android.developers.androidify.results
 
-import android.content.ContentResolver
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseOutBack
@@ -44,6 +43,7 @@ import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -51,9 +51,11 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalInspectionMode
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -61,7 +63,7 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.core.net.toUri
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
@@ -72,23 +74,24 @@ import com.android.developers.androidify.util.SmallPhonePreview
 import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import androidx.core.net.toUri
 
 @Composable
 fun ResultsScreen(
-    /*resultImageUri: Uri,
+    resultImageUri: Uri,
     originalImageUri: Uri?,
-    promptText: String?,*/
+    promptText: String?,
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = allowsFullContent(),
     onBackPress: () -> Unit,
     onAboutPress: () -> Unit,
     onNextPress: (resultImageUri:Uri, originalImageUri:Uri?) -> Unit,
-    viewModel: ResultsViewModel,
+    viewModel: ResultsViewModel = hiltViewModel(),
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    /*LaunchedEffect(resultImageUri, originalImageUri, promptText) {
+    LaunchedEffect(resultImageUri, originalImageUri, promptText) {
         viewModel.setArguments(resultImageUri, originalImageUri, promptText)
-    }*/
+    }
     val snackbarHostState by viewModel.snackbarHostState.collectAsStateWithLifecycle()
     Scaffold(
         snackbarHost = {
@@ -119,12 +122,10 @@ fun ResultsScreen(
             state,
             verboseLayout = verboseLayout,
             onCustomizeShareClicked = {
-                viewModel.state.value.resultImageUri?.let {
-                    onNextPress(
-                        it,
-                        viewModel.state.value.originalImageUrl,
-                    )
-                }
+                onNextPress(
+                    resultImageUri,
+                    originalImageUri,
+                )
             },
         )
     }
@@ -136,7 +137,7 @@ fun ResultsScreen(
 @Composable
 private fun ResultsScreenPreview() {
     AndroidifyTheme {
-        val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+        val imageUri = ("android.resource://com.android.developers.androidify.results/" + R.drawable.placeholderbot).toUri()
         val state = remember {
             mutableStateOf(
                 ResultState(
@@ -158,7 +159,7 @@ private fun ResultsScreenPreview() {
 @Composable
 private fun ResultsScreenPreviewSmall() {
     AndroidifyTheme {
-        val imageUri = ("${ContentResolver.SCHEME_ANDROID_RESOURCE}://${LocalContext.current.packageName}/${R.drawable.placeholderbot}").toUri()
+        val imageUri = ("android.resource://com.android.developers.androidify.results/" + R.drawable.placeholderbot).toUri()
         val state = remember {
             mutableStateOf(
                 ResultState(
