@@ -15,6 +15,7 @@
  */
 package com.android.developers.androidify.results
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement

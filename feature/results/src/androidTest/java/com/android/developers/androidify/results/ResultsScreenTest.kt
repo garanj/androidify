@@ -15,6 +15,7 @@
  */
 package com.android.developers.androidify.results
 
+import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
@@ -173,6 +174,7 @@ class ResultsScreenTest {
         val photoOptionText = composeTestRule.activity.getString(R.string.photo)
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
         val testUri = android.net.Uri.parse("placeholder://image")
+
 
         val initialState = ResultState(resultImageUri = testUri, originalImageUrl = testUri)
         val state = mutableStateOf(initialState)

@@ -49,10 +49,10 @@ class CustomizeExportViewModel @AssistedInject constructor(
 ) : AndroidViewModel(application) {
 
     @AssistedFactory
-    interface Factory {
+    interface Factory{
         fun create(
             @Assisted("resultImageUrl") resultImageUrl: Uri,
-            @Assisted("originalImageUrl")originalImageUrl: Uri?,
+            @Assisted("originalImageUrl")originalImageUrl: Uri?
         ): CustomizeExportViewModel
     }
 
@@ -102,6 +102,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
         }
         loadInitialBitmap(resultImageUrl)
     }
+
 
     override fun onCleared() {
         super.onCleared()
@@ -154,7 +155,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 snackbarHostState.value.showSnackbar("Background removal failed")
                 _state.update {
                     val aspectRatioToolState = (it.toolState[CustomizeTool.Size] as AspectRatioToolState)
-                        .copy(selectedToolOption = previousSizeOption)
+                        .copy(selectedToolOption =  previousSizeOption)
                     it.copy(
                         toolState = it.toolState + (CustomizeTool.Size to aspectRatioToolState),
                         showImageEditProgress = false,
@@ -195,7 +196,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
             is SizeOption -> {
                 val selectedSizeOption = toolState.selectedToolOption as SizeOption
                 val needsBackgroundRemoval = selectedSizeOption == SizeOption.Sticker &&
-                    state.value.exportImageCanvas.imageBitmapRemovedBackground == null
+                        state.value.exportImageCanvas.imageBitmapRemovedBackground == null
 
                 val imageBitmap = state.value.exportImageCanvas.imageBitmap
                 if (needsBackgroundRemoval && imageBitmap != null) {
@@ -247,8 +248,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
             _state.update { it.copy(showImageEditProgress = true) }
             try {
                 val bitmap = imageGenerationRepository.addBackgroundToBot(
-                    image,
-                    backgroundOption.prompt,
+                    image, backgroundOption.prompt,
                 )
                 _state.update {
                     it.copy(
@@ -303,7 +303,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 val bitmap = localFileProvider.loadBitmapFromUri(uri)
                 _state.update {
                     it.copy(
-                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap),
+                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap)
                     )
                 }
             } catch (e: Exception) {

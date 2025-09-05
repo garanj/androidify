@@ -37,7 +37,7 @@ interface LocalSegmentationDataSource {
 }
 
 class LocalSegmentationDataSourceImpl @Inject constructor(
-    private val moduleInstallClient: ModuleInstallClient,
+    private val moduleInstallClient: ModuleInstallClient
 ) : LocalSegmentationDataSource {
     private val segmenter by lazy {
         val options = SubjectSegmenterOptions.Builder()
@@ -60,7 +60,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
         return areModulesAvailable
     }
     private class CustomInstallStatusListener(
-        val continuation: CancellableContinuation<Boolean>,
+        val continuation: CancellableContinuation<Boolean>
     ) : InstallStatusListener {
 
         override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
@@ -70,7 +70,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
                 continuation.resume(true)
             } else if (update.installState == STATE_FAILED || update.installState == STATE_CANCELED) {
                 continuation.resumeWithException(
-                    ImageSegmentationException("Module download failed or was canceled. State: ${update.installState}"),
+                    ImageSegmentationException("Module download failed or was canceled. State: ${update.installState}")
                 )
             } else {
                 Log.d("LocalSegmentationDataSource", "State update: ${update.installState}")
@@ -128,4 +128,4 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
     }
 }
 
-class ImageSegmentationException(message: String? = null) : Exception(message)
+class ImageSegmentationException(message: String? = null): Exception(message)

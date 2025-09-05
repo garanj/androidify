@@ -92,6 +92,7 @@ import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.material3.ripple
 import androidx.compose.material3.toShape
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -120,13 +121,23 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.rectangle
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.Lifecycle
+import androidx.lifecycle.LifecycleEventObserver
+import androidx.lifecycle.LifecycleOwner
+import androidx.lifecycle.compose.LifecycleResumeEffect
+import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.android.developers.androidify.customize.CustomizeAndExportScreen
+import com.android.developers.androidify.customize.CustomizeExportViewModel
 import com.android.developers.androidify.data.DropBehaviourFactory
+import com.android.developers.androidify.results.ResultsScreen
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LimeGreen
 import com.android.developers.androidify.theme.LocalSharedTransitionScope
@@ -183,7 +194,7 @@ fun CreationScreen(
                     uiState.imageUri
                 } else {
                     null
-                },
+                }
             )
             creationViewModel.onResultDisplayed()
         }

@@ -19,11 +19,9 @@ import android.annotation.SuppressLint
 import android.content.Context
 import android.util.Log
 import androidx.startup.Initializer
-import com.android.developers.androidify.network.BuildConfig
 import com.google.firebase.Firebase
 import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.appCheck
-import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
 
 /**
@@ -33,17 +31,9 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 class FirebaseAppCheckInitializer : Initializer<FirebaseAppCheck> {
     override fun create(context: Context): FirebaseAppCheck {
         return Firebase.appCheck.apply {
-            if (BuildConfig.DEBUG) {
-                Log.i("AndroidifyAppCheck", "Firebase debug")
-                installAppCheckProviderFactory(
-                    DebugAppCheckProviderFactory.getInstance(),
-                )
-            } else {
-                Log.i("AndroidifyAppCheck", "Play integrity")
-                installAppCheckProviderFactory(
-                    PlayIntegrityAppCheckProviderFactory.getInstance(),
-                )
-            }
+            installAppCheckProviderFactory(
+                PlayIntegrityAppCheckProviderFactory.getInstance(),
+            )
         }
     }
 
