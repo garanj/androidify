@@ -282,7 +282,7 @@ class CustomizeExportViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Log.d("CustomizeExportViewModel", "Image generation failed", e)
+                Log.e("CustomizeExportViewModel", "Image generation failed", e)
                 snackbarHostState.value.showSnackbar("Background vibe generation failed")
             } finally {
                 _state.update { it.copy(showImageEditProgress = false) }
@@ -308,7 +308,7 @@ class CustomizeExportViewModel @Inject constructor(
                         it.copy(externalOriginalSavedUri = savedOriginalUri)
                     }
                 } catch (exception : Exception) {
-                    Log.e("CustomizeExportViewModel", "Original image save failed: ", exception)
+                    Log.d("CustomizeExportViewModel", "Original image save failed: ", exception)
                 }
             }
             if (resultBitmap != null) {
