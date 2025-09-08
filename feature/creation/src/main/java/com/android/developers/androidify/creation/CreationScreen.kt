@@ -120,13 +120,18 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.net.toUri
 import androidx.graphics.shapes.RoundedPolygon
 import androidx.graphics.shapes.rectangle
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import coil3.compose.AsyncImage
 import coil3.request.ImageRequest
 import coil3.request.crossfade
+import com.android.developers.androidify.customize.CustomizeAndExportScreen
+import com.android.developers.androidify.customize.CustomizeExportViewModel
 import com.android.developers.androidify.data.DropBehaviourFactory
+import com.android.developers.androidify.results.ResultsScreen
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LimeGreen
 import com.android.developers.androidify.theme.LocalSharedTransitionScope
@@ -154,12 +159,12 @@ import com.android.developers.androidify.creation.R as CreationR
 
 @Composable
 fun CreationScreen(
-    creationViewModel: CreationViewModel,
+    fileName: String? = null,
+    creationViewModel: CreationViewModel = hiltViewModel(),
     isMedium: Boolean = isAtLeastMedium(),
     onCameraPressed: () -> Unit = {},
     onBackPressed: () -> Unit,
     onAboutPressed: () -> Unit,
-    onImageCreated: (resultImageUri: Uri, prompt: String?, originalImageUri: Uri?) -> Unit,
 ) {
     val uiState by creationViewModel.uiState.collectAsStateWithLifecycle()
     BackHandler(
@@ -167,28 +172,19 @@ fun CreationScreen(
     ) {
         creationViewModel.onBackPress()
     }
+    LaunchedEffect(Unit) {
+        if (fileName != null) {
+            creationViewModel.onImageSelected(fileName.toUri())
+        } else {
+            creationViewModel.onImageSelected(null)
+        }
+    }
     val pickMedia = rememberLauncherForActivityResult(PickVisualMedia()) { uri ->
         if (uri != null) {
             creationViewModel.onImageSelected(uri)
         }
     }
     val snackbarHostState by creationViewModel.snackbarHostState.collectAsStateWithLifecycle()
-
-    LaunchedEffect(uiState.resultBitmapUri) {
-        uiState.resultBitmapUri?.let { resultBitmapUri ->
-            onImageCreated(
-                resultBitmapUri,
-                uiState.descriptionText.text.toString(),
-                if (uiState.selectedPromptOption == PromptType.PHOTO) {
-                    uiState.imageUri
-                } else {
-                    null
-                },
-            )
-            creationViewModel.onResultDisplayed()
-        }
-    }
-
     when (uiState.screenState) {
         ScreenState.EDIT -> {
             EditScreen(
@@ -215,6 +211,46 @@ fun CreationScreen(
                     creationViewModel.cancelInProgressTask()
                 },
             )
+        }
+
+        ScreenState.RESULT -> {
+            val prompt = uiState.descriptionText.text.toString()
+            val key = if (uiState.descriptionText.text.isBlank()) {
+                uiState.imageUri.toString()
+            } else {
+                prompt
+            }
+            ResultsScreen(
+                uiState.resultBitmap!!,
+                if (uiState.selectedPromptOption == PromptType.PHOTO) {
+                    uiState.imageUri
+                } else {
+                    null
+                },
+                promptText = prompt,
+                viewModel = hiltViewModel(key = key),
+                onAboutPress = onAboutPressed,
+                onBackPress = onBackPressed,
+                onNextPress = creationViewModel::customizeExportClicked,
+            )
+        }
+
+        ScreenState.CUSTOMIZE -> {
+            val prompt = uiState.descriptionText.text.toString()
+            val key = if (uiState.descriptionText.text.isBlank()) {
+                uiState.imageUri.toString()
+            } else {
+                prompt
+            }
+            uiState.resultBitmap?.let { bitmap ->
+                CustomizeAndExportScreen(
+                    resultImage = bitmap,
+                    originalImageUri = uiState.imageUri,
+                    onBackPress = onBackPressed,
+                    onInfoPress = onAboutPressed,
+                    viewModel = hiltViewModel<CustomizeExportViewModel>(key = key),
+                )
+            }
         }
     }
 }

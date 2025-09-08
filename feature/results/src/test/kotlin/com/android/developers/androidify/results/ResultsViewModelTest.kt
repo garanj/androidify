@@ -17,11 +17,13 @@
 
 package com.android.developers.androidify.results
 
+import android.graphics.Bitmap
 import android.net.Uri
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Before
 import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -32,14 +34,19 @@ class ResultsViewModelTest {
     @get:Rule
     val mainDispatcherRule = MainDispatcherRule()
 
+    private lateinit var viewModel: ResultsViewModel
+
+    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
     private val fakePromptText = "Pink Hair, plaid shirt, jeans"
     private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
-    private val fakeUri = Uri.parse("content://test/image.jpg")
+    @Before
+    fun setup() {
+        viewModel = ResultsViewModel()
+    }
 
     @Test
     fun stateInitialEmpty() = runTest {
-        val viewModel = ResultsViewModel(null, null, null)
         assertEquals(
             ResultState(),
             viewModel.state.value,
@@ -47,11 +54,15 @@ class ResultsViewModelTest {
     }
 
     @Test
-    fun setArgumentsWithOriginalImage_isCorrect() = runTest {
-        val viewModel = ResultsViewModel(fakeUri, originalFakeUri, null)
+    fun setArgumentsWithOriginalImage() = runTest {
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+            promptText = null,
+        )
         assertEquals(
             ResultState(
-                resultImageUri = fakeUri,
+                resultImageBitmap = fakeBitmap,
                 originalImageUrl = originalFakeUri,
             ),
             viewModel.state.value,
@@ -59,11 +70,15 @@ class ResultsViewModelTest {
     }
 
     @Test
-    fun initialState_withPrompt_isCorrect() = runTest {
-        val viewModel = ResultsViewModel(fakeUri, null, fakePromptText)
+    fun setArgumentsWithPrompt() = runTest {
+        viewModel.setArguments(
+            fakeBitmap,
+            null,
+            promptText = fakePromptText,
+        )
         assertEquals(
             ResultState(
-                resultImageUri = fakeUri,
+                resultImageBitmap = fakeBitmap,
                 originalImageUrl = null,
                 promptText = fakePromptText,
             ),

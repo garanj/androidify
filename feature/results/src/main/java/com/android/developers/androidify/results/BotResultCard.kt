@@ -15,6 +15,7 @@
  */
 package com.android.developers.androidify.results
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -49,7 +50,7 @@ import coil3.compose.AsyncImage
 
 @Composable
 fun BotResultCard(
-    resultImageUri: Uri,
+    resultImage: Bitmap,
     originalImageUrl: Uri?,
     promptText: String?,
     flippableState: FlippableState,
@@ -65,7 +66,7 @@ fun BotResultCard(
         flippableState = flippableState,
         onFlipStateChanged = onFlipStateChanged,
         front = {
-            FrontCard(resultImageUri)
+            FrontCard(resultImage)
         },
         back = {
             if (originalImageUrl != null) {
@@ -78,9 +79,9 @@ fun BotResultCard(
 }
 
 @Composable
-private fun FrontCard(resultImageUri: Uri) {
+private fun FrontCard(bitmap: Bitmap) {
     AsyncImage(
-        model = resultImageUri,
+        model = bitmap,
         contentDescription = stringResource(R.string.resultant_android_bot),
         contentScale = ContentScale.Crop,
         modifier = Modifier
