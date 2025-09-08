@@ -58,10 +58,7 @@ import javax.inject.Singleton
 
 interface ComposableBitmapRenderer {
 
-    suspend fun renderComposableToBitmap(
-        canvasSize: Size,
-        composableContent: @Composable () -> Unit,
-    ): Bitmap?
+    suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap?
 }
 
 /**
@@ -77,19 +74,17 @@ interface ComposableBitmapRenderer {
  *              }
  */
 @Singleton
-class ComposableBitmapRendererImpl @Inject constructor(private val application: Application) :
-    ComposableBitmapRenderer {
+class ComposableBitmapRendererImpl @Inject constructor(private val application: Application) : ComposableBitmapRenderer {
 
     private suspend fun <T> useVirtualDisplay(callback: suspend (display: Display) -> T): T? {
         val texture = SurfaceTexture(false)
         val surface = Surface(texture)
-        val outerContext = application.resources.displayMetrics
-        val virtualDisplay =
-            application.getSystemService(DisplayManager::class.java).createVirtualDisplay(
+        val virtualDisplay: VirtualDisplay? =
+            (application.getSystemService(DISPLAY_SERVICE) as DisplayManager).createVirtualDisplay(
                 "virtualDisplay",
-                outerContext.widthPixels,
-                outerContext.heightPixels,
-                outerContext.densityDpi,
+                1,
+                1,
+                72,
                 surface,
                 DisplayManager.VIRTUAL_DISPLAY_FLAG_OWN_CONTENT_ONLY,
             )
@@ -101,10 +96,7 @@ class ComposableBitmapRendererImpl @Inject constructor(private val application: 
         return result
     }
 
-    override suspend fun renderComposableToBitmap(
-        canvasSize: Size,
-        composableContent: @Composable () -> Unit,
-    ): Bitmap? {
+    override suspend fun renderComposableToBitmap(canvasSize: Size, composableContent: @Composable () -> Unit): Bitmap? {
         val bitmap = useVirtualDisplay { display ->
             val outputDensity = Density(1f)
 
@@ -181,7 +173,7 @@ class ComposableBitmapRendererImpl @Inject constructor(private val application: 
             }
         }
 
-        val composeView = ComposeView(presentation.context).apply {
+        val composeView = ComposeView(context).apply {
             val intSize = with(density) { size.toSize().roundedToIntSize() }
             require(intSize.width > 0 && intSize.height > 0) { "pixel size must not have zero dimension" }
 

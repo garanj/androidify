@@ -29,6 +29,10 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
     override fun imageModelName(): String {
         TODO("Not yet implemented")
     }
+    var backgroundVibeEnabled: Boolean = true
+    override fun isBackgroundVibesFeatureEnabled(): Boolean {
+        return backgroundVibeEnabled
+    }
 
     override fun promptTextVerify(): String {
         TODO("Not yet implemented")
@@ -74,6 +78,10 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
 
     override fun getBotBackgroundInstructionPrompt(): String {
         return "bot_background_instruction_prompt"
+    }
+
+    override fun watchfaceFeatureEnabled(): Boolean {
+        return true
     }
 
     override fun isXrEnabled(): Boolean {
