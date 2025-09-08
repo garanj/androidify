@@ -156,7 +156,7 @@ if [[ -f "$WEAR_OS_AAB_PATH" ]]; then
   mkdir -p "${ARTIFACT_DEST_DIR}"
 
   # Copy the AAB
-  cp "${WEAR_OS_AAB_PATH}" "${WEAR_OS_ARTIFACT_DEST_DIR}/wear-release-unsigned.aab"
+  cp "${WEAR_OS_AAB_PATH}" "${ARTIFACT_DEST_DIR}/wear-release-unsigned.aab"
   echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
 
   # Find and list the files before copying
