@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.isNotEmpty
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
@@ -281,7 +282,7 @@ class CustomizeExportViewModel @Inject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Log.e("CustomizeExportViewModel", "Image generation failed", e)
+                Log.d("CustomizeExportViewModel", "Image generation failed", e)
                 snackbarHostState.value.showSnackbar("Background vibe generation failed")
             } finally {
                 _state.update { it.copy(showImageEditProgress = false) }
@@ -300,10 +301,14 @@ class CustomizeExportViewModel @Inject constructor(
             }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
-                val savedOriginalUri =
-                    imageGenerationRepository.saveImageToExternalStorage(originalImage)
-                _state.update {
-                    it.copy(externalOriginalSavedUri = savedOriginalUri)
+                try {
+                    val savedOriginalUri =
+                        imageGenerationRepository.saveImageToExternalStorage(originalImage)
+                    _state.update {
+                        it.copy(externalOriginalSavedUri = savedOriginalUri)
+                    }
+                } catch (exception : Exception) {
+                    Log.e("CustomizeExportViewModel", "Original image save failed: ", exception)
                 }
             }
             if (resultBitmap != null) {
