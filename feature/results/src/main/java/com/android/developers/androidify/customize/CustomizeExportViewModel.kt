@@ -300,10 +300,14 @@ class CustomizeExportViewModel @Inject constructor(
             }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
-                val savedOriginalUri =
-                    imageGenerationRepository.saveImageToExternalStorage(originalImage)
-                _state.update {
-                    it.copy(externalOriginalSavedUri = savedOriginalUri)
+                try {
+                    val savedOriginalUri =
+                        imageGenerationRepository.saveImageToExternalStorage(originalImage)
+                    _state.update {
+                        it.copy(externalOriginalSavedUri = savedOriginalUri)
+                    }
+                } catch (exception : Exception) {
+                    Log.e("CustomizeExportViewModel", "Original image save failed: ", exception)
                 }
             }
             if (resultBitmap != null) {
