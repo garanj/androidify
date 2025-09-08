@@ -99,7 +99,7 @@ echo "INFO: Building the Android production release bundle..."
 ./gradlew app:bundleRelease app:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
 echo "INFO: Building the Wear OS production release bundle..."
-./gradlew wear:bundleRelease wear:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
+./gradlew wear:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
 # --- Artifact Collection ---
 echo "INFO: Preparing Android artifacts for Kokoro..."
