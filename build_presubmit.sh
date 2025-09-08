@@ -175,10 +175,6 @@ if [[ -f "$WEAR_OS_AAB_PATH" ]]; then
     echo "INFO: No .intoto.jsonl files found."
   fi
 
-  echo "INFO: Copying SPDX SBOM..."
-  # The output file from wear:spdxSbomForRelease is build/spdx/release.spdx.json
-  cp wear/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/wear-release.spdx.json"
-
 else
   echo "FAILURE: AAB not found at ${WEAR_OS_AAB_PATH}"
   exit 1
