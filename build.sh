@@ -22,7 +22,6 @@ set -e
 # --- Configuration ---
 # Get the script's directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
-
 # Define the Android SDK version you want to target.
 ANDROID_SDK_VERSION="36"
 ANDROID_BUILD_TOOLS_VERSION="36.0.0"
@@ -101,80 +100,58 @@ echo "INFO: Building the Wear OS production release bundle..."
 ./gradlew wear:bundleRelease -x test -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
 # --- Artifact Collection ---
-echo "INFO: Preparing Android artifacts for Kokoro..."
+echo "INFO: Preparing artifacts for Kokoro..."
 
-# Default output path for the Android bundle
-AAB_SRC_DIR="app/build/outputs/bundle/release"
-# The default name of the AAB for a release bundle
-AAB_FILE="app-release.aab"
-AAB_PATH="${AAB_SRC_DIR}/${AAB_FILE}"
+# This function collects a specific AAB and its associated in-toto files.
+# Arguments:
+#   $1: Source directory for the AAB (e.g., "app/build/outputs/bundle/release")
+#   $2: Source filename for the AAB (e.g., "app-release.aab")
+#   $3: Destination filename for the AAB (e.g., "app-release-unsigned.aab")
+collect_artifacts() {
+  local aab_src_dir="$1"
+  local aab_file="$2"
+  local aab_dest_file="$3"
+  local aab_path="${aab_src_dir}/${aab_file}"
 
-# Check if the AAB exists
-if [[ -f "$AAB_PATH" ]]; then
-  # Create a directory within Kokoro's artifact collection area
-  ARTIFACT_DEST_DIR="${KOKORO_ARTIFACTS_DIR}/artifacts"
-  mkdir -p "${ARTIFACT_DEST_DIR}"
+  # Check if the AAB exists
+  if [[ -f "$aab_path" ]]; then
+    # Create a directory within Kokoro's artifact collection area
+    local artifact_dest_dir="${KOKORO_ARTIFACTS_DIR}/artifacts"
+    mkdir -p "${artifact_dest_dir}"
 
-  # Copy the AAB
-  cp "${AAB_PATH}" "${ARTIFACT_DEST_DIR}/app-release-unsigned.aab"
-  echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
+    # Copy the AAB
+    cp "${aab_path}" "${artifact_dest_dir}/${aab_dest_file}"
+    echo "SUCCESS: AAB copied to ${artifact_dest_dir}"
 
-  # Find and list the files before copying
-  # Store the find results in a variable to avoid running find twice
-  # and to handle the case where no files are found gracefully.
-  intoto_files=$(find . -type f -name "*.intoto.jsonl")
+    # Find and list the files before copying
+    # Store the find results in a variable to avoid running find twice
+    # and to handle the case where no files are found gracefully.
+    local intoto_files
+    intoto_files=$(find . -type f -name "*.intoto.jsonl")
 
-  if [ -n "$intoto_files" ]; then
-    echo "INFO: Found the following .intoto.jsonl files:"
-    echo "$intoto_files" # This will list each file on a new line
-    echo "INFO: Copying .intoto.jsonl files to ${ARTIFACT_DEST_DIR}/"
-    # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
-    find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
+    if [ -n "$intoto_files" ]; then
+      echo "INFO: Found the following .intoto.jsonl files:"
+      echo "$intoto_files" # This will list each file on a new line
+      echo "INFO: Copying .intoto.jsonl files to ${artifact_dest_dir}/"
+      # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
+      find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${artifact_dest_dir}/"
+    else
+      echo "INFO: No .intoto.jsonl files found."
+    fi
   else
-    echo "INFO: No .intoto.jsonl files found."
+    echo "FAILURE: AAB not found at ${aab_path}"
+    exit 1
   fi
+}
 
-  echo "INFO: Copying SPDX SBOM..."
-  # The output file from app:spdxSbomForRelease is build/spdx/release.spdx.json
-  cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
+# Collect the main application artifacts
+collect_artifacts "app/build/outputs/bundle/release" "app-release.aab" "app-release-unsigned.aab"
 
-else
-  echo "FAILURE: AAB not found at ${AAB_PATH}"
-  exit 1
-fi
+# Copy the app-specific SPDX SBOM
+echo "INFO: Copying SPDX SBOM..."
+cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
 
-# Default output path for the Wear OS bundle
-WEAR_OS_AAB_SRC_DIR="wear/build/outputs/bundle/release"
-# The default name of the AAB for a release bundle
-WEAR_OS_AAB_FILE="wear-release.aab"
-WEAR_OS_AAB_PATH="${WEAR_OS_AAB_SRC_DIR}/${WEAR_OS_AAB_FILE}"
+# Collect the Wear OS application artifacts
+collect_artifacts "wear/build/outputs/bundle/release" "wear-release.aab" "wear-release-unsigned.aab"
 
-# Check if the AAB exists
-if [[ -f "$WEAR_OS_AAB_PATH" ]]; then
-  # Create a directory within Kokoro's artifact collection area
-  ARTIFACT_DEST_DIR="${KOKORO_ARTIFACTS_DIR}/artifacts"
-  mkdir -p "${ARTIFACT_DEST_DIR}"
-
-  # Copy the AAB
-  cp "${WEAR_OS_AAB_PATH}" "${ARTIFACT_DEST_DIR}/wear-release-unsigned.aab"
-  echo "SUCCESS: AAB copied to ${ARTIFACT_DEST_DIR}"
-
-  # Find and list the files before copying
-  # Store the find results in a variable to avoid running find twice
-  # and to handle the case where no files are found gracefully.
-  intoto_files=$(find . -type f -name "*.intoto.jsonl")
-
-  if [ -n "$intoto_files" ]; then
-    echo "INFO: Found the following .intoto.jsonl files:"
-    echo "$intoto_files" # This will list each file on a new line
-    echo "INFO: Copying .intoto.jsonl files to ${ARTIFACT_DEST_DIR}/"
-    # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
-    find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${ARTIFACT_DEST_DIR}/"
-  else
-    echo "INFO: No .intoto.jsonl files found."
-  fi
-
-else
-  echo "FAILURE: AAB not found at ${WEAR_OS_AAB_PATH}"
-  exit 1
-fi
+exit 0
