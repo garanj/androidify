@@ -44,7 +44,6 @@ import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.util.fastRoundToInt
-import coil3.compose.AsyncImage
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LocalAnimateBoundsScope
 @OptIn(ExperimentalMaterial3ExpressiveApi::class, ExperimentalSharedTransitionApi::class)
@@ -90,9 +89,9 @@ fun ImageResult(
                         contentScale = ContentScale.Crop,
                         contentDescription = null,
                     )
-                } else if (exportImageCanvas.imageUri != null) {
-                    AsyncImage(
-                        model = exportImageCanvas.imageUri,
+                } else if (exportImageCanvas.imageBitmap != null) {
+                    Image(
+                        bitmap = exportImageCanvas.imageBitmap.asImageBitmap(),
                         modifier = Modifier
                             .fillMaxSize(),
                         contentScale = ContentScale.Crop,
