@@ -45,6 +45,8 @@ interface RemoteConfigDataSource {
     fun getBotBackgroundInstructionPrompt(): String
 
     fun watchfaceFeatureEnabled(): Boolean
+
+    fun isXrEnabled(): Boolean
 }
 
 @Singleton
@@ -116,5 +118,9 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
 
     override fun watchfaceFeatureEnabled(): Boolean {
         return remoteConfig.getBoolean("watchface_feature_enabled")
+    }
+
+    override fun isXrEnabled(): Boolean {
+        return remoteConfig.getBoolean("xr_feature_enabled")
     }
 }

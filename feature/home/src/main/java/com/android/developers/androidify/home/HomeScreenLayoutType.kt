@@ -16,28 +16,20 @@
 package com.android.developers.androidify.home
 
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.tooling.preview.Preview
-import com.android.developers.androidify.theme.AndroidifyTheme
-import com.android.developers.androidify.theme.SharedElementContextPreview
-import com.android.developers.androidify.util.AdaptivePreview
+import androidx.xr.compose.platform.LocalSpatialCapabilities
 import com.android.developers.androidify.util.isAtLeastMedium
 
-class HomeScreenScreenshotTest {
+enum class HomeScreenLayoutType {
+    Compact,
+    Medium,
+    Spatial,
+}
 
-    @AdaptivePreview
-    @Preview(showBackground = true)
-    @Composable
-    fun HomeScreenScreenshot() {
-        AndroidifyTheme {
-            SharedElementContextPreview {
-                HomeScreenContents(
-                    layoutType = calculateLayoutType(enableXr = false),
-                    onClickLetsGo = { },
-                    onAboutClicked = {},
-                    videoLink = "",
-                    dancingBotLink = "",
-                )
-            }
-        }
+@Composable
+fun calculateLayoutType(enableXr: Boolean = false): HomeScreenLayoutType {
+    return when {
+        LocalSpatialCapabilities.current.isSpatialUiEnabled && enableXr -> HomeScreenLayoutType.Spatial
+        isAtLeastMedium() -> HomeScreenLayoutType.Medium
+        else -> HomeScreenLayoutType.Compact
     }
 }

@@ -155,6 +155,10 @@ dependencies {
     implementation(projects.core.theme)
     implementation(projects.core.util)
 
+    // library must be compileOnly, see
+    // https://developer.android.com/develop/xr/jetpack-xr-sdk/getting-started#enable-minification
+    compileOnly(libs.androidx.xr.extensions)
+
     baselineProfile(projects.benchmark)
 
     // Android Instrumented Tests
