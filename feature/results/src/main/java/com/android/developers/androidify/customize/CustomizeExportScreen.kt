@@ -13,11 +13,14 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-@file:OptIn(ExperimentalPermissionsApi::class)
+@file:OptIn(ExperimentalPermissionsApi::class, ExperimentalMaterial3Api::class)
 
 package com.android.developers.androidify.customize
 
 import android.Manifest
+import android.R.attr.visible
+import android.graphics.Bitmap
+import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -46,6 +49,7 @@ import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
@@ -58,14 +62,18 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
+import androidx.compose.ui.graphics.ImageBitmap
+import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.android.developers.androidify.results.PermissionRationaleDialog
@@ -81,6 +89,8 @@ import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
+import com.android.developers.androidify.watchface.WatchFaceAsset
+import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
 import com.google.accompanist.permissions.isGranted
 import com.google.accompanist.permissions.rememberPermissionState
@@ -90,12 +100,18 @@ import com.android.developers.androidify.theme.R as ThemeR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomizeAndExportScreen(
+    resultImage: Bitmap,
+    originalImageUri: Uri?,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
     isMediumWindowSize: Boolean = isAtLeastMedium(),
-    viewModel: CustomizeExportViewModel,
+    viewModel: CustomizeExportViewModel = hiltViewModel<CustomizeExportViewModel>(),
 ) {
+    LaunchedEffect(resultImage, originalImageUri) {
+        viewModel.setArguments(resultImage, originalImageUri)
+    }
     val state = viewModel.state.collectAsStateWithLifecycle()
+
     val context = LocalContext.current
     LaunchedEffect(state.value.savedUri) {
         val savedImageUri = state.value.savedUri
@@ -114,8 +130,16 @@ fun CustomizeAndExportScreen(
         onShareClicked = viewModel::shareClicked,
         onDownloadClicked = viewModel::downloadClicked,
         onSelectedToolStateChanged = viewModel::selectedToolStateChanged,
+        onInstallWatchFaceClicked = {
+            viewModel.installWatchFace()
+        },
+        onResetWatchFaceSend = {
+            viewModel.resetWatchFaceSend()
+        },
         isMediumWindowSize = isMediumWindowSize,
         snackbarHostState = viewModel.snackbarHostState.collectAsStateWithLifecycle().value,
+        loadWatchFaces = viewModel::loadWatchFaces,
+        onWatchFaceSelect = viewModel::onWatchFaceSelected,
     )
 }
 
@@ -129,8 +153,12 @@ private fun CustomizeExportContents(
     onDownloadClicked: () -> Unit,
     onToolSelected: (CustomizeTool) -> Unit,
     onSelectedToolStateChanged: (ToolState) -> Unit,
+    onInstallWatchFaceClicked: () -> Unit,
+    onResetWatchFaceSend: () -> Unit,
     isMediumWindowSize: Boolean,
     snackbarHostState: SnackbarHostState,
+    loadWatchFaces: () -> Unit,
+    onWatchFaceSelect: (WatchFaceAsset) -> Unit,
 ) {
     Scaffold(
         snackbarHost = {
@@ -152,6 +180,10 @@ private fun CustomizeExportContents(
         },
         containerColor = MaterialTheme.colorScheme.surface,
     ) { paddingValues ->
+        var showWatchFaceBottomSheet by remember { mutableStateOf(false) }
+        val watchFaceSheetState = rememberModalBottomSheetState(
+            skipPartiallyExpanded = true,
+        )
         val imageResult = remember(state.showImageEditProgress) {
             movableContentWithReceiverOf<ExportImageCanvas> {
                 val chromeModifier = if (this.showSticker) {
@@ -213,8 +245,31 @@ private fun CustomizeExportContents(
                 onDownloadClicked = {
                     onDownloadClicked()
                 },
+                onWearDeviceClick = {
+                    showWatchFaceBottomSheet = true
+                },
+                hasWearDevice = state.connectedWatch != null,
                 modifier = modifier,
             )
+        }
+        state.connectedWatch?.let { device ->
+            if (showWatchFaceBottomSheet) {
+                WatchFaceModalSheet(
+                    sheetState = watchFaceSheetState,
+                    onDismiss = {
+                        onResetWatchFaceSend()
+                        showWatchFaceBottomSheet = false
+                    },
+                    connectedWatch = device,
+                    installationStatus = state.watchFaceInstallationStatus,
+                    onWatchFaceInstallClick = {
+                        onInstallWatchFaceClicked()
+                    },
+                    onLoad = loadWatchFaces,
+                    watchFaceSelectionState = state.watchFaceSelectionState,
+                    onWatchFaceSelect = onWatchFaceSelect,
+                )
+            }
         }
         LookaheadScope {
             CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
@@ -344,8 +399,10 @@ fun SelectedToolDetail(
 
 @Composable
 private fun BotActionsButtonRow(
+    onWearDeviceClick: () -> Unit,
     onShareClicked: () -> Unit,
     onDownloadClicked: () -> Unit,
+    hasWearDevice: Boolean,
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = allowsFullContent(),
 ) {
@@ -400,6 +457,20 @@ private fun BotActionsButtonRow(
             },
             modifier = Modifier.fillMaxHeight(),
         )
+        if (hasWearDevice) {
+            Spacer(Modifier.width(8.dp))
+            SecondaryOutlinedButton(
+                onClick = onWearDeviceClick,
+                leadingIcon = {
+                    Icon(
+                        ImageVector
+                            .vectorResource(R.drawable.watch_24),
+                        contentDescription = stringResource(R.string.send_to_watch),
+                    )
+                },
+                modifier = Modifier.fillMaxHeight(),
+            )
+        }
         PermissionRationaleDialog(
             showRationaleDialog,
             onDismiss = {
@@ -418,9 +489,15 @@ fun CustomizeExportPreview() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = getPlaceholderBotUri()
+                val connectedWatch = ConnectedWatch(
+                    nodeId = "1234",
+                    displayName = "Pixel Watch 3",
+                    hasAndroidify = true,
+                )
+                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
                 val state = CustomizeExportState(
-                    exportImageCanvas = ExportImageCanvas(imageUri = imageUri),
+                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
+                    connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
                     state = state,
@@ -432,6 +509,10 @@ fun CustomizeExportPreview() {
                     snackbarHostState = SnackbarHostState(),
                     isMediumWindowSize = false,
                     onSelectedToolStateChanged = {},
+                    onInstallWatchFaceClicked = {},
+                    onResetWatchFaceSend = {},
+                    loadWatchFaces = {},
+                    onWatchFaceSelect = {},
                 )
             }
         }
@@ -445,13 +526,19 @@ fun CustomizeExportPreviewLarge() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val imageUri = getPlaceholderBotUri()
+                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val connectedWatch = ConnectedWatch(
+                    nodeId = "1234",
+                    displayName = "Pixel Watch 3",
+                    hasAndroidify = true,
+                )
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
-                        imageUri = imageUri,
+                        imageBitmap = bitmap.asAndroidBitmap(),
                         aspectRatioOption = SizeOption.Square,
                     ),
                     selectedTool = CustomizeTool.Background,
+                    connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
                     state = state,
@@ -463,6 +550,10 @@ fun CustomizeExportPreviewLarge() {
                     snackbarHostState = SnackbarHostState(),
                     isMediumWindowSize = true,
                     onSelectedToolStateChanged = {},
+                    onInstallWatchFaceClicked = {},
+                    onResetWatchFaceSend = {},
+                    loadWatchFaces = {},
+                    onWatchFaceSelect = {},
                 )
             }
         }

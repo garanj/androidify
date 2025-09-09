@@ -69,16 +69,6 @@ class CustomizeStateTest {
                 BackgroundOption.Plain,
                 BackgroundOption.Lightspeed,
                 BackgroundOption.IO,
-                BackgroundOption.MusicLover,
-                BackgroundOption.PoolMaven,
-                BackgroundOption.SoccerFanatic,
-                BackgroundOption.StarGazer,
-                BackgroundOption.FitnessBuff,
-                BackgroundOption.Fandroid,
-                BackgroundOption.GreenThumb,
-                BackgroundOption.Gamer,
-                BackgroundOption.Jetsetter,
-                BackgroundOption.Chef,
             ),
             state.options,
         )
@@ -87,7 +77,7 @@ class CustomizeStateTest {
     @Test
     fun exportImageCanvas_defaultValues() {
         val canvas = ExportImageCanvas()
-        Assert.assertNull(canvas.imageUri)
+        Assert.assertNull(canvas.imageBitmap)
         Assert.assertEquals(SizeOption.Square, canvas.aspectRatioOption)
         Assert.assertEquals(Size(1000f, 1000f), canvas.canvasSize)
         Assert.assertNull(canvas.mainImageUri)

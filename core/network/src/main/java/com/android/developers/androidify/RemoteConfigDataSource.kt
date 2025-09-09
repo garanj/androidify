@@ -24,6 +24,7 @@ interface RemoteConfigDataSource {
     fun isAppInactive(): Boolean
     fun textModelName(): String
     fun imageModelName(): String
+    fun isBackgroundVibesFeatureEnabled(): Boolean
     fun promptTextVerify(): String
     fun promptImageValidation(): String
     fun promptImageDescription(): String
@@ -42,6 +43,8 @@ interface RemoteConfigDataSource {
     fun getImageGenerationEditsModelName(): String
 
     fun getBotBackgroundInstructionPrompt(): String
+
+    fun watchfaceFeatureEnabled(): Boolean
 }
 
 @Singleton
@@ -58,6 +61,10 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
 
     override fun imageModelName(): String {
         return remoteConfig.getString("image_model_name")
+    }
+
+    override fun isBackgroundVibesFeatureEnabled(): Boolean {
+        return remoteConfig.getBoolean("background_vibes_feature_enabled")
     }
 
     override fun promptTextVerify(): String {
@@ -105,5 +112,9 @@ class RemoteConfigDataSourceImpl @Inject constructor() : RemoteConfigDataSource 
 
     override fun getBotBackgroundInstructionPrompt(): String {
         return remoteConfig.getString("bot_background_instruction_prompt")
+    }
+
+    override fun watchfaceFeatureEnabled(): Boolean {
+        return remoteConfig.getBoolean("watchface_feature_enabled")
     }
 }

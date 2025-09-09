@@ -50,12 +50,11 @@ class CreationViewModelTest {
 
     private val internetConnectivityManager = TestInternetConnectivityManager(true)
     private val imageGenerationRepository = FakeImageGenerationRepository()
-    private val fakeUri = Uri.parse("content://test/image.jpg")
 
+    private val fakeUri = Uri.parse("test.jpeg")
     @Before
     fun setup() {
         viewModel = CreationViewModel(
-            originalImageUrl = fakeUri,
             internetConnectivityManager,
             imageGenerationRepository,
             TestTextGenerationRepository(),
@@ -63,22 +62,23 @@ class CreationViewModelTest {
             FakeDropImageFactory(),
             context = RuntimeEnvironment.getApplication(),
         )
+
     }
 
     @Test
     fun stateInitialEdit_WithImage() = runTest {
+        viewModel.onImageSelected(fakeUri)
         assertEquals(
             ScreenState.EDIT,
             viewModel.uiState.value.screenState,
         )
         assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
-        assertEquals( fakeUri, viewModel.uiState.value.imageUri)
+        assertEquals(fakeUri, viewModel.uiState.value.imageUri)
     }
 
     @Test
     fun stateInitialEdit_WithOutImage() = runTest {
         viewModel = CreationViewModel(
-            originalImageUrl = null,
             internetConnectivityManager,
             imageGenerationRepository,
             TestTextGenerationRepository(),
@@ -91,7 +91,7 @@ class CreationViewModelTest {
             viewModel.uiState.value.screenState,
         )
         assertEquals(false, viewModel.uiState.value.promptGenerationInProgress)
-        assertEquals( null, viewModel.uiState.value.imageUri)
+        assertEquals(null, viewModel.uiState.value.imageUri)
     }
 
     @Test
@@ -136,8 +136,8 @@ class CreationViewModelTest {
         viewModel.onImageSelected(Uri.parse("content://test/image.jpg"))
         viewModel.onSelectedPromptOptionChanged(PromptType.PHOTO)
         viewModel.startClicked()
-        assertEquals(ScreenState.EDIT, viewModel.uiState.value.screenState)
-        assertNotNull(viewModel.uiState.value.resultBitmapUri)
+        assertEquals(ScreenState.RESULT, viewModel.uiState.value.screenState)
+        assertNotNull(viewModel.uiState.value.resultBitmap)
     }
 
     @Test
@@ -197,8 +197,8 @@ class CreationViewModelTest {
             "testing input description"
         }
         viewModel.startClicked()
-        assertEquals(ScreenState.EDIT, viewModel.uiState.value.screenState)
-        assertNotNull(viewModel.uiState.value.resultBitmapUri)
+        assertEquals(ScreenState.RESULT, viewModel.uiState.value.screenState)
+        assertNotNull(viewModel.uiState.value.resultBitmap)
     }
 
     @Test

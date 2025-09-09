@@ -21,6 +21,8 @@ import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import com.android.developers.androidify.wear.common.ConnectedWatch
+import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 
 data class CustomizeExportState(
     val originalImageUrl: Uri? = null,
@@ -35,6 +37,9 @@ data class CustomizeExportState(
     ),
     val exportImageCanvas: ExportImageCanvas = ExportImageCanvas(),
     val showImageEditProgress: Boolean = false,
+    val connectedWatch: ConnectedWatch? = null,
+    val watchFaceInstallationStatus: WatchFaceInstallationStatus = WatchFaceInstallationStatus.NotStarted,
+    val watchFaceSelectionState: WatchFaceSelectionState = WatchFaceSelectionState(),
 )
 
 interface ToolState {
@@ -61,21 +66,10 @@ data class BackgroundToolState(
         BackgroundOption.Plain,
         BackgroundOption.Lightspeed,
         BackgroundOption.IO,
-        BackgroundOption.MusicLover,
-        BackgroundOption.PoolMaven,
-        BackgroundOption.SoccerFanatic,
-        BackgroundOption.StarGazer,
-        BackgroundOption.FitnessBuff,
-        BackgroundOption.Fandroid,
-        BackgroundOption.GreenThumb,
-        BackgroundOption.Gamer,
-        BackgroundOption.Jetsetter,
-        BackgroundOption.Chef,
     ),
 ) : ToolState
 
 data class ExportImageCanvas(
-    val imageUri: Uri? = null,
     val imageBitmap: Bitmap? = null,
     val imageBitmapRemovedBackground: Bitmap? = null,
     val aspectRatioOption: SizeOption = SizeOption.Square,

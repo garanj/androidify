@@ -24,38 +24,55 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
+import com.android.developers.androidify.watchface.WatchFaceAsset
+import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepository
+import com.android.developers.androidify.wear.common.WatchFaceInstallError
+import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-@HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
-class CustomizeExportViewModel @AssistedInject constructor(
-    @Assisted("resultImageUrl") val resultImageUrl: Uri,
-    @Assisted("originalImageUrl") val originalImageUrl: Uri?,
+@HiltViewModel
+class CustomizeExportViewModel @Inject constructor(
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
+    val watchfaceInstallationRepository: WatchFaceInstallationRepository,
     val localFileProvider: LocalFileProvider,
+    val remoteConfigDataSource: RemoteConfigDataSource,
     application: Application,
 ) : AndroidViewModel(application) {
 
-    @AssistedFactory
-    interface Factory {
-        fun create(
-            @Assisted("resultImageUrl") resultImageUrl: Uri,
-            @Assisted("originalImageUrl")originalImageUrl: Uri?,
-        ): CustomizeExportViewModel
-    }
-
     private val _state = MutableStateFlow(CustomizeExportState())
-    val state = _state.asStateFlow()
+    val state: StateFlow<CustomizeExportState> = combine(
+        _state,
+        watchfaceInstallationRepository.connectedWatch,
+        watchfaceInstallationRepository.watchFaceInstallationUpdates,
+    ) {
+            currentState, watch, installationStatus ->
+        currentState.copy(
+            connectedWatch = watch,
+            watchFaceInstallationStatus = installationStatus,
+        )
+    }.stateIn(
+        scope = viewModelScope,
+        started = WhileSubscribed(5000),
+        initialValue = _state.value,
+    )
+
+    private var transferJob: Job? = null
 
     private var _snackbarHostState = MutableStateFlow(SnackbarHostState())
 
@@ -63,17 +80,55 @@ class CustomizeExportViewModel @AssistedInject constructor(
         get() = _snackbarHostState
 
     init {
+        val enableBackgroundVibes = remoteConfigDataSource.isBackgroundVibesFeatureEnabled()
+        var backgrounds = mutableListOf(
+            BackgroundOption.None,
+            BackgroundOption.Plain,
+            BackgroundOption.Lightspeed,
+            BackgroundOption.IO,
+        )
+        if (enableBackgroundVibes) {
+            val backgroundVibes = listOf(
+                BackgroundOption.MusicLover,
+                BackgroundOption.PoolMaven,
+                BackgroundOption.SoccerFanatic,
+                BackgroundOption.StarGazer,
+                BackgroundOption.FitnessBuff,
+                BackgroundOption.Fandroid,
+                BackgroundOption.GreenThumb,
+                BackgroundOption.Gamer,
+                BackgroundOption.Jetsetter,
+                BackgroundOption.Chef,
+            )
+            backgrounds.addAll(backgroundVibes)
+        }
+
         _state.update {
-            it.copy(
-                originalImageUrl = originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
+            CustomizeExportState(
+                toolState = mapOf(
+                    CustomizeTool.Size to AspectRatioToolState(),
+                    CustomizeTool.Background to BackgroundToolState(
+                        options = backgrounds,
+                    ),
+                ),
             )
         }
-        loadInitialBitmap(resultImageUrl)
     }
 
     override fun onCleared() {
         super.onCleared()
+    }
+
+    fun setArguments(
+        resultImageUrl: Bitmap,
+        originalImageUrl: Uri?,
+    ) {
+        _state.update {
+            _state.value.copy(
+                originalImageUrl,
+                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl),
+            )
+        }
     }
 
     fun shareClicked() {
@@ -208,6 +263,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                 }
                 return@launch
             }
+
             val image = state.value.exportImageCanvas.imageBitmap
             if (image == null) {
                 return@launch
@@ -266,18 +322,76 @@ class CustomizeExportViewModel @AssistedInject constructor(
         }
     }
 
-    private fun loadInitialBitmap(uri: Uri) {
+    fun loadWatchFaces() {
+        if (_state.value.watchFaceSelectionState.watchFaces.isNotEmpty()) return
+
+        _state.update { it.copy(watchFaceSelectionState = it.watchFaceSelectionState.copy(isLoadingWatchFaces = true)) }
+
         viewModelScope.launch {
-            try {
-                val bitmap = localFileProvider.loadBitmapFromUri(uri)
-                _state.update {
-                    it.copy(
-                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap),
-                    )
+            watchfaceInstallationRepository.getAvailableWatchFaces()
+                .onSuccess { faces ->
+                    _state.update {
+                        it.copy(
+                            watchFaceSelectionState = WatchFaceSelectionState(
+                                watchFaces = faces,
+                                isLoadingWatchFaces = false,
+                                selectedWatchFace = faces.firstOrNull(),
+                            ),
+                        )
+                    }
                 }
-            } catch (e: Exception) {
-                _snackbarHostState.value.showSnackbar("Could not load image.")
+                .onFailure { error ->
+                    _state.update {
+                        it.copy(
+                            watchFaceSelectionState = it.watchFaceSelectionState.copy(
+                                isLoadingWatchFaces = false,
+                            ),
+                        )
+                    }
+                }
+        }
+    }
+
+    fun onWatchFaceSelected(watchFace: WatchFaceAsset) {
+        _state.update {
+            it.copy(
+                watchFaceSelectionState = it.watchFaceSelectionState.copy(
+                    selectedWatchFace = watchFace,
+                ),
+            )
+        }
+    }
+
+    fun installWatchFace() {
+        val watchFaceToInstall = _state.value.watchFaceSelectionState.selectedWatchFace ?: return
+        transferJob = viewModelScope.launch {
+            val bitmap = state.value.exportImageCanvas.imageBitmap
+            val watch = state.value.connectedWatch
+            if (watch != null && bitmap != null) {
+                val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
+                val response = watchfaceInstallationRepository
+                    .createAndTransferWatchFace(watch, watchFaceToInstall, wfBitmap)
+
+                if (response != WatchFaceInstallError.NO_ERROR) {
+                    _state.update {
+                        it.copy(
+                            watchFaceInstallationStatus = WatchFaceInstallationStatus.Complete(
+                                success = false,
+                                installError = response,
+                                otherNodeId = watch.nodeId,
+                            ),
+                        )
+                    }
+                }
             }
+        }
+    }
+
+    fun resetWatchFaceSend() {
+        transferJob?.cancel()
+        transferJob = null
+        viewModelScope.launch {
+            watchfaceInstallationRepository.resetInstallationStatus()
         }
     }
 }

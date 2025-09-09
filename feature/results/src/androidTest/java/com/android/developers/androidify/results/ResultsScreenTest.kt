@@ -15,6 +15,7 @@
  */
 package com.android.developers.androidify.results
 
+import android.graphics.Bitmap
 import androidx.activity.ComponentActivity
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,15 +41,15 @@ class ResultsScreenTest {
     @get:Rule
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
-    // Create a test bitmap for testing
-    val testUri = android.net.Uri.parse("placeholder://image")
+    // Create a dummy bitmap for testing
+    private val testBitmap: Bitmap = Bitmap.createBitmap(100, 100, Bitmap.Config.ARGB_8888)
 
     @Test
     fun resultsScreenContents_displaysActionButtons() {
         val shareButtonText = composeTestRule.activity.getString(R.string.customize_and_share)
         // Note: Download button is identified by icon, harder to test reliably without tags/desc
 
-        val initialState = ResultState(resultImageUri = testUri, promptText = "test")
+        val initialState = ResultState(resultImageBitmap = testBitmap, promptText = "test")
         val state = mutableStateOf(initialState)
 
         composeTestRule.setContent {
@@ -77,7 +78,7 @@ class ResultsScreenTest {
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
 
         // Ensure promptText is non-null when bitmap is present
-        val initialState = ResultState(resultImageUri = testUri, promptText = "test")
+        val initialState = ResultState(resultImageBitmap = testBitmap, promptText = "test")
         val state = mutableStateOf(initialState)
 
         composeTestRule.setContent {
@@ -105,9 +106,9 @@ class ResultsScreenTest {
         val photoOptionText = composeTestRule.activity.getString(R.string.photo)
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
         val backCardDesc = composeTestRule.activity.getString(R.string.original_image)
-        val testUri = android.net.Uri.parse("placeholder://image")
+        val dummyUri = android.net.Uri.parse("dummy://image")
 
-        val initialState = ResultState(resultImageUri = testUri, originalImageUrl = testUri)
+        val initialState = ResultState(resultImageBitmap = testBitmap, originalImageUrl = dummyUri)
         val state = mutableStateOf(initialState)
 
         composeTestRule.setContent {
@@ -142,7 +143,7 @@ class ResultsScreenTest {
         val promptText = "test prompt"
         val promptPrefix = composeTestRule.activity.getString(R.string.my_bot_is_wearing)
 
-        val initialState = ResultState(resultImageUri = testUri, promptText = promptText) // No original image URI
+        val initialState = ResultState(resultImageBitmap = testBitmap, promptText = promptText) // No original image URI
         val state = mutableStateOf(initialState)
 
         composeTestRule.setContent {
@@ -172,9 +173,9 @@ class ResultsScreenTest {
         val botOptionText = composeTestRule.activity.getString(R.string.bot)
         val photoOptionText = composeTestRule.activity.getString(R.string.photo)
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
-        val testUri = android.net.Uri.parse("placeholder://image")
+        val dummyUri = android.net.Uri.parse("dummy://image")
 
-        val initialState = ResultState(resultImageUri = testUri, originalImageUrl = testUri)
+        val initialState = ResultState(resultImageBitmap = testBitmap, originalImageUrl = dummyUri)
         val state = mutableStateOf(initialState)
 
         composeTestRule.setContent {
@@ -209,7 +210,7 @@ class ResultsScreenTest {
         var shareClicked = false
 
         // Ensure promptText is non-null when bitmap is present
-        val initialState = ResultState(resultImageUri = testUri, promptText = "test")
+        val initialState = ResultState(resultImageBitmap = testBitmap, promptText = "test")
         val state = mutableStateOf(initialState)
 
         composeTestRule.setContent {

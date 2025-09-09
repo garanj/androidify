@@ -17,14 +17,17 @@
 
 package com.android.developers.androidify.customize
 
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.test.core.app.ApplicationProvider
 import com.android.developers.testing.data.TestFileProvider
-import com.android.developers.testing.data.bitmapSample
+import com.android.developers.testing.network.TestRemoteConfigDataSource
 import com.android.developers.testing.repository.FakeImageGenerationRepository
+import com.android.developers.testing.repository.FakeWatchFaceInstallationRepository
 import com.android.developers.testing.util.FakeComposableBitmapRenderer
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceUntilIdle
@@ -46,56 +49,83 @@ class CustomizeViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private lateinit var viewModel: CustomizeExportViewModel
-    private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
-    private val fakeUri = Uri.parse("content://com.example.app/images/original.jpg")
+    private val fakeBitmap = Bitmap.createBitmap(1, 1, Bitmap.Config.ARGB_8888)
+    private val originalFakeUri = Uri.parse("content://com.example.app/images/original.jpg")
 
     @Before
     fun setup() {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = false
         viewModel = CustomizeExportViewModel(
-            fakeUri,
-            originalFakeUri,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = remoteConfigDataSource,
         )
     }
 
     @Test
-    fun stateResultUri_NotNull() = runTest {
-        assertNotNull(
-            viewModel.state.value.exportImageCanvas.imageUri,
+    fun stateInitialEmpty() = runTest {
+        assertEquals(
+            CustomizeExportState(),
+            viewModel.state.value,
         )
     }
 
     @Test
     fun setArgumentsWithOriginalImage() = runTest {
+        val initialState = viewModel.state.value
+
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
+
+        // Ensure state has changed - view model uses combine to combine state flows so state
+        // update is not immediate
+        val newState = viewModel.state.first { it != initialState }
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
+                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
                 originalImageUrl = originalFakeUri,
             ),
-            viewModel.state.value,
+            newState,
         )
     }
 
     @Test
     fun setArgumentsWithPrompt() = runTest {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = false
+        val initialState = viewModel.state.value
+
         val viewModel = CustomizeExportViewModel(
-            fakeUri,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
+            remoteConfigDataSource = remoteConfigDataSource,
         )
+
+        viewModel.setArguments(
+            fakeBitmap,
+            null,
+        )
+
+        // Ensure state has changed - view model uses combine to combine state flows so state
+        // update is not immediate
+        val newState = viewModel.state.first { it != initialState }
+
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
+                exportImageCanvas = ExportImageCanvas(imageBitmap = fakeBitmap),
                 originalImageUrl = null,
             ),
-            viewModel.state.value,
+            newState,
         )
     }
 
@@ -107,6 +137,11 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
 
         viewModel.downloadClicked()
         assertNotNull(values.last().externalOriginalSavedUri)
@@ -125,6 +160,10 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         advanceUntilIdle()
         viewModel.shareClicked()
         // Ensure all coroutines on the test scheduler complete
@@ -135,12 +174,12 @@ class CustomizeViewModelTest {
     @Test
     fun changeBackground_NotNull() = runTest {
         val viewModel = CustomizeExportViewModel(
-            fakeUri,
-            null,
             FakeImageGenerationRepository(),
             composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
             application = ApplicationProvider.getApplicationContext(),
             localFileProvider = TestFileProvider(),
+            remoteConfigDataSource = TestRemoteConfigDataSource(false),
         )
         val values = mutableListOf<CustomizeExportState>()
         // Launch collector on the backgroundScope directly to use runTest's scheduler
@@ -149,6 +188,10 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -175,6 +218,10 @@ class CustomizeViewModelTest {
                 values.add(it)
             }
         }
+        viewModel.setArguments(
+            fakeBitmap,
+            originalFakeUri,
+        )
         advanceUntilIdle()
         viewModel.selectedToolStateChanged(
             BackgroundToolState(
@@ -189,5 +236,32 @@ class CustomizeViewModelTest {
         advanceUntilIdle()
         assertTrue { !values[values.lastIndex].showImageEditProgress }
         assertNull(values.last().exportImageCanvas.imageWithEdit)
+    }
+
+    @Test
+    fun remoteConfigDataSource_BackgroundVibesFeatureEnabled_ContainsVibeList() = runTest {
+        val remoteConfigDataSource = TestRemoteConfigDataSource(true)
+        remoteConfigDataSource.backgroundVibeEnabled = true
+        val viewModel = CustomizeExportViewModel(
+            FakeImageGenerationRepository(),
+            composableBitmapRenderer = FakeComposableBitmapRenderer(),
+            application = ApplicationProvider.getApplicationContext(),
+            localFileProvider = TestFileProvider(),
+            watchfaceInstallationRepository = FakeWatchFaceInstallationRepository(),
+            remoteConfigDataSource = remoteConfigDataSource,
+        )
+
+        val initialState = viewModel.state.value
+
+        viewModel.setArguments(
+            fakeBitmap,
+            null,
+        )
+
+        val newState = viewModel.state.first { it != initialState }
+        val toolState = newState.toolState[CustomizeTool.Background] as BackgroundToolState
+
+        assertTrue(toolState.options.size > 5)
+        assertTrue(toolState.options.any { it.aiBackground })
     }
 }

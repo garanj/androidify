@@ -16,6 +16,14 @@
 -->
 <defaults>
     <entry>
+        <key>watchface_feature_enabled</key>
+        <value>false</value>
+    </entry>
+    <entry>
+        <key>background_vibes_feature_enabled</key>
+        <value>false</value>
+    </entry>
+    <entry>
         <key>bot_background_instruction_prompt</key>
         <value>Add the input image android bot as the main subject to the result,
             it should be the most prominent element of the resultant image, large and
