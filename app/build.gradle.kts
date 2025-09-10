@@ -136,6 +136,7 @@ dependencies {
 
     implementation(platform(libs.firebase.bom))
     implementation(libs.firebase.crashlytics)
+    implementation(libs.timber)
     implementation(libs.firebase.ai)
     implementation(libs.firebase.app.check)
     implementation(libs.firebase.config)

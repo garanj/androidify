@@ -18,13 +18,13 @@ package com.android.developers.androidify.data
 import android.graphics.Bitmap
 import android.graphics.BitmapFactory
 import android.net.Uri
-import android.util.Log
 import com.android.developers.androidify.RemoteConfigDataSource
 import com.android.developers.androidify.model.ValidatedDescription
 import com.android.developers.androidify.model.ValidatedImage
 import com.android.developers.androidify.ondevice.LocalSegmentationDataSource
 import com.android.developers.androidify.util.LocalFileProvider
 import com.android.developers.androidify.vertexai.FirebaseAiDataSource
+import timber.log.Timber
 import java.io.File
 import java.util.UUID
 import javax.inject.Inject
@@ -53,7 +53,7 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
 ) : ImageGenerationRepository {
 
     override suspend fun initialize() {
-        Log.d("ImageGenerationRepository", "Initializing")
+        Timber.d("Initializing")
         geminiNanoDataSource.initialize()
     }
 

@@ -71,6 +71,7 @@ dependencies {
     implementation(libs.coil.compose.http)
     implementation(libs.coil.gif)
     implementation(platform(libs.firebase.bom))
+    implementation(libs.timber)
     implementation(libs.firebase.ai)
     implementation(libs.firebase.analytics) {
         exclude(group = "com.google.guava")

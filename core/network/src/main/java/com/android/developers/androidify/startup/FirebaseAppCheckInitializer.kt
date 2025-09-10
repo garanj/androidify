@@ -17,7 +17,6 @@ package com.android.developers.androidify.startup
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.startup.Initializer
 import com.android.developers.androidify.network.BuildConfig
 import com.google.firebase.Firebase
@@ -25,6 +24,7 @@ import com.google.firebase.appcheck.FirebaseAppCheck
 import com.google.firebase.appcheck.appCheck
 import com.google.firebase.appcheck.debug.DebugAppCheckProviderFactory
 import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderFactory
+import timber.log.Timber
 
 /**
  * Initialize [FirebaseAppCheck] using the App Startup Library.
@@ -32,19 +32,35 @@ import com.google.firebase.appcheck.playintegrity.PlayIntegrityAppCheckProviderF
 @SuppressLint("EnsureInitializerMetadata") // Registered in :app module
 class FirebaseAppCheckInitializer : Initializer<FirebaseAppCheck> {
     override fun create(context: Context): FirebaseAppCheck {
-        return Firebase.appCheck.apply {
+        val appCheck = Firebase.appCheck.apply {
             if (BuildConfig.DEBUG) {
-                Log.i("AndroidifyAppCheck", "Firebase debug")
+                Timber.i(
+                    "Installing Firebase debug, ensure your " +
+                        "debug token is registered on Firebase Console",
+                )
                 installAppCheckProviderFactory(
                     DebugAppCheckProviderFactory.getInstance(),
                 )
             } else {
-                Log.i("AndroidifyAppCheck", "Play integrity")
+                Timber.i("Play integrity installing...")
                 installAppCheckProviderFactory(
                     PlayIntegrityAppCheckProviderFactory.getInstance(),
                 )
             }
+            setTokenAutoRefreshEnabled(true)
         }
+        if (!BuildConfig.DEBUG) {
+            val token = appCheck.getAppCheckToken(false)
+            token.addOnCompleteListener {
+                if (token.isSuccessful) {
+                    Timber.i("Firebase app check token success: ${token.result.token}")
+                    Timber.i("Firebase app check token success: ${token.result.expireTimeMillis}")
+                } else {
+                    Timber.e(token.exception, "Firebase app check token failure")
+                }
+            }
+        }
+        return appCheck
     }
 
     override fun dependencies(): List<Class<out Initializer<*>?>?> {

@@ -19,7 +19,6 @@ import android.app.Application
 import android.media.Image
 import android.media.MediaActionSound
 import android.net.Uri
-import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.annotation.OptIn
 import androidx.camera.core.CameraControl
@@ -66,6 +65,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.tasks.await
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -192,10 +192,10 @@ class CameraViewModel
             try {
                 // Use the suspend version of takePicture() to get the result
                 val outputFileResults = cameraCaptureUseCase.takePicture(outputFileOptions)
-                Log.d("CameraViewModel", "Image captured: ${outputFileResults.savedUri}")
+                Timber.d("Image captured: ${outputFileResults.savedUri}")
                 _uiState.update { it.copy(imageUri = outputFileResults.savedUri) }
             } catch (exception: ImageCaptureException) {
-                Log.e("CameraViewModel", "Error capturing image $exception")
+                Timber.e(exception, "Error capturing image")
                 // TODO handle error on screen
             }
         }
