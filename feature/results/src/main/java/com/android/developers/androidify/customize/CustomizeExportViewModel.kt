@@ -37,7 +37,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
@@ -77,9 +77,10 @@ class CustomizeExportViewModel @AssistedInject constructor(
         )
     }.stateIn(
         scope = viewModelScope,
-        started = WhileSubscribed(5000),
+        started = SharingStarted.Eagerly,
         initialValue = _state.value,
     )
+    //val state = _state.asStateFlow()
 
     private var transferJob: Job? = null
 

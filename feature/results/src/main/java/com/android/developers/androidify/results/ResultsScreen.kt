@@ -43,6 +43,7 @@ import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -71,6 +72,7 @@ import com.android.developers.androidify.util.SmallPhonePreview
 import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
+import kotlinx.coroutines.delay
 
 @Composable
 fun ResultsScreen(
@@ -181,7 +183,11 @@ fun ResultsScreenContents(
     defaultSelectedResult: ResultOption = ResultOption.ResultImage,
 ) {
     ResultsBackground()
-    val showResult = state.value.resultImageUri != null
+    var showResult by remember { mutableStateOf(false) }
+    LaunchedEffect(Unit) {
+        delay(100)
+        showResult = state.value.resultImageUri != null
+    }
     var selectedResultOption by remember {
         mutableStateOf(defaultSelectedResult)
     }
