@@ -83,4 +83,8 @@ class TestRemoteConfigDataSource(private val useGeminiNano: Boolean) : RemoteCon
     override fun watchfaceFeatureEnabled(): Boolean {
         return true
     }
+
+    override fun isXrEnabled(): Boolean {
+        return false
+    }
 }

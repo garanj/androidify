@@ -48,7 +48,7 @@ class HomeScreenTest {
 
             SharedElementContextPreview {
                 HomeScreenContents(
-                    isMediumWindowSize = false, // Provide a default or mock value
+                    layoutType = HomeScreenLayoutType.Compact, // Provide a default or mock value
                     onClickLetsGo = { offset: IntOffset -> // Match the lambda signature
                         wasClicked = true
                     },
@@ -74,7 +74,7 @@ class HomeScreenTest {
         composeTestRule.setContent {
             SharedElementContextPreview {
                 HomeScreenContents(
-                    isMediumWindowSize = false, // Ensure compact mode for pager
+                    layoutType = HomeScreenLayoutType.Compact, // Ensure compact mode for pager
                     onClickLetsGo = { },
                     onAboutClicked = {},
                     videoLink = "",
