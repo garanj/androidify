@@ -136,17 +136,16 @@ fun PhotoPrompt(
                     MaterialTheme.colorScheme.outline,
                     cornerRadius = 28.dp,
                 )
-                .apply {
-                    if (externalAppCallback != null) {
-                        dragAndDropTarget(
-                            shouldStartDragAndDrop = { event ->
-                                dropBehaviourFactory.shouldStartDragAndDrop(
-                                    event,
-                                )
-                            },
-                            target = externalAppCallback,
-                        )
-                    }
+                .run {
+                    if (externalAppCallback == null) this
+                    else dragAndDropTarget(
+                        shouldStartDragAndDrop = { event ->
+                            dropBehaviourFactory.shouldStartDragAndDrop(
+                                event,
+                            )
+                        },
+                        target = externalAppCallback,
+                    )
                 }
                 .fillMaxSize()
                 .padding(2.dp),
@@ -354,7 +353,8 @@ fun ImagePreviewPreview() {
                 onUndoPressed = {},
                 onChooseImagePressed = {},
             ) {
-                val bitmap = ImageBitmap.imageResource(com.android.developers.androidify.results.R.drawable.placeholderbot)
+                val bitmap =
+                    ImageBitmap.imageResource(com.android.developers.androidify.results.R.drawable.placeholderbot)
                 Image(bitmap = bitmap, contentDescription = null)
             }
         }
