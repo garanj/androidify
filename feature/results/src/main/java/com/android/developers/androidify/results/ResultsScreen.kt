@@ -72,7 +72,6 @@ import com.android.developers.androidify.util.SmallPhonePreview
 import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
 import com.google.accompanist.permissions.ExperimentalPermissionsApi
-import kotlinx.coroutines.delay
 
 @Composable
 fun ResultsScreen(
@@ -184,8 +183,7 @@ fun ResultsScreenContents(
 ) {
     ResultsBackground()
     var showResult by remember { mutableStateOf(false) }
-    LaunchedEffect(Unit) {
-        delay(100)
+    LaunchedEffect(state.value.resultImageUri) {
         showResult = state.value.resultImageUri != null
     }
     var selectedResultOption by remember {
