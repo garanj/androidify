@@ -44,6 +44,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import javax.inject.Inject
+import kotlin.collections.isNotEmpty
 
 @HiltViewModel
 class CustomizeExportViewModel @Inject constructor(
@@ -300,10 +301,14 @@ class CustomizeExportViewModel @Inject constructor(
             }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
-                val savedOriginalUri =
-                    imageGenerationRepository.saveImageToExternalStorage(originalImage)
-                _state.update {
-                    it.copy(externalOriginalSavedUri = savedOriginalUri)
+                try {
+                    val savedOriginalUri =
+                        imageGenerationRepository.saveImageToExternalStorage(originalImage)
+                    _state.update {
+                        it.copy(externalOriginalSavedUri = savedOriginalUri)
+                    }
+                } catch (exception : Exception) {
+                    Log.d("CustomizeExportViewModel", "Original image save failed: ", exception)
                 }
             }
             if (resultBitmap != null) {
