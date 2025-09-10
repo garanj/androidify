@@ -20,7 +20,6 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.SharedElementContextPreview
 import com.android.developers.androidify.util.AdaptivePreview
-import com.android.developers.androidify.util.isAtLeastMedium
 
 class HomeScreenScreenshotTest {
 
