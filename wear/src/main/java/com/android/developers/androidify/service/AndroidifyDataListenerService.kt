@@ -226,7 +226,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
         delay(TRANSFER_TIMEOUT_MS)
         val transferState = watchFacePushStateManager.watchFaceInstallationStatus.first()
         if (transferState is WatchFaceInstallationStatus.Receiving &&
-            transferState.transferId == initialRequest.transferId) {
+            transferState.transferId == initialRequest.transferId
+        ) {
             watchFacePushStateManager.setWatchFaceInstallationStatus(
                 WatchFaceInstallationStatus.Complete(
                     success = false,
@@ -285,8 +286,8 @@ class AndroidifyDataListenerService : WearableListenerService() {
         @Suppress("DEPRECATION")
         val wakeLock = powerManager.newWakeLock(
             PowerManager.FULL_WAKE_LOCK
-                    or PowerManager.ACQUIRE_CAUSES_WAKEUP
-                    or PowerManager.ON_AFTER_RELEASE,
+                or PowerManager.ACQUIRE_CAUSES_WAKEUP
+                or PowerManager.ON_AFTER_RELEASE,
             WAKELOCK_TAG,
         )
 

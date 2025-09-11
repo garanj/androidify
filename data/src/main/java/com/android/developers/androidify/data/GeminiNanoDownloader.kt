@@ -16,12 +16,12 @@
 package com.android.developers.androidify.data
 
 import android.app.Application
-import android.util.Log
 import com.google.ai.edge.aicore.DownloadCallback
 import com.google.ai.edge.aicore.DownloadConfig
 import com.google.ai.edge.aicore.GenerativeAIException
 import com.google.ai.edge.aicore.GenerativeModel
 import com.google.ai.edge.aicore.generationConfig
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -35,34 +35,34 @@ class GeminiNanoDownloader @Inject constructor(private val application: Applicat
     fun isModelDownloaded() = modelDownloaded
 
     suspend fun downloadModel() {
-        Log.d("GeminiNanoDownloader", "downloadModel")
+        Timber.d("downloadModel")
         try {
             setup()
             generativeModel?.prepareInferenceEngine()
         } catch (e: Exception) {
-            Log.e("GeminiNanoDownloader", "Error preparing inference engine", e)
+            Timber.e(e, "Error preparing inference engine")
         }
-        Log.d("GeminiNanoDownloader", "prepare inference engine")
+        Timber.d("prepare inference engine")
     }
 
     private fun setup() {
         val downloadCallback = object : DownloadCallback {
             override fun onDownloadStarted(bytesToDownload: Long) {
                 super.onDownloadStarted(bytesToDownload)
-                Log.i("GeminiNanoDownloader", "onDownloadStarted for Gemini Nano $bytesToDownload")
+                Timber.i("onDownloadStarted for Gemini Nano $bytesToDownload")
             }
 
             override fun onDownloadCompleted() {
                 super.onDownloadCompleted()
                 modelDownloaded = true
-                Log.i("GeminiNanoDownloader", "onDownloadCompleted for Gemini Nano")
+                Timber.i("onDownloadCompleted for Gemini Nano")
             }
 
             override fun onDownloadFailed(failureStatus: String, e: GenerativeAIException) {
                 super.onDownloadFailed(failureStatus, e)
                 // downloading the model has failed so make the model null as we can't use it
                 generativeModel = null
-                Log.i("GeminiNanoDownloader", "onDownloadFailed for Gemini Nano")
+                Timber.i("onDownloadFailed for Gemini Nano")
             }
         }
 

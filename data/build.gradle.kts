@@ -49,6 +49,7 @@ dependencies {
 
     implementation(libs.kotlinx.serialization.json)
     implementation(libs.retrofit)
+    implementation(libs.timber)
     implementation(libs.converter.gson)
     implementation(libs.logging.interceptor)
     implementation(libs.hilt.android)

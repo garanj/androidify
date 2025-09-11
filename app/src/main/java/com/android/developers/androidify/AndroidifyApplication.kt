@@ -23,7 +23,9 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import dagger.hilt.android.HiltAndroidApp
+import timber.log.Timber
 import javax.inject.Inject
+
 @HiltAndroidApp
 class AndroidifyApplication : Application(), SingletonImageLoader.Factory {
 
@@ -32,6 +34,11 @@ class AndroidifyApplication : Application(), SingletonImageLoader.Factory {
 
     override fun onCreate() {
         super.onCreate()
+        if (isDebuggable()) {
+            Timber.plant(Timber.DebugTree())
+        } else {
+            Timber.plant(CrashlyticsTree())
+        }
         setStrictModePolicy()
     }
 

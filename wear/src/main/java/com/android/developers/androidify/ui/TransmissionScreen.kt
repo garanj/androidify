@@ -100,12 +100,14 @@ fun TransmissionScreen(modifier: Modifier = Modifier) {
 
 @Composable
 fun FourColorProgressIndicator() {
-    val colors = remember { listOf(
-        LimeGreen,
-        Primary80,
-        Primary90,
-        Blue,
-    ) }
+    val colors = remember {
+        listOf(
+            LimeGreen,
+            Primary80,
+            Primary90,
+            Blue,
+        )
+    }
 
     val infiniteTransition = rememberInfiniteTransition(label = "transition")
     val progress by infiniteTransition.animateFloat(

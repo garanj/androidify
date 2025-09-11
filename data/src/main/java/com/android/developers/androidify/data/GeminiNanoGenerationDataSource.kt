@@ -15,7 +15,7 @@
  */
 package com.android.developers.androidify.data
 
-import android.util.Log
+import timber.log.Timber
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -39,7 +39,7 @@ internal class GeminiNanoGenerationDataSourceImpl @Inject constructor(private va
     override suspend fun generatePrompt(prompt: String): String? {
         if (!downloader.isModelDownloaded()) return null
         val response = downloader.generativeModel?.generateContent(prompt)
-        Log.d("GeminiNanoGenerationDataSource", "generatePrompt: ${response?.text}")
+        Timber.d("generatePrompt: ${response?.text}")
         return response?.text
     }
 }
