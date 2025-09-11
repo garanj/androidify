@@ -49,15 +49,13 @@ class FirebaseAppCheckInitializer : Initializer<FirebaseAppCheck> {
             }
             setTokenAutoRefreshEnabled(true)
         }
-        if (!BuildConfig.DEBUG) {
-            val token = appCheck.getAppCheckToken(false)
-            token.addOnCompleteListener {
-                if (token.isSuccessful) {
-                    Timber.i("Firebase app check token success: ${token.result.token}")
-                    Timber.i("Firebase app check token success: ${token.result.expireTimeMillis}")
-                } else {
-                    Timber.e(token.exception, "Firebase app check token failure")
-                }
+
+        val token = appCheck.getAppCheckToken(false)
+        token.addOnCompleteListener {
+            if (token.isSuccessful) {
+                Timber.i("Firebase app check token success: ${token.result.expireTimeMillis}")
+            } else {
+                Timber.e(token.exception, "Firebase app check token failure")
             }
         }
         return appCheck
