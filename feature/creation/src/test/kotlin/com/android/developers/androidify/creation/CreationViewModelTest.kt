@@ -52,6 +52,7 @@ class CreationViewModelTest {
     private val imageGenerationRepository = FakeImageGenerationRepository()
 
     private val fakeUri = Uri.parse("test.jpeg")
+
     @Before
     fun setup() {
         viewModel = CreationViewModel(
@@ -62,7 +63,6 @@ class CreationViewModelTest {
             FakeDropImageFactory(),
             context = RuntimeEnvironment.getApplication(),
         )
-
     }
 
     @Test
