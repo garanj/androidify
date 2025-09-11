@@ -73,6 +73,7 @@ dependencies {
     implementation(libs.kotlinx.coroutines.play.services)
     implementation(libs.mlkit.pose.detection)
     implementation(libs.guava)
+    implementation(libs.timber)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.ui.tooling)

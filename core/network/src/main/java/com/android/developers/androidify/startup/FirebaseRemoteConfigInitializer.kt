@@ -17,13 +17,13 @@ package com.android.developers.androidify.startup
 
 import android.annotation.SuppressLint
 import android.content.Context
-import android.util.Log
 import androidx.startup.Initializer
 import com.android.developers.androidify.network.R
 import com.google.firebase.Firebase
 import com.google.firebase.remoteconfig.FirebaseRemoteConfig
 import com.google.firebase.remoteconfig.remoteConfig
 import com.google.firebase.remoteconfig.remoteConfigSettings
+import timber.log.Timber
 
 /**
  * Initialize [FirebaseRemoteConfig] using the App Startup Library.
@@ -39,10 +39,10 @@ class FirebaseRemoteConfigInitializer : Initializer<FirebaseRemoteConfig> {
             setDefaultsAsync(R.xml.remote_config_defaults)
             fetchAndActivate()
                 .addOnSuccessListener {
-                    Log.d("FirebaseRemoteConfig", "Config params updated: $it")
+                    Timber.d("Config params updated: $it")
                 }
                 .addOnFailureListener {
-                    Log.d("FirebaseRemoteConfig", "Config params failed: $it")
+                    Timber.d("Config params failed: $it")
                 }
         }
     }

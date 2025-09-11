@@ -65,6 +65,7 @@ dependencies {
     implementation(libs.accompanist.permissions)
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.mlkit.segmentation)
+    implementation(libs.timber)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.ui.tooling)
