@@ -43,3 +43,11 @@
 
 # Ignore missing Java SE annotation processing classes, often from libraries like AutoValue
 -dontwarn javax.lang.model.**
+
+# OkHttp
+-keep class okhttp3.** { *; }
+-keep interface okhttp3.** { *; }
+-dontwarn okhttp3.**
+
+# Ignore SAX parser warning
+-dontwarn org.xml.sax.**
