@@ -409,6 +409,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                     )
                 }
             } catch (e: Exception) {
+                Timber.e(e, "Could not load Bitmap from the URI due to ${e.message}")
                 _snackbarHostState.value.showSnackbar("Could not load image.")
             }
         }
