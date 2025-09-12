@@ -16,6 +16,7 @@
 package com.android.developers.androidify.customize
 
 import android.content.ContentResolver
+import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.ImageBitmap
@@ -23,7 +24,6 @@ import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.imageResource
 import androidx.core.net.toUri
-import coil3.Bitmap
 import com.android.developers.androidify.results.R
 
 @Composable
