@@ -17,7 +17,6 @@
 
 package com.android.developers.androidify.results
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.EaseOutBack
@@ -52,11 +51,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringArrayResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -64,8 +60,8 @@ import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.android.developers.androidify.customize.getPlaceholderBotUri
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.AboutButton
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
@@ -79,20 +75,14 @@ import com.google.accompanist.permissions.ExperimentalPermissionsApi
 
 @Composable
 fun ResultsScreen(
-    resultImage: Bitmap,
-    originalImageUri: Uri?,
-    promptText: String?,
     modifier: Modifier = Modifier,
     verboseLayout: Boolean = allowsFullContent(),
     onBackPress: () -> Unit,
     onAboutPress: () -> Unit,
-    onNextPress: () -> Unit,
-    viewModel: ResultsViewModel = hiltViewModel<ResultsViewModel>(),
+    onNextPress: (resultImageUri: Uri, originalImageUri: Uri?) -> Unit,
+    viewModel: ResultsViewModel,
 ) {
     val state = viewModel.state.collectAsStateWithLifecycle()
-    LaunchedEffect(resultImage, originalImageUri, promptText) {
-        viewModel.setArguments(resultImage, originalImageUri, promptText)
-    }
     val snackbarHostState by viewModel.snackbarHostState.collectAsStateWithLifecycle()
     Scaffold(
         snackbarHost = {
@@ -124,7 +114,14 @@ fun ResultsScreen(
             contentPadding,
             state,
             verboseLayout = verboseLayout,
-            onCustomizeShareClicked = onNextPress,
+            onCustomizeShareClicked = {
+                viewModel.state.value.resultImageUri?.let {
+                    onNextPress(
+                        it,
+                        viewModel.state.value.originalImageUrl,
+                    )
+                }
+            },
         )
     }
 }
@@ -135,11 +132,11 @@ fun ResultsScreen(
 @Composable
 private fun ResultsScreenPreview() {
     AndroidifyTheme {
-        val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+        val imageUri = getPlaceholderBotUri()
         val state = remember {
             mutableStateOf(
                 ResultState(
-                    resultImageBitmap = bitmap.asAndroidBitmap(),
+                    resultImageUri = imageUri,
                     promptText = "wearing a hat with straw hair",
                 ),
             )
@@ -157,11 +154,11 @@ private fun ResultsScreenPreview() {
 @Composable
 private fun ResultsScreenPreviewSmall() {
     AndroidifyTheme {
-        val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+        val imageUri = getPlaceholderBotUri()
         val state = remember {
             mutableStateOf(
                 ResultState(
-                    resultImageBitmap = bitmap.asAndroidBitmap(),
+                    resultImageUri = imageUri,
                     promptText = "wearing a hat with straw hair",
                 ),
             )
@@ -185,7 +182,10 @@ fun ResultsScreenContents(
     defaultSelectedResult: ResultOption = ResultOption.ResultImage,
 ) {
     ResultsBackground()
-    val showResult = state.value.resultImageBitmap != null
+    var showResult by remember { mutableStateOf(false) }
+    LaunchedEffect(state.value.resultImageUri) {
+        showResult = state.value.resultImageUri != null
+    }
     var selectedResultOption by remember {
         mutableStateOf(defaultSelectedResult)
     }
@@ -213,7 +213,7 @@ fun ResultsScreenContents(
                     .fillMaxSize(),
             ) {
                 BotResultCard(
-                    state.value.resultImageBitmap!!,
+                    state.value.resultImageUri!!,
                     state.value.originalImageUrl,
                     state.value.promptText,
                     modifier = Modifier.align(Alignment.Center),

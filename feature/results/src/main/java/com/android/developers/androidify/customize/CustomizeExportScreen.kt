@@ -18,9 +18,6 @@
 package com.android.developers.androidify.customize
 
 import android.Manifest
-import android.R.attr.visible
-import android.graphics.Bitmap
-import android.net.Uri
 import android.os.Build
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ExperimentalSharedTransitionApi
@@ -62,18 +59,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.dropShadow
-import androidx.compose.ui.graphics.ImageBitmap
-import androidx.compose.ui.graphics.asAndroidBitmap
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.res.imageResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
 import com.android.developers.androidify.results.PermissionRationaleDialog
@@ -101,16 +94,11 @@ import com.android.developers.androidify.theme.R as ThemeR
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun CustomizeAndExportScreen(
-    resultImage: Bitmap,
-    originalImageUri: Uri?,
     onBackPress: () -> Unit,
     onInfoPress: () -> Unit,
     isMediumWindowSize: Boolean = isAtLeastMedium(),
-    viewModel: CustomizeExportViewModel = hiltViewModel<CustomizeExportViewModel>(),
+    viewModel: CustomizeExportViewModel,
 ) {
-    LaunchedEffect(resultImage, originalImageUri) {
-        viewModel.setArguments(resultImage, originalImageUri)
-    }
     val state = viewModel.state.collectAsStateWithLifecycle()
 
     val context = LocalContext.current
@@ -497,9 +485,9 @@ fun CustomizeExportPreview() {
                     displayName = "Pixel Watch 3",
                     hasAndroidify = true,
                 )
-                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val bitmap = getPlaceholderBotBitmap()
                 val state = CustomizeExportState(
-                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap.asAndroidBitmap()),
+                    exportImageCanvas = ExportImageCanvas(imageBitmap = bitmap),
                     connectedWatch = connectedWatch,
                 )
                 CustomizeExportContents(
@@ -529,7 +517,7 @@ fun CustomizeExportPreviewLarge() {
         AnimatedContent(true) { targetState ->
             targetState
             CompositionLocalProvider(LocalNavAnimatedContentScope provides this@AnimatedContent) {
-                val bitmap = ImageBitmap.imageResource(R.drawable.placeholderbot)
+                val bitmap = getPlaceholderBotBitmap()
                 val connectedWatch = ConnectedWatch(
                     nodeId = "1234",
                     displayName = "Pixel Watch 3",
@@ -537,7 +525,7 @@ fun CustomizeExportPreviewLarge() {
                 )
                 val state = CustomizeExportState(
                     exportImageCanvas = ExportImageCanvas(
-                        imageBitmap = bitmap.asAndroidBitmap(),
+                        imageBitmap = bitmap,
                         aspectRatioOption = SizeOption.Square,
                     ),
                     selectedTool = CustomizeTool.Background,
