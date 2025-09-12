@@ -35,6 +35,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerScope
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
@@ -46,6 +47,9 @@ import androidx.compose.material3.ToggleButton
 import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
@@ -68,8 +72,8 @@ fun MainCreationPane(
     onSelectedPromptOptionChanged: (PromptType) -> Unit,
     onDropCallback: (Uri) -> Unit,
 ) {
-    PromptTypePager(modifier, uiState, onSelectedPromptOptionChanged) {
-        when (it) {
+    PromptTypePager(modifier, uiState, onSelectedPromptOptionChanged) { promptType, pagerState ->
+        when (promptType) {
             PromptType.PHOTO -> {
                 PhotoPrompt(
                     uiState = uiState,
@@ -82,16 +86,25 @@ fun MainCreationPane(
             }
 
             PromptType.TEXT -> {
-                TextPrompt(
-                    textFieldState = uiState.descriptionText,
-                    promptGenerationInProgress = uiState.promptGenerationInProgress,
-                    generatedPrompt = uiState.generatedPrompt,
-                    onPromptGenerationPressed = onPromptGenerationPressed,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .heightIn(min = 200.dp)
-                        .padding(2.dp),
-                )
+                // Workaround for https://issuetracker.google.com/432431393
+                val showTextPrompt by remember {
+                    derivedStateOf {
+                        pagerState.currentPage == PromptType.TEXT.ordinal
+                                && pagerState.targetPage == pagerState.currentPage
+                    }
+                }
+                if (showTextPrompt) {
+                    TextPrompt(
+                        textFieldState = uiState.descriptionText,
+                        promptGenerationInProgress = uiState.promptGenerationInProgress,
+                        generatedPrompt = uiState.generatedPrompt,
+                        onPromptGenerationPressed = onPromptGenerationPressed,
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .heightIn(min = 200.dp)
+                            .padding(2.dp),
+                    )
+                }
             }
         }
     }
@@ -102,7 +115,7 @@ private fun PromptTypePager(
     modifier: Modifier = Modifier,
     uiState: CreationState,
     onSelectedPromptOptionChanged: (PromptType) -> Unit,
-    content: @Composable PagerScope.(PromptType) -> Unit,
+    content: @Composable PagerScope.(PromptType, PagerState) -> Unit,
 ) {
     Box(
         modifier = modifier,
@@ -141,7 +154,7 @@ private fun PromptTypePager(
             pageSpacing = 16.dp,
             contentPadding = PaddingValues(16.dp),
             pageContent = {
-                content(this, PromptType.entries[it])
+                content(this, PromptType.entries[it], pagerState)
             },
         )
     }
