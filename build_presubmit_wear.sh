@@ -128,10 +128,6 @@ collect_artifacts() {
   fi
 }
 
-# Copy the app-specific SPDX SBOM
-echo "INFO: Copying SPDX SBOM..."
-cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/wear-release.spdx.json"
-
 # Collect the Wear OS application artifacts
 collect_artifacts "wear/build/outputs/bundle/release" "wear-release.aab" "wear-release-unsigned.aab"
 
