@@ -77,7 +77,7 @@ class CustomizeStateTest {
     @Test
     fun exportImageCanvas_defaultValues() {
         val canvas = ExportImageCanvas()
-        Assert.assertNull(canvas.imageUri)
+        Assert.assertNull(canvas.imageBitmap)
         Assert.assertEquals(SizeOption.Square, canvas.aspectRatioOption)
         Assert.assertEquals(Size(1000f, 1000f), canvas.canvasSize)
         Assert.assertNull(canvas.mainImageUri)
@@ -86,7 +86,7 @@ class CustomizeStateTest {
         Assert.assertEquals(0f, canvas.imageRotation)
         Assert.assertEquals(Size(1024f, 1024f), canvas.imageOriginalBitmapSize)
         Assert.assertEquals(BackgroundOption.IO, canvas.selectedBackgroundOption)
-        Assert.assertEquals(com.android.developers.androidify.results.R.drawable.background_square_blocks, canvas.selectedBackgroundDrawable)
+        Assert.assertEquals(R.drawable.background_square_blocks, canvas.selectedBackgroundDrawable)
         Assert.assertTrue(canvas.includeWatermark)
     }
 

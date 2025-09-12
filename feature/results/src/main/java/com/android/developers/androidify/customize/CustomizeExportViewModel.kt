@@ -115,7 +115,6 @@ class CustomizeExportViewModel @AssistedInject constructor(
         _state.update {
             it.copy(
                 originalImageUrl = originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageUri = resultImageUrl),
                 toolState = mapOf(
                     CustomizeTool.Size to AspectRatioToolState(),
                     CustomizeTool.Background to BackgroundToolState(

@@ -74,8 +74,8 @@ class CustomizeViewModelTest {
         val firstState = viewModel.state.first()
 
         // Assert
-        assertNotNull(firstState.exportImageCanvas.imageUri)
-        assertEquals(fakeUri, firstState.exportImageCanvas.imageUri)
+        assertNotNull(firstState.exportImageCanvas.imageBitmap)
+        assertEquals(bitmapSample, firstState.exportImageCanvas.imageBitmap)
         /*assertNotNull(
             viewModel.state.value.exportImageCanvas.imageUri,
         )*/
@@ -89,7 +89,7 @@ class CustomizeViewModelTest {
         val newState = viewModel.state.first { it != initialState }
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
+                exportImageCanvas = ExportImageCanvas(imageBitmap = bitmapSample),
                 originalImageUrl = originalFakeUri,
             ),
             newState,
@@ -118,7 +118,7 @@ class CustomizeViewModelTest {
 
         assertEquals(
             CustomizeExportState(
-                exportImageCanvas = ExportImageCanvas(imageUri = fakeUri, imageBitmap = bitmapSample),
+                exportImageCanvas = ExportImageCanvas(imageBitmap = bitmapSample),
                 originalImageUrl = null,
             ),
             newState,

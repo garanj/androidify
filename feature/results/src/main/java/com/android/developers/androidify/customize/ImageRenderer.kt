@@ -207,12 +207,12 @@ private fun Modifier.safeAnimateBounds(): Modifier {
 @Preview
 @Composable
 private fun ImageRendererPreviewSquare() {
-    val imageUri = getPlaceholderBotUri()
+    val imageBitmap = getPlaceholderBotBitmap()
 
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
-                imageUri = imageUri,
+                imageBitmap = imageBitmap,
                 canvasSize = Size(1000f, 1000f),
                 aspectRatioOption = SizeOption.Square,
                 selectedBackgroundOption = BackgroundOption.IO,
@@ -230,11 +230,11 @@ private fun ImageRendererPreviewSquare() {
 @Preview
 @Composable
 private fun ImageRendererPreviewBanner() {
-    val imageUri = getPlaceholderBotUri()
+    val imageBitmap = getPlaceholderBotBitmap()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
-                imageUri = imageUri,
+                imageBitmap = imageBitmap,
                 canvasSize = Size(1000f, 1000f),
                 aspectRatioOption = SizeOption.Banner,
                 selectedBackgroundOption = BackgroundOption.Lightspeed,
@@ -252,11 +252,11 @@ private fun ImageRendererPreviewBanner() {
 @Preview
 @Composable
 private fun ImageRendererPreviewWallpaper() {
-    val imageUri = getPlaceholderBotUri()
+    val imageBitmap = getPlaceholderBotBitmap()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
-                imageUri = imageUri,
+                imageBitmap = imageBitmap,
                 canvasSize = Size(1000f, 1000f),
                 aspectRatioOption = SizeOption.Wallpaper,
                 selectedBackgroundOption = BackgroundOption.Lightspeed,
@@ -274,11 +274,11 @@ private fun ImageRendererPreviewWallpaper() {
 @Preview(widthDp = 1280, heightDp = 800)
 @Composable
 private fun ImageRendererPreviewWallpaperTablet() {
-    val imageUri = getPlaceholderBotUri()
+    val imageBitmap = getPlaceholderBotBitmap()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
-                imageUri = imageUri,
+                imageBitmap = imageBitmap,
                 canvasSize = Size(1280f, 800f),
                 aspectRatioOption = SizeOption.WallpaperTablet,
                 selectedBackgroundOption = BackgroundOption.Lightspeed,
@@ -296,11 +296,11 @@ private fun ImageRendererPreviewWallpaperTablet() {
 @Preview
 @Composable
 private fun ImageRendererPreviewWallpaperSocial() {
-    val imageUri = getPlaceholderBotUri()
+    val imageBitmap = getPlaceholderBotBitmap()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
-                imageUri = imageUri,
+                imageBitmap = imageBitmap,
                 canvasSize = Size(1600f, 900f),
                 aspectRatioOption = SizeOption.SocialHeader,
                 selectedBackgroundOption = BackgroundOption.Lightspeed,
@@ -318,11 +318,11 @@ private fun ImageRendererPreviewWallpaperSocial() {
 @Preview
 @Composable
 fun ImageRendererPreviewWallpaperIO() {
-    val imageUri = getPlaceholderBotUri()
+    val imageBitmap = getPlaceholderBotBitmap()
     AndroidifyTheme {
         ImageResult(
             ExportImageCanvas(
-                imageUri = imageUri,
+                imageBitmap = imageBitmap,
                 canvasSize = Size(1600f, 900f),
                 aspectRatioOption = SizeOption.SocialHeader,
                 selectedBackgroundOption = BackgroundOption.IO,
