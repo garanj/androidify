@@ -94,10 +94,6 @@ chmod +x ./gradlew
 echo "INFO: Cleaning the project..."
 ./gradlew clean -Pandroid.sdk.path=$ANDROID_HOME
 
-# Build the production release bundles without generating baseline profiles.
-echo "INFO: Building the Android production release bundle..."
-./gradlew app:bundleRelease app:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
-
 echo "INFO: Building the Wear OS production release bundle..."
 ./gradlew wear:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
@@ -125,18 +121,12 @@ collect_artifacts() {
     cp "${aab_path}" "${artifact_dest_dir}/${aab_dest_file}"
     echo "SUCCESS: AAB copied to ${artifact_dest_dir}"
 
+
   else
     echo "FAILURE: AAB not found at ${aab_path}"
     exit 1
   fi
 }
-
-# Collect the main application artifacts
-collect_artifacts "app/build/outputs/bundle/release" "app-release.aab" "app-release-unsigned.aab"
-
-# Copy the app-specific SPDX SBOM
-echo "INFO: Copying SPDX SBOM..."
-cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
 
 # Collect the Wear OS application artifacts
 collect_artifacts "wear/build/outputs/bundle/release" "wear-release.aab" "wear-release-unsigned.aab"

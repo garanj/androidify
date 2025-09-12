@@ -22,6 +22,7 @@ set -e
 # --- Configuration ---
 # Get the script's directory.
 DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+echo DIR
 # Define the Android SDK version you want to target.
 ANDROID_SDK_VERSION="36"
 ANDROID_BUILD_TOOLS_VERSION="36.0.0"
@@ -81,6 +82,7 @@ cp /tmpfs/src/git/androidify-prebuilts/google-services.json ${DIR}/app
 echo "Copying gradle.properties"
 echo "" >> ${DIR}/gradle.properties # add a new line to the file
 cat /tmpfs/src/git/androidify-prebuilts/gradle.properties >> ${DIR}/gradle.properties
+ls
 
 # --- Build Process ---
 
@@ -94,10 +96,7 @@ echo "INFO: Cleaning the project..."
 
 # Build the production release bundles without generating baseline profiles.
 echo "INFO: Building the Android production release bundle..."
-./gradlew app:bundleRelease app:spdxSbomForRelease -x test -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
-
-echo "INFO: Building the Wear OS production release bundle..."
-./gradlew wear:bundleRelease -x test -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
+./gradlew app:bundleRelease app:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
 # --- Artifact Collection ---
 echo "INFO: Preparing artifacts for Kokoro..."
@@ -135,8 +134,5 @@ collect_artifacts "app/build/outputs/bundle/release" "app-release.aab" "app-rele
 # Copy the app-specific SPDX SBOM
 echo "INFO: Copying SPDX SBOM..."
 cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
-
-# Collect the Wear OS application artifacts
-collect_artifacts "wear/build/outputs/bundle/release" "wear-release.aab" "wear-release-unsigned.aab"
 
 exit 0
