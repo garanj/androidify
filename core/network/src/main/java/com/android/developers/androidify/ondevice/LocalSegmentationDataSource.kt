@@ -16,7 +16,6 @@
 package com.android.developers.androidify.ondevice
 
 import android.graphics.Bitmap
-import android.util.Log
 import com.google.android.gms.common.moduleinstall.InstallStatusListener
 import com.google.android.gms.common.moduleinstall.ModuleInstallClient
 import com.google.android.gms.common.moduleinstall.ModuleInstallRequest
@@ -28,6 +27,7 @@ import com.google.mlkit.vision.segmentation.subject.SubjectSegmentation
 import com.google.mlkit.vision.segmentation.subject.SubjectSegmenterOptions
 import kotlinx.coroutines.CancellableContinuation
 import kotlinx.coroutines.suspendCancellableCoroutine
+import timber.log.Timber
 import javax.inject.Inject
 import kotlin.coroutines.resume
 import kotlin.coroutines.resumeWithException
@@ -64,7 +64,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
     ) : InstallStatusListener {
 
         override fun onInstallStatusUpdated(update: ModuleInstallStatusUpdate) {
-            Log.d("LocalSegmentationDataSource", "Download progress: ${update.installState}.. ${continuation.hashCode()} ${continuation.isActive}")
+            Timber.d("Download progress: ${update.installState}.. ${continuation.hashCode()} ${continuation.isActive}")
             if (!continuation.isActive) return
             if (update.installState == ModuleInstallStatusUpdate.InstallState.STATE_COMPLETED) {
                 continuation.resume(true)
@@ -73,7 +73,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
                     ImageSegmentationException("Module download failed or was canceled. State: ${update.installState}"),
                 )
             } else {
-                Log.d("LocalSegmentationDataSource", "State update: ${update.installState}")
+                Timber.d("State update: ${update.installState}")
             }
         }
     }
@@ -88,11 +88,11 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
             moduleInstallClient
                 .installModules(moduleInstallRequest)
                 .addOnFailureListener {
-                    Log.e("LocalSegmentationDataSource", "Failed to download module", it)
+                    Timber.e(it, "Failed to download module")
                     continuation.resumeWithException(it)
                 }
                 .addOnCompleteListener {
-                    Log.d("LocalSegmentationDataSource", "Successfully triggered download - await download progress updates")
+                    Timber.d("Successfully triggered download - await download progress updates")
                 }
         }
         return result
@@ -102,13 +102,13 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
         val areModulesAvailable = isSubjectSegmentationModuleInstalled()
 
         if (!areModulesAvailable) {
-            Log.d("LocalSegmentationDataSource", "Modules not available - downloading")
+            Timber.d("Modules not available - downloading")
             val result = installSubjectSegmentationModule()
             if (!result) {
                 throw Exception("Failed to download module")
             }
         } else {
-            Log.d("LocalSegmentationDataSource", "Modules available")
+            Timber.d("Modules available")
         }
         val image = InputImage.fromBitmap(bitmap, 0)
         return suspendCancellableCoroutine { continuation ->
@@ -121,7 +121,7 @@ class LocalSegmentationDataSourceImpl @Inject constructor(
                     }
                 }
                 .addOnFailureListener { e ->
-                    Log.e("LocalSegmentationDataSource", "Exception while executing background removal", e)
+                    Timber.e(e, "Exception while executing background removal")
                     continuation.resumeWithException(e)
                 }
         }

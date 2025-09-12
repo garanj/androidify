@@ -17,7 +17,6 @@ package com.android.developers.androidify.creation
 
 import android.content.Context
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
@@ -43,6 +42,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = CreationViewModel.Factory::class)
 class CreationViewModel @AssistedInject constructor(
@@ -106,13 +107,13 @@ class CreationViewModel @AssistedInject constructor(
     fun onPromptGenerationClicked() {
         promptGenerationJob?.cancel()
         promptGenerationJob = viewModelScope.launch {
-            Log.d("CreationViewModel", "Generating prompt...")
+            Timber.d("Generating prompt...")
             _uiState.update {
                 it.copy(promptGenerationInProgress = true)
             }
             try {
                 val prompt = textGenerationRepository.getNextGeneratedBotPrompt()
-                Log.d("CreationViewModel", "Prompt: $prompt")
+                Timber.d("Prompt: $prompt")
                 if (prompt != null) {
                     _uiState.update {
                         it.copy(
@@ -122,7 +123,7 @@ class CreationViewModel @AssistedInject constructor(
                     }
                 }
             } catch (exception: Exception) {
-                Log.e("CreationViewModel", "Error generating prompt", exception)
+                Timber.e(exception, "Error generating prompt")
                 _uiState.update {
                     it.copy(promptGenerationInProgress = false)
                 }
@@ -176,7 +177,7 @@ class CreationViewModel @AssistedInject constructor(
     }
 
     private suspend fun handleImageGenerationError(exception: Exception) {
-        Log.d("CreationViewModel", "Exception in generating image", exception)
+        Timber.d(exception, "Exception in generating image")
         _uiState.update {
             it.copy(screenState = ScreenState.EDIT)
         }
@@ -195,7 +196,7 @@ class CreationViewModel @AssistedInject constructor(
             is NoInternetException -> context.getString(R.string.error_connectivity)
             is ImageDescriptionFailedGenerationException -> context.getString(R.string.error_image_validation)
             else -> {
-                Log.e("CreationViewModel", "Unknown error:", exception)
+                Timber.e(exception, "Unknown error:")
                 context.getString(R.string.error_upload_generic)
             }
         }

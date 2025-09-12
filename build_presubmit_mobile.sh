@@ -98,9 +98,6 @@ echo "INFO: Cleaning the project..."
 echo "INFO: Building the Android production release bundle..."
 ./gradlew app:bundleRelease app:spdxSbomForRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
 
-echo "INFO: Building the Wear OS production release bundle..."
-./gradlew wear:bundleRelease -x test -x uploadCrashlyticsMappingFileRelease -Pandroid.sdk.path=$ANDROID_HOME -PCI_BUILD=true
-
 # --- Artifact Collection ---
 echo "INFO: Preparing artifacts for Kokoro..."
 
@@ -125,21 +122,6 @@ collect_artifacts() {
     cp "${aab_path}" "${artifact_dest_dir}/${aab_dest_file}"
     echo "SUCCESS: AAB copied to ${artifact_dest_dir}"
 
-    # Find and list the files before copying
-    # Store the find results in a variable to avoid running find twice
-    # and to handle the case where no files are found gracefully.
-    local intoto_files
-    intoto_files=$(find . -type f -name "*.intoto.jsonl")
-
-    if [ -n "$intoto_files" ]; then
-      echo "INFO: Found the following .intoto.jsonl files:"
-      echo "$intoto_files" # This will list each file on a new line
-      echo "INFO: Copying .intoto.jsonl files to ${artifact_dest_dir}/"
-      # Use print0 and xargs -0 for safe handling of filenames with spaces or special characters
-      find . -type f -name "*.intoto.jsonl" -print0 | xargs -0 -I {} cp {} "${artifact_dest_dir}/"
-    else
-      echo "INFO: No .intoto.jsonl files found."
-    fi
   else
     echo "FAILURE: AAB not found at ${aab_path}"
     exit 1
@@ -152,8 +134,5 @@ collect_artifacts "app/build/outputs/bundle/release" "app-release.aab" "app-rele
 # Copy the app-specific SPDX SBOM
 echo "INFO: Copying SPDX SBOM..."
 cp app/build/spdx/release.spdx.json "${KOKORO_ARTIFACTS_DIR}/artifacts/app-release.spdx.json"
-
-# Collect the Wear OS application artifacts
-collect_artifacts "wear/build/outputs/bundle/release" "wear-release.aab" "wear-release-unsigned.aab"
 
 exit 0

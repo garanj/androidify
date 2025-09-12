@@ -50,13 +50,13 @@ fun WatchFaceOnboardingScreen(
         when (state) {
             is WatchFaceInstallationStatus.Receiving,
             is WatchFaceInstallationStatus.Sending,
-                -> {
+            -> {
                 TransmissionScreen()
             }
 
             is WatchFaceInstallationStatus.Unknown,
             WatchFaceInstallationStatus.NotStarted,
-                -> {
+            -> {
                 if (launchedFromWatchFaceTransfer) {
                     TransmissionScreen()
                 } else {

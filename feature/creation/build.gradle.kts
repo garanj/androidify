@@ -68,6 +68,7 @@ dependencies {
     implementation(libs.coil.gif)
     implementation(libs.coil.compose.http)
     implementation(libs.hilt.android)
+    implementation(libs.timber)
     implementation(libs.androidx.hilt.navigation.compose)
     implementation(libs.androidx.adaptive)
     implementation(libs.androidx.adaptive.layout)

@@ -18,7 +18,6 @@ package com.android.developers.androidify.customize
 import android.app.Application
 import android.graphics.Bitmap
 import android.net.Uri
-import android.util.Log
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.Modifier
@@ -43,6 +42,9 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import timber.log.Timber
+import javax.inject.Inject
+import kotlin.collections.isNotEmpty
 
 @HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
 class CustomizeExportViewModel @AssistedInject constructor(
@@ -173,7 +175,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                     )
                 }
             } catch (exception: Exception) {
-                Log.e("CustomizeExportViewModel", "Background removal failed", exception)
+                Timber.e(exception, "Background removal failed")
                 snackbarHostState.value.showSnackbar("Background removal failed")
                 _state.update {
                     val aspectRatioToolState = (it.toolState[CustomizeTool.Size] as AspectRatioToolState)
@@ -279,7 +281,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
                     )
                 }
             } catch (e: Exception) {
-                Log.e("CustomizeExportViewModel", "Image generation failed", e)
+                Timber.e(e, "Image generation failed")
                 snackbarHostState.value.showSnackbar("Background vibe generation failed")
             } finally {
                 _state.update { it.copy(showImageEditProgress = false) }
@@ -298,10 +300,14 @@ class CustomizeExportViewModel @AssistedInject constructor(
             }
             val originalImage = state.value.originalImageUrl
             if (originalImage != null) {
-                val savedOriginalUri =
-                    imageGenerationRepository.saveImageToExternalStorage(originalImage)
-                _state.update {
-                    it.copy(externalOriginalSavedUri = savedOriginalUri)
+                try {
+                    val savedOriginalUri =
+                        imageGenerationRepository.saveImageToExternalStorage(originalImage)
+                    _state.update {
+                        it.copy(externalOriginalSavedUri = savedOriginalUri)
+                    }
+                } catch (exception: Exception) {
+                    Timber.d(exception, "Original image save failed: ")
                 }
             }
             if (resultBitmap != null) {

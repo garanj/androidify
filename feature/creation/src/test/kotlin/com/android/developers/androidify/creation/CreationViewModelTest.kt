@@ -63,7 +63,6 @@ class CreationViewModelTest {
             FakeDropImageFactory(),
             context = RuntimeEnvironment.getApplication(),
         )
-
     }
 
     @Test
