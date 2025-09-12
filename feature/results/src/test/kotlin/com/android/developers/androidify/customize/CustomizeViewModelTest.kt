@@ -72,13 +72,8 @@ class CustomizeViewModelTest {
     @Test
     fun stateResultUri_NotNull() = runTest {
         val firstState = viewModel.state.first()
-
-        // Assert
         assertNotNull(firstState.exportImageCanvas.imageBitmap)
         assertEquals(bitmapSample, firstState.exportImageCanvas.imageBitmap)
-        /*assertNotNull(
-            viewModel.state.value.exportImageCanvas.imageUri,
-        )*/
     }
 
     @Test
@@ -190,7 +185,6 @@ class CustomizeViewModelTest {
         )
         advanceUntilIdle()
         assertFalse { values[values.lastIndex].showImageEditProgress }
-        // assertTrue(values.any { it.showImageEditProgress })
         assertNotNull(values.last().exportImageCanvas.imageWithEdit)
     }
 
