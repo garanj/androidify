@@ -16,7 +16,6 @@
 package com.android.developers.androidify.creation
 
 import android.content.Context
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.foundation.text.input.TextFieldState
 import androidx.compose.material3.SnackbarHostState
@@ -34,6 +33,9 @@ import com.android.developers.androidify.data.InternetConnectivityManager
 import com.android.developers.androidify.data.NoInternetException
 import com.android.developers.androidify.data.TextGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dagger.hilt.android.qualifiers.ApplicationContext
 import kotlinx.coroutines.Job
@@ -42,10 +44,10 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
-@HiltViewModel
-class CreationViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CreationViewModel.Factory::class)
+class CreationViewModel @AssistedInject constructor(
+    @Assisted("originalImageUrl") originalImageUrl: Uri?,
     val internetConnectivityManager: InternetConnectivityManager,
     val imageGenerationRepository: ImageGenerationRepository,
     val textGenerationRepository: TextGenerationRepository,
@@ -56,11 +58,9 @@ class CreationViewModel @Inject constructor(
     configProvider: ConfigProvider,
 ) : ViewModel() {
 
-    init {
-        viewModelScope.launch {
-            imageGenerationRepository.initialize()
-            textGenerationRepository.initialize()
-        }
+    @AssistedFactory
+    interface Factory {
+        fun create(@Assisted("originalImageUrl") originalImageUrl: Uri?): CreationViewModel
     }
 
     private var _uiState = MutableStateFlow(CreationState(xrEnabled = configProvider.isXrEnabled()))
@@ -75,6 +75,14 @@ class CreationViewModel @Inject constructor(
 
     private var promptGenerationJob: Job? = null
     private var imageGenerationJob: Job? = null
+
+    init {
+        onImageSelected(originalImageUrl)
+        viewModelScope.launch {
+            imageGenerationRepository.initialize()
+            textGenerationRepository.initialize()
+        }
+    }
 
     fun onImageSelected(uri: Uri?) {
         _uiState.update {
@@ -155,7 +163,10 @@ class CreationViewModel @Inject constructor(
                         )
                     }
                     _uiState.update {
-                        it.copy(resultBitmap = bitmap, screenState = ScreenState.RESULT)
+                        it.copy(
+                            resultBitmapUri = imageGenerationRepository.saveImage(bitmap),
+                            screenState = ScreenState.EDIT,
+                        )
                     }
                 } catch (e: Exception) {
                     handleImageGenerationError(e)
@@ -220,27 +231,15 @@ class CreationViewModel @Inject constructor(
                 cancelInProgressTask()
             }
 
-            ScreenState.RESULT -> {
-                _uiState.update {
-                    it.copy(screenState = ScreenState.EDIT, resultBitmap = null)
-                }
-            }
-
             ScreenState.EDIT -> {
                 // do nothing, back press handled outside
-            }
-
-            ScreenState.CUSTOMIZE -> {
-                _uiState.update {
-                    it.copy(screenState = ScreenState.RESULT)
-                }
             }
         }
     }
 
-    fun customizeExportClicked() {
+    fun onResultDisplayed() {
         _uiState.update {
-            it.copy(screenState = ScreenState.CUSTOMIZE)
+            it.copy(resultBitmapUri = null)
         }
     }
 }
@@ -254,15 +253,13 @@ data class CreationState(
     val generatedPrompt: String? = null,
     val promptGenerationInProgress: Boolean = false,
     val screenState: ScreenState = ScreenState.EDIT,
-    val resultBitmap: Bitmap? = null,
+    val resultBitmapUri: Uri? = null,
     val xrEnabled: Boolean = false,
 )
 
 enum class ScreenState {
     EDIT,
     LOADING,
-    RESULT,
-    CUSTOMIZE,
 }
 
 data class BotColor(

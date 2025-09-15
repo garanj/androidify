@@ -30,8 +30,11 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
         testInstrumentationRunner = "com.android.developers.testing.AndroidifyTestRunner"
+        consumerProguardFiles("proguard-rules.pro")
     }
-
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())

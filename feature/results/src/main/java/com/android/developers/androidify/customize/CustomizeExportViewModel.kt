@@ -30,6 +30,9 @@ import com.android.developers.androidify.watchface.WatchFaceAsset
 import com.android.developers.androidify.watchface.transfer.WatchFaceInstallationRepository
 import com.android.developers.androidify.wear.common.WatchFaceInstallError
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -40,11 +43,12 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 import kotlin.collections.isNotEmpty
 
-@HiltViewModel
-class CustomizeExportViewModel @Inject constructor(
+@HiltViewModel(assistedFactory = CustomizeExportViewModel.Factory::class)
+class CustomizeExportViewModel @AssistedInject constructor(
+    @Assisted("resultImageUrl") val resultImageUrl: Uri,
+    @Assisted("originalImageUrl") val originalImageUrl: Uri?,
     val imageGenerationRepository: ImageGenerationRepository,
     val composableBitmapRenderer: ComposableBitmapRenderer,
     val watchfaceInstallationRepository: WatchFaceInstallationRepository,
@@ -52,6 +56,14 @@ class CustomizeExportViewModel @Inject constructor(
     val remoteConfigDataSource: RemoteConfigDataSource,
     application: Application,
 ) : AndroidViewModel(application) {
+
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("resultImageUrl") resultImageUrl: Uri,
+            @Assisted("originalImageUrl")originalImageUrl: Uri?,
+        ): CustomizeExportViewModel
+    }
 
     private val _state = MutableStateFlow(CustomizeExportState())
     val state: StateFlow<CustomizeExportState> = combine(
@@ -102,7 +114,8 @@ class CustomizeExportViewModel @Inject constructor(
         }
 
         _state.update {
-            CustomizeExportState(
+            it.copy(
+                originalImageUrl = originalImageUrl,
                 toolState = mapOf(
                     CustomizeTool.Size to AspectRatioToolState(),
                     CustomizeTool.Background to BackgroundToolState(
@@ -111,22 +124,11 @@ class CustomizeExportViewModel @Inject constructor(
                 ),
             )
         }
+        loadInitialBitmap(resultImageUrl)
     }
 
     override fun onCleared() {
         super.onCleared()
-    }
-
-    fun setArguments(
-        resultImageUrl: Bitmap,
-        originalImageUrl: Uri?,
-    ) {
-        _state.update {
-            _state.value.copy(
-                originalImageUrl,
-                exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = resultImageUrl),
-            )
-        }
     }
 
     fun shareClicked() {
@@ -261,7 +263,6 @@ class CustomizeExportViewModel @Inject constructor(
                 }
                 return@launch
             }
-
             val image = state.value.exportImageCanvas.imageBitmap
             if (image == null) {
                 return@launch
@@ -394,6 +395,22 @@ class CustomizeExportViewModel @Inject constructor(
         transferJob = null
         viewModelScope.launch {
             watchfaceInstallationRepository.resetInstallationStatus()
+        }
+    }
+
+    private fun loadInitialBitmap(uri: Uri) {
+        viewModelScope.launch {
+            try {
+                val bitmap = localFileProvider.loadBitmapFromUri(uri)
+                _state.update {
+                    it.copy(
+                        exportImageCanvas = it.exportImageCanvas.copy(imageBitmap = bitmap),
+                    )
+                }
+            } catch (e: Exception) {
+                Timber.e(e, "Could not load Bitmap from the URI due to ${e.message}")
+                _snackbarHostState.value.showSnackbar("Could not load image.")
+            }
         }
     }
 }

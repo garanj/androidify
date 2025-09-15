@@ -15,20 +15,33 @@
  */
 package com.android.developers.androidify.results
 
-import android.graphics.Bitmap
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import javax.inject.Inject
 
-@HiltViewModel
-class ResultsViewModel @Inject constructor() : ViewModel() {
+@HiltViewModel(assistedFactory = ResultsViewModel.Factory::class)
+class ResultsViewModel @AssistedInject constructor(
+    @Assisted("resultImageUrl") val resultImageUrl: Uri?,
+    @Assisted("originalImageUrl") val originalImageUrl: Uri?,
+    @Assisted("promptText") val promptText: String?,
+) : ViewModel() {
 
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            @Assisted("resultImageUrl") resultImageUrl: Uri?,
+            @Assisted("originalImageUrl") originalImageUrl: Uri?,
+            @Assisted("promptText") promptText: String?,
+        ): ResultsViewModel
+    }
     private val _state = MutableStateFlow(ResultState())
     val state = _state.asStateFlow()
 
@@ -37,11 +50,7 @@ class ResultsViewModel @Inject constructor() : ViewModel() {
     val snackbarHostState: StateFlow<SnackbarHostState>
         get() = _snackbarHostState
 
-    fun setArguments(
-        resultImageUrl: Bitmap,
-        originalImageUrl: Uri?,
-        promptText: String?,
-    ) {
+    init {
         _state.update {
             ResultState(resultImageUrl, originalImageUrl, promptText = promptText)
         }
@@ -49,7 +58,7 @@ class ResultsViewModel @Inject constructor() : ViewModel() {
 }
 
 data class ResultState(
-    val resultImageBitmap: Bitmap? = null,
+    val resultImageUri: Uri? = null,
     val originalImageUrl: Uri? = null,
     val promptText: String? = null,
 )
