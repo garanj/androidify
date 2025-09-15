@@ -23,6 +23,7 @@ import com.android.apksig.util.DataSink
 import com.android.apksig.util.DataSource
 import com.android.apksig.util.DataSources
 import com.android.apksig.util.ReadableDataSink
+import com.android.developers.androidify.watchface.BuildConfig
 import org.bouncycastle.asn1.x500.X500Name
 import org.bouncycastle.cert.jcajce.JcaX509CertificateConverter
 import org.bouncycastle.cert.jcajce.JcaX509v3CertificateBuilder
@@ -38,8 +39,10 @@ import java.security.cert.X509Certificate
 import java.util.Calendar
 import java.util.Date
 
-private const val KEY_ALIAS = "com.android.developers.androidify.ApkSigningKey"
-private const val CERT_ALIAS = "com.android.developers.androidify.Cert"
+private val keyAlias : String
+    get() = "com.android.developers.androidify.ApkSigningKey-" + BuildConfig.BUILD_TYPE
+private val certAlias: String
+    get() = "com.android.developers.androidify.Cert-" + BuildConfig.BUILD_TYPE
 private const val ANDROID_KEYSTORE = "AndroidKeyStore"
 
 /**
@@ -71,13 +74,13 @@ fun signApk(unsignedApk: ByteArray): ByteArray {
 private fun getOrCreateSigningKeyPair(): KeyPair {
     val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply { load(null) }
 
-    if (keyStore.containsAlias(KEY_ALIAS)) {
-        val entry = keyStore.getEntry(KEY_ALIAS, null) as KeyStore.PrivateKeyEntry
+    if (keyStore.containsAlias(keyAlias)) {
+        val entry = keyStore.getEntry(keyAlias, null) as KeyStore.PrivateKeyEntry
         return KeyPair(entry.certificate.publicKey, entry.privateKey)
     }
 
     val parameterSpec = KeyGenParameterSpec.Builder(
-        KEY_ALIAS,
+        keyAlias,
         KeyProperties.PURPOSE_SIGN,
     ).run {
         setDigests(KeyProperties.DIGEST_SHA256)
@@ -151,7 +154,7 @@ private fun storeCertificate(certificate: X509Certificate): Boolean {
         val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply {
             load(null)
         }
-        keyStore.setCertificateEntry(CERT_ALIAS, certificate)
+        keyStore.setCertificateEntry(certAlias, certificate)
         true
     } catch (e: Exception) {
         // Log the exception for debugging
@@ -169,7 +172,7 @@ private fun getOrCreateCertificate(keyPair: KeyPair): X509Certificate {
     val keyStore = KeyStore.getInstance(ANDROID_KEYSTORE).apply {
         load(null)
     }
-    return (keyStore.getCertificate(CERT_ALIAS) ?: createCertificate(keyPair)) as X509Certificate
+    return (keyStore.getCertificate(certAlias) ?: createCertificate(keyPair)) as X509Certificate
 }
 
 /**

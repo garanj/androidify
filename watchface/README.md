@@ -22,9 +22,3 @@ example, using `pngquant` on all images, to help keep the watch face size to a m
 To package the watch face, the [Pack](https://github.com/google/pack) is used. This is a native
 library, so the pre-builts are provided in `jniLibs`. A script is also included for building these
 fresh, but that should not be necessary.
-
-## Signing the APK
-
-For the purposes of this project, a key is generated at runtime and used to sign the APK. This is
-not the approach to take in production, but the watch face APK must be signed, and it doesn't so
-much matter what key is used to do it.
