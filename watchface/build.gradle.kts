@@ -30,6 +30,7 @@ android {
         minSdk = libs.versions.minSdk.get().toInt()
         targetSdk = 36
         testInstrumentationRunner = "com.android.developers.testing.AndroidifyTestRunner"
+        consumerProguardFiles("proguard-rules.pro")
     }
     buildFeatures {
         buildConfig = true
@@ -45,9 +46,6 @@ android {
         getByName("androidTest") {
             assets.srcDir("src/androidTest/assets")
         }
-    }
-    defaultConfig {
-        consumerProguardFiles("proguard-rules.pro")
     }
     // To avoid packaging conflicts when using bouncycastle
     packaging {
