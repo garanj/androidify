@@ -303,7 +303,7 @@ class CreationScreenTest {
 
         composeTestRule.setContent {
             SharedElementContextPreview {
-                LoadingScreen(onCancelPress = {})
+                LoadingScreen(onCancelPress = {}, layoutType = EditScreenLayoutType.Medium)
             }
         }
 
