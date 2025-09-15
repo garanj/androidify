@@ -24,9 +24,9 @@ data class PackPackage(
     var resources: MutableList<Resource> = mutableListOf()
 
     data class Resource(
-        val subdirectory: String,
-        val name: String,
-        val contentsBase64: String,
+        @JvmField val subdirectory: String,
+        @JvmField val name: String,
+        @JvmField val contentsBase64: String,
     ) {
         companion object {
             fun fromBase64Contents(

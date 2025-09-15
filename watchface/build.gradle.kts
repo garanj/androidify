@@ -31,7 +31,9 @@ android {
         targetSdk = 36
         testInstrumentationRunner = "com.android.developers.testing.AndroidifyTestRunner"
     }
-
+    buildFeatures {
+        buildConfig = true
+    }
     compileOptions {
         sourceCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
         targetCompatibility = JavaVersion.toVersion(libs.versions.javaVersion.get())
@@ -43,6 +45,9 @@ android {
         getByName("androidTest") {
             assets.srcDir("src/androidTest/assets")
         }
+    }
+    defaultConfig {
+        consumerProguardFiles("proguard-rules.pro")
     }
     // To avoid packaging conflicts when using bouncycastle
     packaging {
