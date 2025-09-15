@@ -22,6 +22,7 @@ import androidx.compose.material3.SnackbarHostState
 import androidx.compose.ui.graphics.Color
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.android.developers.androidify.data.ConfigProvider
 import com.android.developers.androidify.data.DropBehaviourFactory
 import com.android.developers.androidify.data.ImageDescriptionFailedGenerationException
 import com.android.developers.androidify.data.ImageGenerationRepository
@@ -43,7 +44,6 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import timber.log.Timber
-import javax.inject.Inject
 
 @HiltViewModel(assistedFactory = CreationViewModel.Factory::class)
 class CreationViewModel @AssistedInject constructor(
@@ -55,6 +55,7 @@ class CreationViewModel @AssistedInject constructor(
     val dropBehaviourFactory: DropBehaviourFactory,
     @ApplicationContext
     val context: Context,
+    configProvider: ConfigProvider,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -62,7 +63,7 @@ class CreationViewModel @AssistedInject constructor(
         fun create(@Assisted("originalImageUrl") originalImageUrl: Uri?): CreationViewModel
     }
 
-    private var _uiState = MutableStateFlow(CreationState())
+    private var _uiState = MutableStateFlow(CreationState(xrEnabled = configProvider.isXrEnabled()))
 
     val uiState: StateFlow<CreationState>
         get() = _uiState
@@ -253,6 +254,7 @@ data class CreationState(
     val promptGenerationInProgress: Boolean = false,
     val screenState: ScreenState = ScreenState.EDIT,
     val resultBitmapUri: Uri? = null,
+    val xrEnabled: Boolean = false,
 )
 
 enum class ScreenState {
