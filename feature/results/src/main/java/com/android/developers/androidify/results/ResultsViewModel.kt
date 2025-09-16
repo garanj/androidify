@@ -18,6 +18,7 @@ package com.android.developers.androidify.results
 import android.net.Uri
 import androidx.compose.material3.SnackbarHostState
 import androidx.lifecycle.ViewModel
+import com.android.developers.androidify.data.ConfigProvider
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -32,6 +33,7 @@ class ResultsViewModel @AssistedInject constructor(
     @Assisted("resultImageUrl") val resultImageUrl: Uri?,
     @Assisted("originalImageUrl") val originalImageUrl: Uri?,
     @Assisted("promptText") val promptText: String?,
+    configProvider: ConfigProvider,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -52,7 +54,7 @@ class ResultsViewModel @AssistedInject constructor(
 
     init {
         _state.update {
-            ResultState(resultImageUrl, originalImageUrl, promptText = promptText)
+            ResultState(resultImageUrl, originalImageUrl, promptText = promptText, xrEnabled = configProvider.isXrEnabled())
         }
     }
 }
@@ -61,4 +63,5 @@ data class ResultState(
     val resultImageUri: Uri? = null,
     val originalImageUrl: Uri? = null,
     val promptText: String? = null,
+    val xrEnabled: Boolean = false,
 )
