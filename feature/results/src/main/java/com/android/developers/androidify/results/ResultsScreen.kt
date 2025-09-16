@@ -25,23 +25,17 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Snackbar
 import androidx.compose.material3.SnackbarDefaults
 import androidx.compose.material3.SnackbarHost
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.State
@@ -51,21 +45,13 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.vector.ImageVector
-import androidx.compose.ui.platform.LocalInspectionMode
-import androidx.compose.ui.res.stringArrayResource
-import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.res.vectorResource
-import androidx.compose.ui.text.font.FontWeight.Companion.Bold
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.android.developers.androidify.customize.getPlaceholderBotUri
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.AboutButton
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
-import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.theme.components.ResultsBackground
 import com.android.developers.androidify.util.AdaptivePreview
 import com.android.developers.androidify.util.SmallPhonePreview
@@ -122,53 +108,6 @@ fun ResultsScreen(
                     )
                 }
             },
-        )
-    }
-}
-
-@AdaptivePreview
-@SmallPhonePreview
-@Preview
-@Composable
-private fun ResultsScreenPreview() {
-    AndroidifyTheme {
-        val imageUri = getPlaceholderBotUri()
-        val state = remember {
-            mutableStateOf(
-                ResultState(
-                    resultImageUri = imageUri,
-                    promptText = "wearing a hat with straw hair",
-                ),
-            )
-        }
-
-        ResultsScreenContents(
-            contentPadding = PaddingValues(0.dp),
-            state = state,
-            onCustomizeShareClicked = {},
-        )
-    }
-}
-
-@SmallPhonePreview
-@Composable
-private fun ResultsScreenPreviewSmall() {
-    AndroidifyTheme {
-        val imageUri = getPlaceholderBotUri()
-        val state = remember {
-            mutableStateOf(
-                ResultState(
-                    resultImageUri = imageUri,
-                    promptText = "wearing a hat with straw hair",
-                ),
-            )
-        }
-
-        ResultsScreenContents(
-            contentPadding = PaddingValues(0.dp),
-            state = state,
-            verboseLayout = false,
-            onCustomizeShareClicked = {},
         )
     }
 }
@@ -287,81 +226,49 @@ fun ResultsScreenContents(
     }
 }
 
+@AdaptivePreview
+@SmallPhonePreview
+@Preview
 @Composable
-private fun BackgroundRandomQuotes(verboseLayout: Boolean = true) {
-    val locaInspectionMode = LocalInspectionMode.current
-    Box(modifier = Modifier.fillMaxSize()) {
-        val listResultCompliments = stringArrayResource(R.array.list_compliments)
-        val randomQuote = remember {
-            if (locaInspectionMode) {
-                listResultCompliments.first()
-            } else {
-                listResultCompliments.random()
-            }
-        }
-        // Disable animation in tests
-        val iterations = if (LocalInspectionMode.current) 0 else 100
-        Text(
-            randomQuote,
-            style = MaterialTheme.typography.titleLarge.copy(fontWeight = Bold),
-            fontSize = 120.sp,
-            modifier = Modifier
-                .align(if (verboseLayout) Alignment.TopCenter else Alignment.Center)
-                .basicMarquee(
-                    iterations = iterations,
-                    repeatDelayMillis = 0,
-                    velocity = 80.dp,
-                    initialDelayMillis = 500,
+private fun ResultsScreenPreview() {
+    AndroidifyTheme {
+        val imageUri = getPlaceholderBotUri()
+        val state = remember {
+            mutableStateOf(
+                ResultState(
+                    resultImageUri = imageUri,
+                    promptText = "wearing a hat with straw hair",
                 ),
-        )
-        if (verboseLayout) {
-            val listMinusOther = listResultCompliments.asList().minus(randomQuote)
-            val randomQuote2 = remember {
-                if (locaInspectionMode) {
-                    listMinusOther.first()
-                } else {
-                    listMinusOther.random()
-                }
-            }
-            Text(
-                randomQuote2,
-                style = MaterialTheme.typography.titleLarge.copy(fontWeight = Bold),
-                fontSize = 110.sp,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .basicMarquee(
-                        iterations = iterations,
-                        repeatDelayMillis = 0,
-                        velocity = 60.dp,
-                        initialDelayMillis = 500,
-                    ),
             )
         }
+
+        ResultsScreenContents(
+            contentPadding = PaddingValues(0.dp),
+            state = state,
+            onCustomizeShareClicked = {},
+        )
     }
 }
 
+@SmallPhonePreview
 @Composable
-private fun BotActionsButtonRow(
-    onCustomizeShareClicked: () -> Unit,
-    modifier: Modifier = Modifier,
-    verboseLayout: Boolean = false,
-) {
-    Row(modifier) {
-        PrimaryButton(
-            onClick = {
-                onCustomizeShareClicked()
-            },
-            trailingIcon = {
-                Row {
-                    Spacer(modifier = Modifier.width(8.dp))
-                    Icon(
-                        ImageVector
-                            .vectorResource(com.android.developers.androidify.theme.R.drawable.rounded_arrow_forward_24),
-                        contentDescription = null, // decorative element
-                    )
-                }
-            },
-            buttonText = if (verboseLayout) stringResource(R.string.customize_and_share) else null,
+private fun ResultsScreenPreviewSmall() {
+    AndroidifyTheme {
+        val imageUri = getPlaceholderBotUri()
+        val state = remember {
+            mutableStateOf(
+                ResultState(
+                    resultImageUri = imageUri,
+                    promptText = "wearing a hat with straw hair",
+                ),
+            )
+        }
+
+        ResultsScreenContents(
+            contentPadding = PaddingValues(0.dp),
+            state = state,
+            verboseLayout = false,
+            onCustomizeShareClicked = {},
         )
     }
 }
