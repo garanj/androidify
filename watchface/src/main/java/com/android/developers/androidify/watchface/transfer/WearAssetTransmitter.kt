@@ -82,20 +82,30 @@ class WearAssetTransmitterImpl @Inject constructor(
      */
     override val watchFaceInstallationUpdates = callbackFlow {
         trySend(WatchFaceInstallationStatus.NotStarted)
-        val listener = MessageClient.OnMessageReceivedListener { event ->
-            if (event.path.contains(transferId)) {
-                val response =
-                    ProtoBuf.decodeFromByteArray<WatchFaceInstallationStatus.Complete>(event.data)
-                if (response.transferId == transferId) {
-                    trySend(response)
+
+        var listener : MessageClient.OnMessageReceivedListener? = null
+
+        /**
+         * Some devices don't have access to Wearable API via Play Services, so it is necessary to
+         * check for this scenario first before trying to use the API.
+         */
+        val apiAvailable = WearableApiAvailability.isAvailable(messageClient)
+        if (apiAvailable) {
+            listener = MessageClient.OnMessageReceivedListener { event ->
+                if (event.path.contains(transferId)) {
+                    val response =
+                        ProtoBuf.decodeFromByteArray<WatchFaceInstallationStatus.Complete>(event.data)
+                    if (response.transferId == transferId) {
+                        trySend(response)
+                    }
                 }
             }
+            messageClient.addListener(listener).await() 
         }
-
-        messageClient.addListener(listener).await()
-
         awaitClose {
-            messageClient.removeListener(listener).addOnSuccessListener { }
+            listener?.let {
+                messageClient.removeListener(it).addOnSuccessListener { }
+            }
         }
     }
 
