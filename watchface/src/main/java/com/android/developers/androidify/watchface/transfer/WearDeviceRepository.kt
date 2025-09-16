@@ -105,6 +105,4 @@ class WearDeviceRepositoryImpl @Inject constructor(
             null
         }
     }
-
-    private val TAG = "WearDeviceRepository"
 }
