@@ -83,8 +83,8 @@ fun LoadingScreenSpatial(
                 topBar = {},
                 onCancelPress = onCancelPress,
                 containerColor = Color.Transparent,
-            ) {
-                LoadingScreenContents()
+            ) { contentPadding ->
+                LoadingScreenContents(contentPadding)
             }
         }
     }
@@ -106,8 +106,8 @@ private fun LoadingScreenSpatialPreview() {
                     topBar = {},
                     onCancelPress = { },
                     containerColor = Color.Transparent,
-                ) {
-                    LoadingScreenContents()
+                ) { contentPadding ->
+                    LoadingScreenContents(contentPadding)
                 }
             }
         }

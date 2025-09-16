@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -97,8 +98,8 @@ fun LoadingScreen(
                     AndroidifyTopAppBar(isMediumWindowSize = layoutType == EditScreenLayoutType.Medium)
                 },
                 onCancelPress = onCancelPress,
-            ) {
-                LoadingScreenContents()
+            ) { contentPadding ->
+                LoadingScreenContents(contentPadding)
             }
     }
 }
@@ -108,7 +109,7 @@ fun LoadingScreenScaffold(
     topBar: @Composable () -> Unit,
     onCancelPress: () -> Unit,
     containerColor: Color = MaterialTheme.colorScheme.secondary,
-    content: @Composable () -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
         topBar = topBar,
@@ -132,21 +133,16 @@ fun LoadingScreenScaffold(
         modifier = Modifier
             .fillMaxSize()
             .keepScreenOn(),
-    ) { contentPadding ->
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(contentPadding),
-        ) {
-            content()
-        }
-    }
+        content = content,
+    )
 }
 
 @Composable
-fun LoadingScreenContents() {
+fun LoadingScreenContents(contentPadding: PaddingValues) {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(contentPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.Center,
     ) {
