@@ -18,26 +18,13 @@
 package com.android.developers.androidify.results
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.HorizontalToolbar
-
-@Preview
-@Composable
-private fun ResultToolBarOptionPreview() {
-    AndroidifyTheme {
-        Column {
-            ResultToolbarOption {
-            }
-        }
-    }
-}
 
 @Composable
 fun ResultToolbarOption(
@@ -46,12 +33,10 @@ fun ResultToolbarOption(
     wasPromptUsed: Boolean = false,
     onResultOptionSelected: (ResultOption) -> Unit,
 ) {
-    HorizontalToolbar<ResultOption>(
-        selectedOption,
-        modifier = modifier.padding(start = 16.dp, end = 16.dp, top = 8.dp),
-        label = {
-            stringResource(it.displayText(wasPromptUsed))
-        },
+    HorizontalToolbar(
+        selectedOption = selectedOption,
+        modifier = modifier,
+        label = { stringResource(it.displayText(wasPromptUsed)) },
         onOptionSelected = onResultOptionSelected,
     )
 }
@@ -73,6 +58,17 @@ enum class ResultOption(val displayName: Int) {
             if (wasPromptUsed) return R.string.prompt else R.string.photo
         } else {
             this.displayName
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ResultToolBarOptionPreview() {
+    AndroidifyTheme {
+        Column {
+            ResultToolbarOption {
+            }
         }
     }
 }

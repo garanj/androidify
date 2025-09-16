@@ -30,8 +30,8 @@ import com.android.developers.androidify.theme.components.PrimaryButton
 @Composable
 fun BotActionsButtonRow(
     onCustomizeShareClicked: () -> Unit,
+    layoutType: ResultsLayoutType,
     modifier: Modifier = Modifier,
-    verboseLayout: Boolean = false,
 ) {
     Row(modifier) {
         PrimaryButton(
@@ -48,7 +48,10 @@ fun BotActionsButtonRow(
                     )
                 }
             },
-            buttonText = if (verboseLayout) stringResource(R.string.customize_and_share) else null,
+            buttonText = when (layoutType) {
+                ResultsLayoutType.Spatial, ResultsLayoutType.Verbose -> stringResource(R.string.customize_and_share)
+                ResultsLayoutType.Constrained -> null
+            },
         )
     }
 }
