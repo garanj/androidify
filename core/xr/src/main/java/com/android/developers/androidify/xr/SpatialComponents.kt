@@ -34,6 +34,7 @@ import androidx.xr.compose.subspace.SpatialBox
 import androidx.xr.compose.subspace.SpatialBoxScope
 import androidx.xr.compose.subspace.SpatialPanel
 import androidx.xr.compose.subspace.SubspaceComposable
+import androidx.xr.compose.subspace.layout.MoveEvent
 import androidx.xr.compose.subspace.layout.SubspaceModifier
 import androidx.xr.compose.subspace.layout.aspectRatio
 import androidx.xr.compose.subspace.layout.fillMaxSize
@@ -52,6 +53,7 @@ import com.android.developers.androidify.theme.AndroidifyTheme
 @Composable
 fun SquiggleBackgroundSubspace(
     minimumHeight: Dp,
+    onMove: ((MoveEvent) -> Boolean)? = null,
     content:
     @SubspaceComposable @Composable
     SpatialBoxScope.() -> Unit,
@@ -59,6 +61,7 @@ fun SquiggleBackgroundSubspace(
     BackgroundSubspace(
         aspectRatio = 1.7f,
         drawable = R.drawable.squiggle_full,
+        onMove = onMove,
         minimumHeight = minimumHeight,
         content = content,
     )
@@ -69,6 +72,7 @@ fun BackgroundSubspace(
     aspectRatio: Float,
     @DrawableRes drawable: Int,
     minimumHeight: Dp,
+    onMove: ((MoveEvent) -> Boolean)? = null,
     content:
     @SubspaceComposable @Composable
     SpatialBoxScope.() -> Unit,
@@ -76,7 +80,7 @@ fun BackgroundSubspace(
     Subspace {
         SpatialPanel(
             SubspaceModifier
-                .movable()
+                .movable(onMove = onMove)
                 .resizable(
                     minimumSize = DpVolumeSize(0.dp, minimumHeight, 0.dp),
                     maintainAspectRatio = true,
