@@ -39,7 +39,7 @@ import java.security.cert.X509Certificate
 import java.util.Calendar
 import java.util.Date
 
-private val keyAlias : String
+private val keyAlias: String
     get() = "com.android.developers.androidify.ApkSigningKey-" + BuildConfig.BUILD_TYPE
 private val certAlias: String
     get() = "com.android.developers.androidify.Cert-" + BuildConfig.BUILD_TYPE

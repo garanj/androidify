@@ -83,7 +83,7 @@ class WearAssetTransmitterImpl @Inject constructor(
     override val watchFaceInstallationUpdates = callbackFlow {
         trySend(WatchFaceInstallationStatus.NotStarted)
 
-        var listener : MessageClient.OnMessageReceivedListener? = null
+        var listener: MessageClient.OnMessageReceivedListener? = null
 
         /**
          * Some devices don't have access to Wearable API via Play Services, so it is necessary to
@@ -100,7 +100,7 @@ class WearAssetTransmitterImpl @Inject constructor(
                     }
                 }
             }
-            messageClient.addListener(listener).await() 
+            messageClient.addListener(listener).await()
         }
         awaitClose {
             listener?.let {

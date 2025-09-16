@@ -57,7 +57,7 @@ class WearDeviceRepositoryImpl @Inject constructor(
             val reachableCapability =
                 capabilityClient.getCapability(
                     ANDROIDIFY_INSTALLED,
-                    CapabilityClient.FILTER_REACHABLE
+                    CapabilityClient.FILTER_REACHABLE,
                 )
                     .await()
 
