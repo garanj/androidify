@@ -48,6 +48,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.graphics.graphicsLayer
@@ -70,12 +71,12 @@ import androidx.compose.ui.tooling.preview.Devices.PIXEL_3A_XL
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewScreenSizes
 import androidx.compose.ui.unit.dp
+import com.android.developers.androidify.creation.xr.LoadingScreenSpatial
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.PrimaryButton
 import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.SmallPhonePreview
-import com.android.developers.androidify.util.isAtLeastMedium
 import kotlinx.coroutines.delay
 import kotlin.math.roundToInt
 import com.android.developers.androidify.creation.R as CreationR
@@ -83,12 +84,35 @@ import com.android.developers.androidify.creation.R as CreationR
 @Composable
 fun LoadingScreen(
     onCancelPress: () -> Unit,
-    isMediumScreen: Boolean = isAtLeastMedium(),
+    layoutType: EditScreenLayoutType,
+) {
+    when (layoutType) {
+        EditScreenLayoutType.Spatial ->
+            LoadingScreenSpatial(
+                onCancelPress = onCancelPress,
+            )
+
+        EditScreenLayoutType.Compact, EditScreenLayoutType.Medium ->
+            LoadingScreenScaffold(
+                topBar = {
+                    AndroidifyTopAppBar(isMediumWindowSize = layoutType == EditScreenLayoutType.Medium)
+                },
+                onCancelPress = onCancelPress,
+            ) { contentPadding ->
+                LoadingScreenContents(contentPadding)
+            }
+    }
+}
+
+@Composable
+fun LoadingScreenScaffold(
+    topBar: @Composable () -> Unit,
+    onCancelPress: () -> Unit,
+    containerColor: Color = MaterialTheme.colorScheme.secondary,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     Scaffold(
-        topBar = {
-            AndroidifyTopAppBar(isMediumWindowSize = isMediumScreen)
-        },
+        topBar = topBar,
         bottomBar = {
             Box(
                 modifier = Modifier
@@ -105,19 +129,16 @@ fun LoadingScreen(
                 )
             }
         },
-        containerColor = MaterialTheme.colorScheme.secondary,
+        containerColor = containerColor,
         modifier = Modifier
             .fillMaxSize()
             .keepScreenOn(),
-    ) { contentPadding ->
-        LoadingScreenContents(contentPadding)
-    }
+        content = content,
+    )
 }
 
 @Composable
-private fun LoadingScreenContents(
-    contentPadding: PaddingValues,
-) {
+fun LoadingScreenContents(contentPadding: PaddingValues) {
     Column(
         modifier = Modifier
             .fillMaxSize()
@@ -202,7 +223,7 @@ private fun BoxScope.DecorativeSparkleDarkGreen(modifier: Modifier = Modifier) {
 @Composable
 fun LoadingScreenLargePreview() {
     AndroidifyTheme {
-        LoadingScreen(onCancelPress = {})
+        LoadingScreen(onCancelPress = {}, layoutType = EditScreenLayoutType.Medium)
     }
 }
 
@@ -212,7 +233,7 @@ fun LoadingScreenLargePreview() {
 @Composable
 fun LoadingScreenPreview() {
     AndroidifyTheme {
-        LoadingScreen(onCancelPress = {}, isMediumScreen = false)
+        LoadingScreen(onCancelPress = {}, layoutType = EditScreenLayoutType.Compact)
     }
 }
 

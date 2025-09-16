@@ -99,6 +99,7 @@ fun CreationScreen(
                 onCancelPress = {
                     creationViewModel.cancelInProgressTask()
                 },
+                layoutType = layoutType,
             )
         }
     }

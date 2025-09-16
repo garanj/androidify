@@ -75,7 +75,7 @@ fun EditScreenSpatial(
     onDropCallback: (Uri) -> Unit = {},
 ) {
     DisableSharedTransition {
-        SquiggleBackgroundSubspace {
+        SquiggleBackgroundSubspace(minimumHeight = 600.dp) {
             MainPanelWorkaround()
             SpatialColumn(SubspaceModifier.fillMaxWidth()) {
                 SpatialPanel(

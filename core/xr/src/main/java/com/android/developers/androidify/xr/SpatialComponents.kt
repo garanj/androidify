@@ -15,7 +15,19 @@
  */
 package com.android.developers.androidify.xr
 
+import androidx.annotation.DrawableRes
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.vectorResource
+import androidx.compose.ui.tooling.preview.Devices.PIXEL_TABLET
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.xr.compose.spatial.Subspace
 import androidx.xr.compose.subspace.SpatialBox
@@ -24,11 +36,13 @@ import androidx.xr.compose.subspace.SpatialPanel
 import androidx.xr.compose.subspace.SubspaceComposable
 import androidx.xr.compose.subspace.layout.SubspaceModifier
 import androidx.xr.compose.subspace.layout.aspectRatio
+import androidx.xr.compose.subspace.layout.fillMaxSize
 import androidx.xr.compose.subspace.layout.fillMaxWidth
 import androidx.xr.compose.subspace.layout.movable
 import androidx.xr.compose.subspace.layout.offset
 import androidx.xr.compose.subspace.layout.resizable
-import com.android.developers.androidify.theme.components.SquiggleBackgroundFull
+import androidx.xr.compose.unit.DpVolumeSize
+import com.android.developers.androidify.theme.AndroidifyTheme
 
 /**
  * A composable for a Subspace with a Squiggle background.
@@ -37,6 +51,24 @@ import com.android.developers.androidify.theme.components.SquiggleBackgroundFull
  */
 @Composable
 fun SquiggleBackgroundSubspace(
+    minimumHeight: Dp,
+    content:
+    @SubspaceComposable @Composable
+    SpatialBoxScope.() -> Unit,
+) {
+    BackgroundSubspace(
+        aspectRatio = 1.7f,
+        drawable = R.drawable.squiggle_full,
+        minimumHeight = minimumHeight,
+        content = content,
+    )
+}
+
+@Composable
+fun BackgroundSubspace(
+    aspectRatio: Float,
+    @DrawableRes drawable: Int,
+    minimumHeight: Dp,
     content:
     @SubspaceComposable @Composable
     SpatialBoxScope.() -> Unit,
@@ -45,14 +77,42 @@ fun SquiggleBackgroundSubspace(
         SpatialPanel(
             SubspaceModifier
                 .movable()
-                .resizable()
-                .fillMaxWidth(1f)
-                .aspectRatio(1.7f),
+                .resizable(
+                    minimumSize = DpVolumeSize(0.dp, minimumHeight, 0.dp),
+                    maintainAspectRatio = true,
+                )
+                .fillMaxWidth()
+                .aspectRatio(aspectRatio),
         ) {
-            SquiggleBackgroundFull()
+            FillBackground(drawable)
             Subspace {
-                SpatialBox(SubspaceModifier.offset(z = 10.dp), content = content)
+                SpatialBox(SubspaceModifier.offset(z = 10.dp).fillMaxSize(), content = content)
             }
         }
+    }
+}
+
+/**
+ * Background squiggle that tries to fit in its parent.
+ */
+@Composable
+fun FillBackground(@DrawableRes drawable: Int) {
+    val vectorBackground =
+        rememberVectorPainter(ImageVector.vectorResource(drawable))
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = vectorBackground,
+            contentDescription = null,
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Fit,
+        )
+    }
+}
+
+@Preview(device = PIXEL_TABLET)
+@Composable
+fun SquiggleFullImagePreview() {
+    AndroidifyTheme {
+        FillBackground(R.drawable.squiggle_full)
     }
 }
