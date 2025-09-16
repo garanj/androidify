@@ -66,6 +66,7 @@ dependencies {
     implementation(libs.androidx.lifecycle.process)
     implementation(libs.mlkit.segmentation)
     implementation(libs.timber)
+    implementation(libs.androidx.xr.compose)
     ksp(libs.hilt.compiler)
 
     implementation(libs.androidx.ui.tooling)
@@ -78,6 +79,7 @@ dependencies {
 
     implementation(projects.core.theme)
     implementation(projects.core.util)
+    implementation(projects.core.xr)
     implementation(projects.data)
     implementation(projects.wear.common)
     implementation(projects.watchface)
