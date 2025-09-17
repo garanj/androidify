@@ -41,9 +41,9 @@ fun ResultToolbarOption(
     )
 }
 
-enum class ResultOption(val displayName: Int) {
-    OriginalInput(R.string.photo),
-    ResultImage(R.string.bot),
+enum class ResultOption {
+    OriginalInput,
+    ResultImage,
     ;
 
     fun toFlippableState(): FlippableState {
@@ -54,10 +54,9 @@ enum class ResultOption(val displayName: Int) {
     }
 
     fun displayText(wasPromptUsed: Boolean): Int {
-        return if (this == OriginalInput) {
-            if (wasPromptUsed) return R.string.prompt else R.string.photo
-        } else {
-            this.displayName
+        return when (this) {
+            OriginalInput -> if (wasPromptUsed) R.string.prompt else R.string.photo
+            ResultImage -> R.string.bot
         }
     }
 }

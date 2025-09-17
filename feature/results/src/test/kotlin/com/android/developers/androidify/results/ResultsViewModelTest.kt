@@ -18,6 +18,8 @@
 package com.android.developers.androidify.results
 
 import android.net.Uri
+import com.android.developers.androidify.data.ConfigProvider
+import com.android.developers.testing.network.TestRemoteConfigDataSource
 import com.android.developers.testing.util.MainDispatcherRule
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.test.runTest
@@ -39,7 +41,8 @@ class ResultsViewModelTest {
 
     @Test
     fun stateInitialEmpty() = runTest {
-        val viewModel = ResultsViewModel(null, null, null)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(null, null, null, configProvider)
         assertEquals(
             ResultState(),
             viewModel.state.value,
@@ -48,7 +51,8 @@ class ResultsViewModelTest {
 
     @Test
     fun setArgumentsWithOriginalImage_isCorrect() = runTest {
-        val viewModel = ResultsViewModel(fakeUri, originalFakeUri, null)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(fakeUri, originalFakeUri, null, configProvider)
         assertEquals(
             ResultState(
                 resultImageUri = fakeUri,
@@ -60,7 +64,8 @@ class ResultsViewModelTest {
 
     @Test
     fun initialState_withPrompt_isCorrect() = runTest {
-        val viewModel = ResultsViewModel(fakeUri, null, fakePromptText)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(fakeUri, null, fakePromptText, configProvider)
         assertEquals(
             ResultState(
                 resultImageUri = fakeUri,

@@ -102,7 +102,7 @@ fun ResultsScreen(
 }
 
 @Composable
-private fun ResultsScreenContents(
+fun ResultsScreenContents(
     selectedResultOption: ResultOption,
     onResultOptionSelected: (ResultOption) -> Unit,
     wasPromptUsed: Boolean,
