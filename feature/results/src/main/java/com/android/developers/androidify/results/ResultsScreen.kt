@@ -167,19 +167,20 @@ fun ResultsScreenContents(
                         BackCardPrompt(state.promptText!!)
                     }
                 }
+                val onFlipStateChanged = { flipOption: FlippableState ->
+                    val option = when (flipOption) {
+                        FlippableState.Front -> ResultOption.ResultImage
+                        FlippableState.Back -> ResultOption.OriginalInput
+                    }
+                    onResultOptionSelected(option)
+                }
                 when (layoutType) {
                     ResultsLayoutType.Spatial ->
                         FlippablePanel(
                             front = front,
                             back = back,
                             flippableState = selectedResultOption.toFlippableState(),
-                            onFlipStateChanged = { flipOption ->
-                                val option = when (flipOption) {
-                                    FlippableState.Front -> ResultOption.ResultImage
-                                    FlippableState.Back -> ResultOption.OriginalInput
-                                }
-                                onResultOptionSelected(option)
-                            },
+                            onFlipStateChanged = onFlipStateChanged,
                         )
 
                     else ->
@@ -188,13 +189,7 @@ fun ResultsScreenContents(
                             front = front,
                             back = back,
                             flippableState = selectedResultOption.toFlippableState(),
-                            onFlipStateChanged = { flipOption ->
-                                val option = when (flipOption) {
-                                    FlippableState.Front -> ResultOption.ResultImage
-                                    FlippableState.Back -> ResultOption.OriginalInput
-                                }
-                                onResultOptionSelected(option)
-                            },
+                            onFlipStateChanged = onFlipStateChanged,
                         )
                 }
             }
