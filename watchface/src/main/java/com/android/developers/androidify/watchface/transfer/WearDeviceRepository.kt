@@ -45,23 +45,39 @@ class WearDeviceRepositoryImpl @Inject constructor(
     private val capabilityClient: CapabilityClient by lazy { Wearable.getCapabilityClient(context) }
 
     override val connectedWatch = callbackFlow {
-        val allDevices = nodeClient.connectedNodes.await().toSet()
-        val reachableCapability =
-            capabilityClient.getCapability(ANDROIDIFY_INSTALLED, CapabilityClient.FILTER_REACHABLE)
-                .await()
+        var capabilityListener: CapabilityClient.OnCapabilityChangedListener? = null
 
-        val installedDevices = reachableCapability.nodes.toSet()
+        /**
+         * Some devices don't have access to Wearable API via Play Services, so it is necessary to
+         * check for this scenario first before trying to use the API.
+         */
+        val apiAvailable = WearableApiAvailability.isAvailable(nodeClient)
+        if (apiAvailable) {
+            val allDevices = nodeClient.connectedNodes.await().toSet()
+            val reachableCapability =
+                capabilityClient.getCapability(
+                    ANDROIDIFY_INSTALLED,
+                    CapabilityClient.FILTER_REACHABLE,
+                )
+                    .await()
 
-        trySend(selectConnectedDevice(installedDevices, allDevices))
+            val installedDevices = reachableCapability.nodes.toSet()
+            trySend(selectConnectedDevice(installedDevices, allDevices))
 
-        val capabilityListener = CapabilityClient.OnCapabilityChangedListener { capabilityInfo ->
-            val installedDevicesUpdated = capabilityInfo.nodes.toSet()
+            capabilityListener =
+                CapabilityClient.OnCapabilityChangedListener { capabilityInfo ->
+                    val installedDevicesUpdated = capabilityInfo.nodes.toSet()
 
-            trySend(selectConnectedDevice(installedDevicesUpdated, allDevices))
+                    trySend(selectConnectedDevice(installedDevicesUpdated, allDevices))
+                }
+            capabilityClient.addListener(capabilityListener, ANDROIDIFY_INSTALLED)
+        } else {
+            trySend(null)
         }
-        capabilityClient.addListener(capabilityListener, ANDROIDIFY_INSTALLED)
         awaitClose {
-            capabilityClient.removeListener(capabilityListener)
+            capabilityListener?.let {
+                capabilityClient.removeListener(it)
+            }
         }
     }
 
