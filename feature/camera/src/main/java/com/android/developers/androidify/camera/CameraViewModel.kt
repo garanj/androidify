@@ -50,6 +50,7 @@ import androidx.lifecycle.asFlow
 import androidx.lifecycle.viewModelScope
 import androidx.window.layout.FoldingFeature
 import androidx.window.layout.WindowInfoTracker
+import com.android.developers.androidify.data.ConfigProvider
 import com.android.developers.androidify.util.LocalFileProvider
 import com.google.mlkit.vision.common.InputImage
 import com.google.mlkit.vision.pose.PoseDetection
@@ -76,8 +77,9 @@ class CameraViewModel
     application: Application,
     val localFileProvider: LocalFileProvider,
     val rearCameraUseCase: RearCameraUseCase,
+    configProvider: ConfigProvider,
 ) : AndroidViewModel(application) {
-    private var _uiState = MutableStateFlow(CameraUiState())
+    private var _uiState = MutableStateFlow(CameraUiState(xrEnabled = configProvider.isXrEnabled()))
     val uiState: StateFlow<CameraUiState>
         get() = _uiState
 
@@ -351,6 +353,7 @@ data class CameraUiState(
     val canFlipCamera: Boolean = true,
     val isRearCameraActive: Boolean = false,
     val autofocusUiState: AutofocusUiState = AutofocusUiState.Unspecified,
+    val xrEnabled: Boolean = false,
 ) {
     val zoomOptions = when {
         zoomMinRatio <= 0.6f && zoomMaxRatio >= 1f -> listOf(0.6f, 1f)

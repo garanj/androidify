@@ -68,6 +68,7 @@ internal fun CameraLayout(
     guideText: @Composable (modifier: Modifier) -> Unit,
     guide: @Composable (modifier: Modifier) -> Unit,
     rearCameraButton: @Composable (modifier: Modifier) -> Unit,
+    xrEnabled: Boolean = false,
     supportsTabletop: Boolean = supportsTabletop(),
     isTabletop: Boolean = false,
 ) {

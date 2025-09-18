@@ -147,6 +147,7 @@ fun CameraPreviewScreen(
                         toggleRearCameraFeature = { viewModel.toggleRearDisplayFeature(activity) },
                         isRearCameraEnabled = uiState.isRearCameraActive,
                         cameraSessionId = uiState.cameraSessionId,
+                        xrEnabled = uiState.xrEnabled,
                     )
                 }
             } else {
@@ -203,6 +204,7 @@ fun StatelessCameraPreviewContent(
     onAnimateZoom: (Float) -> Unit,
     requestCaptureImage: () -> Unit,
     modifier: Modifier = Modifier,
+    xrEnabled: Boolean = false,
     foldingFeature: FoldingFeature? = null,
     shouldShowRearCameraFeature: () -> Boolean = { false },
     toggleRearCameraFeature: () -> Unit = {},
@@ -276,6 +278,7 @@ fun StatelessCameraPreviewContent(
                 aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
             }
         },
+        xrEnabled = xrEnabled,
     )
 }
 
@@ -303,6 +306,7 @@ private fun CameraPreviewContent(
     shouldShowRearCameraFeature: () -> Boolean = { false },
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
+    xrEnabled: Boolean = false,
 ) {
     val scope = rememberCoroutineScope()
     val zoomState = remember(cameraSessionId) {
@@ -341,6 +345,7 @@ private fun CameraPreviewContent(
         shouldShowRearCameraFeature = shouldShowRearCameraFeature,
         toggleRearCameraFeature = toggleRearCameraFeature,
         isRearCameraEnabled = isRearCameraEnabled,
+        xrEnabled = xrEnabled,
         modifier = modifier,
     )
 }
