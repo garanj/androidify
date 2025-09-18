@@ -148,6 +148,7 @@ fun CameraPreviewScreen(
                         isRearCameraEnabled = uiState.isRearCameraActive,
                         cameraSessionId = uiState.cameraSessionId,
                         xrEnabled = uiState.xrEnabled,
+                        surfaceAspectRatio = uiState.surfaceAspectRatio,
                     )
                 }
             } else {
@@ -204,13 +205,14 @@ fun StatelessCameraPreviewContent(
     onAnimateZoom: (Float) -> Unit,
     requestCaptureImage: () -> Unit,
     modifier: Modifier = Modifier,
+    surfaceAspectRatio: Float = 9f / 16f,
     xrEnabled: Boolean = false,
     foldingFeature: FoldingFeature? = null,
     shouldShowRearCameraFeature: () -> Boolean = { false },
     toggleRearCameraFeature: () -> Unit = {},
     isRearCameraEnabled: Boolean = false,
 ) {
-    var aspectRatio by remember { mutableFloatStateOf(9f / 16f) }
+    var layoutAspectRatio by remember { mutableFloatStateOf(9f / 16f) }
     val emptyComposable: @Composable (Modifier) -> Unit = {}
     val rearCameraButton: @Composable (Modifier) -> Unit = { rearModifier ->
         RearCameraButton(
@@ -261,7 +263,7 @@ fun StatelessCameraPreviewContent(
             CameraGuide(
                 detectedPose = detectedPose,
                 modifier = guideModifier,
-                defaultAspectRatio = aspectRatio,
+                defaultAspectRatio = layoutAspectRatio,
             )
         },
         rearCameraButton = (
@@ -275,9 +277,11 @@ fun StatelessCameraPreviewContent(
         modifier = modifier.onSizeChanged { size ->
             if (size.height > 0) {
                 // Recalculate aspect ratio based on the overall layout size
-                aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
+                layoutAspectRatio =
+                    calculateCorrectAspectRatio(size.height, size.width, layoutAspectRatio)
             }
         },
+        surfaceAspectRatio = surfaceAspectRatio,
         xrEnabled = xrEnabled,
     )
 }
@@ -301,6 +305,7 @@ private fun CameraPreviewContent(
     zoomLevel: () -> Float,
     onChangeZoomLevel: (zoomLevel: Float) -> Unit,
     requestCaptureImage: () -> Unit,
+    surfaceAspectRatio: Float,
     modifier: Modifier = Modifier,
     foldingFeature: FoldingFeature? = null,
     shouldShowRearCameraFeature: () -> Boolean = { false },
@@ -328,7 +333,8 @@ private fun CameraPreviewContent(
                 onScaleZoom = { scope.launch { zoomState.scaleZoom(it) } },
                 modifier = viewfinderModifier.onSizeChanged { size -> // Apply modifier from slot
                     if (size.height > 0) {
-                        aspectRatio = calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
+                        aspectRatio =
+                            calculateCorrectAspectRatio(size.height, size.width, aspectRatio)
                     }
                 },
             )
@@ -345,6 +351,7 @@ private fun CameraPreviewContent(
         shouldShowRearCameraFeature = shouldShowRearCameraFeature,
         toggleRearCameraFeature = toggleRearCameraFeature,
         isRearCameraEnabled = isRearCameraEnabled,
+        surfaceAspectRatio = surfaceAspectRatio,
         xrEnabled = xrEnabled,
         modifier = modifier,
     )

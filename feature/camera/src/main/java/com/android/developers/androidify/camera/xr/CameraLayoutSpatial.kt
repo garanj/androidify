@@ -51,7 +51,8 @@ fun CameraLayoutSpatial(
         MainPanelWorkaround()
         SpatialPanel(
             SubspaceModifier
-                .fillMaxSize(0.5f),
+                .fillMaxSize(0.5f)
+                .aspectRatio(surfaceAspectRatio),
         ) {
             Orbiter(
                 position = ContentEdge.Top,

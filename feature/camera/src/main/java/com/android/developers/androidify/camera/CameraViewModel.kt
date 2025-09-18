@@ -92,10 +92,12 @@ class CameraViewModel
 
     private val cameraPreviewUseCase = Preview.Builder().build().apply {
         setSurfaceProvider { newSurfaceRequest ->
-            _uiState.update { it.copy(surfaceRequest = newSurfaceRequest) }
+            val width = newSurfaceRequest.resolution.width.toFloat()
+            val height = newSurfaceRequest.resolution.height.toFloat()
+            _uiState.update { it.copy(surfaceRequest = newSurfaceRequest, surfaceAspectRatio = height / width) }
             surfaceMeteringPointFactory = SurfaceOrientedMeteringPointFactory(
-                newSurfaceRequest.resolution.width.toFloat(),
-                newSurfaceRequest.resolution.height.toFloat(),
+                width,
+                height,
             )
         }
     }
@@ -354,6 +356,7 @@ data class CameraUiState(
     val isRearCameraActive: Boolean = false,
     val autofocusUiState: AutofocusUiState = AutofocusUiState.Unspecified,
     val xrEnabled: Boolean = false,
+    val surfaceAspectRatio: Float = 9f / 16f,
 ) {
     val zoomOptions = when {
         zoomMinRatio <= 0.6f && zoomMaxRatio >= 1f -> listOf(0.6f, 1f)

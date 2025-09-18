@@ -71,6 +71,7 @@ internal fun CameraLayout(
     guideText: @Composable (modifier: Modifier) -> Unit,
     guide: @Composable (modifier: Modifier) -> Unit,
     rearCameraButton: @Composable (modifier: Modifier) -> Unit,
+    surfaceAspectRatio: Float,
     xrEnabled: Boolean = false,
     supportsTabletop: Boolean = supportsTabletop(),
     isTabletop: Boolean = false,
@@ -107,6 +108,7 @@ internal fun CameraLayout(
                 zoomButton,
                 guideText,
                 guide,
+                surfaceAspectRatio,
             )
 
             isAtLeastMedium() && shouldShowTabletopLayout(
@@ -580,6 +582,7 @@ private fun CameraOverlayPreview(
             },
             supportsTabletop = parameters.supportsTabletop,
             isTabletop = parameters.isTabletop,
+            surfaceAspectRatio = 16f / 9f,
         )
     }
 }
