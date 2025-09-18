@@ -50,6 +50,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.LifecycleStartEffect
+import com.android.developers.androidify.camera.xr.CameraLayoutSpatial
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.TertiaryContainer
 import com.android.developers.androidify.util.FoldablePreviewParameters
@@ -58,6 +59,7 @@ import com.android.developers.androidify.util.allowsFullContent
 import com.android.developers.androidify.util.isAtLeastMedium
 import com.android.developers.androidify.util.shouldShowTabletopLayout
 import com.android.developers.androidify.util.supportsTabletop
+import com.android.developers.androidify.xr.LocalSpatialCapabilities
 
 @Composable
 internal fun CameraLayout(
@@ -98,6 +100,15 @@ internal fun CameraLayout(
             .background(TertiaryContainer),
     ) {
         when {
+            xrEnabled && LocalSpatialCapabilities.current.isSpatialUiEnabled -> CameraLayoutSpatial(
+                viewfinder,
+                captureButton,
+                flipCameraButton,
+                zoomButton,
+                guideText,
+                guide,
+            )
+
             isAtLeastMedium() && shouldShowTabletopLayout(
                 supportsTabletop = supportsTabletop,
                 isTabletop = isTabletop,
