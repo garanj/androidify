@@ -208,7 +208,7 @@ fun ResultsScreenContents(
         AnimatedVisibility(
             showResult,
             enter = slideInHorizontally(animationSpec = tween(1000)) { fullWidth -> fullWidth },
-            modifier = Modifier.fillMaxSize(),
+            modifier = modifier.fillMaxSize(),
         ) {
             BackgroundRandomQuotes(layoutType != ResultsLayoutType.Constrained)
         }
