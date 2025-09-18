@@ -17,35 +17,14 @@
 
 package com.android.developers.androidify.results
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
-import androidx.compose.material3.FloatingToolbarColors
-import androidx.compose.material3.HorizontalFloatingToolbar
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
-import androidx.compose.material3.ToggleButton
-import androidx.compose.material3.ToggleButtonDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.android.developers.androidify.theme.AndroidifyTheme
-
-@Preview
-@Composable
-private fun ResultToolBarOptionPreview() {
-    AndroidifyTheme {
-        Column {
-            ResultToolbarOption {
-            }
-        }
-    }
-}
+import com.android.developers.androidify.theme.components.HorizontalToolbar
 
 @Composable
 fun ResultToolbarOption(
@@ -54,46 +33,17 @@ fun ResultToolbarOption(
     wasPromptUsed: Boolean = false,
     onResultOptionSelected: (ResultOption) -> Unit,
 ) {
-    val options = ResultOption.entries
-    HorizontalFloatingToolbar(
-        modifier = modifier
-            .padding(start = 16.dp, end = 16.dp, top = 8.dp)
-            .border(
-                2.dp,
-                color = MaterialTheme.colorScheme.outline,
-                shape = MaterialTheme.shapes.large,
-            ),
-        colors = FloatingToolbarColors(
-            toolbarContainerColor = MaterialTheme.colorScheme.surface,
-            toolbarContentColor = MaterialTheme.colorScheme.onSurfaceVariant,
-            fabContainerColor = MaterialTheme.colorScheme.tertiary,
-            fabContentColor = MaterialTheme.colorScheme.onTertiary,
-        ),
-        expanded = true,
-    ) {
-        options.forEachIndexed { index, label ->
-            ToggleButton(
-                modifier = Modifier,
-                checked = selectedOption == label,
-                onCheckedChange = { onResultOptionSelected(label) },
-                shapes = ToggleButtonDefaults.shapes(checkedShape = MaterialTheme.shapes.large),
-                colors = ToggleButtonDefaults.toggleButtonColors(
-                    checkedContainerColor = MaterialTheme.colorScheme.onSurface,
-                    containerColor = MaterialTheme.colorScheme.surface,
-                ),
-            ) {
-                Text(stringResource(label.displayText(wasPromptUsed)), maxLines = 1)
-            }
-            if (index != options.size - 1) {
-                Spacer(Modifier.width(8.dp))
-            }
-        }
-    }
+    HorizontalToolbar(
+        selectedOption = selectedOption,
+        modifier = modifier,
+        label = { stringResource(it.displayText(wasPromptUsed)) },
+        onOptionSelected = onResultOptionSelected,
+    )
 }
 
-enum class ResultOption(val displayName: Int) {
-    OriginalInput(R.string.photo),
-    ResultImage(R.string.bot),
+enum class ResultOption {
+    OriginalInput,
+    ResultImage,
     ;
 
     fun toFlippableState(): FlippableState {
@@ -104,10 +54,20 @@ enum class ResultOption(val displayName: Int) {
     }
 
     fun displayText(wasPromptUsed: Boolean): Int {
-        return if (this == OriginalInput) {
-            if (wasPromptUsed) return R.string.prompt else R.string.photo
-        } else {
-            this.displayName
+        return when (this) {
+            OriginalInput -> if (wasPromptUsed) R.string.prompt else R.string.photo
+            ResultImage -> R.string.bot
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun ResultToolBarOptionPreview() {
+    AndroidifyTheme {
+        Column {
+            ResultToolbarOption {
+            }
         }
     }
 }

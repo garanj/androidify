@@ -1,7 +1,7 @@
 [versions]
 # build
-appVersionCode = "8"
-appVersionName = "1.2.1"
+appVersionCode = "9"
+appVersionName = "1.2.2"
 agp = "8.11.1"
 bcpkixJdk18on = "1.81"
 compileSdk = "36"
