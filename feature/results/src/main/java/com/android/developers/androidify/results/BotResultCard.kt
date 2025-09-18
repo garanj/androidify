@@ -49,10 +49,9 @@ import coil3.compose.AsyncImage
 
 @Composable
 fun BotResultCard(
-    resultImageUri: Uri,
-    originalImageUrl: Uri?,
-    promptText: String?,
     flippableState: FlippableState,
+    front: @Composable () -> Unit,
+    back: @Composable () -> Unit,
     modifier: Modifier = Modifier,
     onFlipStateChanged: ((FlippableState) -> Unit)? = null,
 ) {
@@ -64,21 +63,13 @@ fun BotResultCard(
             .safeContentPadding(),
         flippableState = flippableState,
         onFlipStateChanged = onFlipStateChanged,
-        front = {
-            FrontCard(resultImageUri)
-        },
-        back = {
-            if (originalImageUrl != null) {
-                BackCard(originalImageUrl)
-            } else {
-                BackCardPrompt(promptText!!)
-            }
-        },
+        front = front,
+        back = back,
     )
 }
 
 @Composable
-private fun FrontCard(resultImageUri: Uri) {
+fun FrontCardImage(resultImageUri: Uri) {
     AsyncImage(
         model = resultImageUri,
         contentDescription = stringResource(R.string.resultant_android_bot),
@@ -92,7 +83,7 @@ private fun FrontCard(resultImageUri: Uri) {
 }
 
 @Composable
-private fun BackCard(originalImageUrl: Uri) {
+fun BackCard(originalImageUrl: Uri) {
     AsyncImage(
         model = originalImageUrl,
         contentDescription = stringResource(R.string.original_image),
@@ -106,7 +97,7 @@ private fun BackCard(originalImageUrl: Uri) {
 }
 
 @Composable
-private fun BackCardPrompt(promptText: String) {
+fun BackCardPrompt(promptText: String) {
     val annotatedString = buildAnnotatedString {
         pushStyle(SpanStyle(fontWeight = Bold))
         append(stringResource(R.string.my_bot_is_wearing))

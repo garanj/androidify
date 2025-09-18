@@ -15,10 +15,9 @@
  */
 package com.android.developers.androidify.results
 
+import android.net.Uri
 import androidx.activity.ComponentActivity
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.test.assertIsDisplayed
 import androidx.compose.ui.test.assertIsOff
@@ -27,8 +26,10 @@ import androidx.compose.ui.test.junit4.createAndroidComposeRule
 import androidx.compose.ui.test.onNodeWithContentDescription
 import androidx.compose.ui.test.onNodeWithText
 import androidx.compose.ui.test.performClick
-import androidx.compose.ui.unit.dp
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.android.developers.androidify.data.ConfigProvider
+import com.android.developers.androidify.theme.SharedElementContextPreview
+import com.android.developers.testing.network.TestRemoteConfigDataSource
 import junit.framework.TestCase.assertTrue
 import org.junit.Rule
 import org.junit.Test
@@ -41,24 +42,27 @@ class ResultsScreenTest {
     val composeTestRule = createAndroidComposeRule<ComponentActivity>()
 
     // Create a test bitmap for testing
-    val testUri = android.net.Uri.parse("placeholder://image")
+    val testUri = Uri.parse("placeholder://image")
 
     @Test
     fun resultsScreenContents_displaysActionButtons() {
         val shareButtonText = composeTestRule.activity.getString(R.string.customize_and_share)
         // Note: Download button is identified by icon, harder to test reliably without tags/desc
 
-        val initialState = ResultState(resultImageUri = testUri, promptText = "test")
-        val state = mutableStateOf(initialState)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(testUri, null, promptText = "test", configProvider)
 
         composeTestRule.setContent {
-            // Disable animation
-            CompositionLocalProvider(LocalInspectionMode provides true) {
-                ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    onCustomizeShareClicked = {},
-                )
+            SharedElementContextPreview {
+                // Disable animation
+                CompositionLocalProvider(LocalInspectionMode provides true) {
+                    ResultsScreen(
+                        onBackPress = {},
+                        onAboutPress = {},
+                        onNextPress = { _, _ -> },
+                        viewModel = viewModel,
+                    )
+                }
             }
         }
 
@@ -77,17 +81,20 @@ class ResultsScreenTest {
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
 
         // Ensure promptText is non-null when bitmap is present
-        val initialState = ResultState(resultImageUri = testUri, promptText = "test")
-        val state = mutableStateOf(initialState)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(testUri, null, promptText = "test", configProvider)
 
         composeTestRule.setContent {
-            // Disable animation
-            CompositionLocalProvider(LocalInspectionMode provides true) {
-                ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    onCustomizeShareClicked = {},
-                )
+            SharedElementContextPreview {
+                // Disable animation
+                CompositionLocalProvider(LocalInspectionMode provides true) {
+                    ResultsScreen(
+                        onBackPress = {},
+                        onAboutPress = {},
+                        onNextPress = { _, _ -> },
+                        viewModel = viewModel,
+                    )
+                }
             }
         }
 
@@ -105,19 +112,22 @@ class ResultsScreenTest {
         val photoOptionText = composeTestRule.activity.getString(R.string.photo)
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
         val backCardDesc = composeTestRule.activity.getString(R.string.original_image)
-        val testUri = android.net.Uri.parse("placeholder://image")
+        val testUri = Uri.parse("placeholder://image")
 
-        val initialState = ResultState(resultImageUri = testUri, originalImageUrl = testUri)
-        val state = mutableStateOf(initialState)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(testUri, testUri, null, configProvider)
 
         composeTestRule.setContent {
-            // Disable animation
-            CompositionLocalProvider(LocalInspectionMode provides true) {
-                ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    onCustomizeShareClicked = {},
-                )
+            SharedElementContextPreview {
+                // Disable animation
+                CompositionLocalProvider(LocalInspectionMode provides true) {
+                    ResultsScreen(
+                        onBackPress = {},
+                        onAboutPress = {},
+                        onNextPress = { _, _ -> },
+                        viewModel = viewModel,
+                    )
+                }
             }
         }
 
@@ -137,34 +147,37 @@ class ResultsScreenTest {
     @Test
     fun toolbarOption_ClickPhoto_selectsPhoto_andShowsBackCard_Prompt() {
         val botOptionText = composeTestRule.activity.getString(R.string.bot)
-        val photoOptionText = composeTestRule.activity.getString(R.string.prompt)
-        val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
+        val promptOptionText = composeTestRule.activity.getString(R.string.prompt)
         val promptText = "test prompt"
         val promptPrefix = composeTestRule.activity.getString(R.string.my_bot_is_wearing)
 
-        val initialState = ResultState(resultImageUri = testUri, promptText = promptText) // No original image URI
-        val state = mutableStateOf(initialState)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(testUri, null, promptText, configProvider)
 
         composeTestRule.setContent {
-            // Disable animation
-            CompositionLocalProvider(LocalInspectionMode provides true) {
-                ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    onCustomizeShareClicked = {},
-                )
+            SharedElementContextPreview {
+                // Disable animation
+                CompositionLocalProvider(LocalInspectionMode provides true) {
+                    ResultsScreen(
+                        onBackPress = {},
+                        onAboutPress = {},
+                        onNextPress = { _, _ -> },
+                        viewModel = viewModel,
+                    )
+                }
             }
         }
 
         // Click Photo option
-        composeTestRule.onNodeWithText(photoOptionText).performClick()
+        composeTestRule.onNodeWithText(promptOptionText).performClick()
 
         // Check toolbar state
         composeTestRule.onNodeWithText(botOptionText).assertIsOff()
-        composeTestRule.onNodeWithText(photoOptionText).assertIsOn()
+        composeTestRule.onNodeWithText(promptOptionText).assertIsOn()
 
         // Check back card (prompt) is visible by finding its text
-        composeTestRule.onNodeWithText(promptPrefix + " " + promptText, substring = true).assertIsDisplayed()
+        composeTestRule.onNodeWithText(promptPrefix + " " + promptText, substring = true)
+            .assertIsDisplayed()
     }
 
     @Test
@@ -172,19 +185,23 @@ class ResultsScreenTest {
         val botOptionText = composeTestRule.activity.getString(R.string.bot)
         val photoOptionText = composeTestRule.activity.getString(R.string.photo)
         val frontCardDesc = composeTestRule.activity.getString(R.string.resultant_android_bot)
-        val testUri = android.net.Uri.parse("placeholder://image")
+        val testUri = Uri.parse("placeholder://image")
 
-        val initialState = ResultState(resultImageUri = testUri, originalImageUrl = testUri)
-        val state = mutableStateOf(initialState)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(testUri, originalImageUrl = testUri, null, configProvider)
+
 
         composeTestRule.setContent {
             // Disable animation
-            CompositionLocalProvider(LocalInspectionMode provides true) {
-                ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    onCustomizeShareClicked = {},
-                )
+            SharedElementContextPreview {
+                CompositionLocalProvider(LocalInspectionMode provides true) {
+                    ResultsScreen(
+                        onBackPress = {},
+                        onAboutPress = {},
+                        onNextPress = { _, _ -> },
+                        viewModel = viewModel,
+                    )
+                }
             }
         }
 
@@ -209,19 +226,22 @@ class ResultsScreenTest {
         var shareClicked = false
 
         // Ensure promptText is non-null when bitmap is present
-        val initialState = ResultState(resultImageUri = testUri, promptText = "test")
-        val state = mutableStateOf(initialState)
+        val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
+        val viewModel = ResultsViewModel(testUri, originalImageUrl = null, "test", configProvider)
 
         composeTestRule.setContent {
-            // Disable animation
-            CompositionLocalProvider(LocalInspectionMode provides true) {
-                ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    onCustomizeShareClicked = {
-                        shareClicked = true // Callback to test
-                    },
-                )
+            SharedElementContextPreview {
+                // Disable animation
+                CompositionLocalProvider(LocalInspectionMode provides true) {
+                    ResultsScreen(
+                        onBackPress = {},
+                        onAboutPress = {},
+                        onNextPress = { _, _ ->
+                            shareClicked = true
+                        },
+                        viewModel = viewModel,
+                    )
+                }
             }
         }
 

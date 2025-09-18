@@ -21,14 +21,13 @@ import android.graphics.Color
 import android.graphics.LinearGradient
 import android.graphics.Paint
 import android.graphics.Shader
-import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalInspectionMode
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import androidx.core.net.toUri
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.util.AdaptivePreview
@@ -52,10 +51,15 @@ class ResultsScreenScreenshotTest {
         CompositionLocalProvider(value = LocalInspectionMode provides true) {
             AndroidifyTheme {
                 ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    verboseLayout = true, // Replicates ResultsScreenPreview
+                    state = state.value,
+                    snackbarHostState = SnackbarHostState(),
                     onCustomizeShareClicked = {},
+                    selectedResultOption = ResultOption.ResultImage,
+                    onResultOptionSelected = {},
+                    wasPromptUsed = false,
+                    onBackPress = {},
+                    layoutType = ResultsLayoutType.Verbose, // Replicates ResultsScreenPreview
+                    onAboutPress = {},
                 )
             }
         }
@@ -77,10 +81,15 @@ class ResultsScreenScreenshotTest {
         CompositionLocalProvider(value = LocalInspectionMode provides true) {
             AndroidifyTheme {
                 ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    verboseLayout = false, // Replicates ResultsScreenPreviewSmall
+                    state = state.value,
+                    snackbarHostState = SnackbarHostState(),
                     onCustomizeShareClicked = {},
+                    selectedResultOption = ResultOption.ResultImage,
+                    onResultOptionSelected = {},
+                    wasPromptUsed = false,
+                    onBackPress = {},
+                    layoutType = ResultsLayoutType.Constrained, // Replicates ResultsScreenPreviewSmall
+                    onAboutPress = {},
                 )
             }
         }
@@ -101,11 +110,15 @@ class ResultsScreenScreenshotTest {
         CompositionLocalProvider(value = LocalInspectionMode provides true) {
             AndroidifyTheme {
                 ResultsScreenContents(
-                    contentPadding = PaddingValues(0.dp),
-                    state = state,
-                    verboseLayout = true,
+                    state = state.value,
+                    snackbarHostState = SnackbarHostState(),
                     onCustomizeShareClicked = {},
-                    defaultSelectedResult = ResultOption.OriginalInput, // Set the non-default option
+                    selectedResultOption = ResultOption.OriginalInput, // Set the non-default option
+                    onResultOptionSelected = {},
+                    wasPromptUsed = false,
+                    onBackPress = {},
+                    layoutType = ResultsLayoutType.Verbose,
+                    onAboutPress = {},
                 )
             }
         }

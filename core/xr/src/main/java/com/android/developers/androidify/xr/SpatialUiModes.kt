@@ -27,7 +27,6 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.unit.dp
-import androidx.xr.compose.platform.SpatialCapabilities
 import androidx.xr.scenecore.scene
 
 /** Check if the device is XR-enabled, but is not yet rendering spatial UI. */
@@ -38,9 +37,8 @@ fun couldRequestFullSpace(): Boolean {
 
 /** Check if the device is XR-enabled and is rendering spatial UI. */
 @Composable
-fun SpatialCapabilities.couldRequestHomeSpace(): Boolean {
-    if (!LocalSpatialConfiguration.current.hasXrSpatialFeature) return false
-    return isSpatialUiEnabled
+fun couldRequestHomeSpace(): Boolean {
+    return LocalSpatialConfiguration.current.hasXrSpatialFeature && LocalSpatialCapabilities.current.isSpatialUiEnabled
 }
 
 /** Default styling for an IconButton with a home space button and behavior. */
@@ -68,19 +66,26 @@ fun RequestHomeSpaceIconButton(
     }
 }
 
-/** Default styling for an TopAppBar Button with a full space button and behavior. */
+/** Default styling for an IconButton with a full space button and behavior. */
 @Composable
-fun RequestFullSpaceIconButton(modifier: Modifier = Modifier) {
+fun RequestFullSpaceIconButton(
+    modifier: Modifier = Modifier,
+    colors: IconButtonColors = IconButtonDefaults.iconButtonColors(),
+) {
     val session = LocalSession.current ?: return
 
     IconButton(
         modifier = modifier,
+        colors = colors,
         onClick = {
             session.scene.requestFullSpaceMode()
         },
     ) {
         Icon(
-            ImageVector.vectorResource(R.drawable.expand_content_24px),
+            modifier = Modifier
+                .fillMaxSize()
+                .padding(8.dp),
+            imageVector = ImageVector.vectorResource(R.drawable.expand_content_24px),
             contentDescription = stringResource(R.string.xr_to_full_space_mode),
         )
     }
