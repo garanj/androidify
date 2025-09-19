@@ -44,6 +44,8 @@ import androidx.xr.compose.subspace.layout.width
 import com.android.developers.androidify.customize.CustomizeExportScreenScaffold
 import com.android.developers.androidify.customize.CustomizeExportState
 import com.android.developers.androidify.customize.ExportImageCanvas
+import com.android.developers.androidify.customize.ToolDetailComposable
+import com.android.developers.androidify.customize.ToolSelectorComposable
 import com.android.developers.androidify.xr.DisableSharedTransition
 import com.android.developers.androidify.xr.MainPanelWorkaround
 import com.android.developers.androidify.xr.SquiggleBackgroundSubspace
@@ -53,8 +55,8 @@ fun CustomizeExportLayoutSpatial(
     state: CustomizeExportState,
     snackbarHostState: SnackbarHostState,
     imageResult: @Composable (ExportImageCanvas.() -> Unit),
-    toolDetail: @Composable (Modifier, Boolean) -> Unit,
-    toolSelector: @Composable (Modifier, Boolean) -> Unit,
+    toolDetail: ToolDetailComposable,
+    toolSelector: ToolSelectorComposable,
     actionButtons: @Composable (Modifier) -> Unit,
     topBar: @Composable () -> Unit,
 ) {

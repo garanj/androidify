@@ -211,7 +211,7 @@ private fun CustomizeExportContents(
             },
         )
     }
-    val toolSelector = @Composable { modifier: Modifier, horizontal: Boolean ->
+    val toolSelector: ToolSelectorComposable = @Composable { modifier, horizontal ->
         ToolSelector(
             tools = state.tools,
             selectedOption = state.selectedTool,
@@ -222,7 +222,7 @@ private fun CustomizeExportContents(
             },
         )
     }
-    val toolDetail = @Composable { modifier: Modifier, singleLine: Boolean ->
+    val toolDetail: ToolDetailComposable = @Composable { modifier, singleLine ->
         SelectedToolDetail(
             state,
             onSelectedToolStateChanged = { toolState ->
@@ -314,8 +314,8 @@ private fun CustomizeExportLayoutCompact(
     paddingValues: PaddingValues,
     imageResult: @Composable (ExportImageCanvas.() -> Unit),
     state: CustomizeExportState,
-    toolSelector: @Composable (Modifier, Boolean) -> Unit,
-    toolDetail: @Composable (Modifier, Boolean) -> Unit,
+    toolDetail: ToolDetailComposable,
+    toolSelector: ToolSelectorComposable,
     actionButtons: @Composable (Modifier) -> Unit,
 ) {
     Column(
@@ -349,8 +349,8 @@ private fun CustomizeExportLayoutMedium(
     paddingValues: PaddingValues,
     imageResult: @Composable (ExportImageCanvas.() -> Unit),
     state: CustomizeExportState,
-    toolDetail: @Composable (Modifier, Boolean) -> Unit,
-    toolSelector: @Composable (Modifier, Boolean) -> Unit,
+    toolDetail: ToolDetailComposable,
+    toolSelector: ToolSelectorComposable,
     actionButtons: @Composable (Modifier) -> Unit,
 ) {
     Row(
@@ -530,6 +530,9 @@ private fun BotActionsButtonRow(
         )
     }
 }
+
+typealias ToolSelectorComposable = @Composable (modifier: Modifier, horizontal: Boolean) -> Unit
+typealias ToolDetailComposable = @Composable (modifier: Modifier, singleLine: Boolean) -> Unit
 
 @Composable
 fun CustomizeExportScreenScaffold(
