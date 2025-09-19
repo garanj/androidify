@@ -63,6 +63,7 @@ import androidx.compose.ui.draw.dropShadow
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.shadow.Shadow
 import androidx.compose.ui.graphics.vector.ImageVector
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
@@ -75,6 +76,7 @@ import com.android.developers.androidify.results.PermissionRationaleDialog
 import com.android.developers.androidify.results.R
 import com.android.developers.androidify.results.shareImage
 import com.android.developers.androidify.theme.AndroidifyTheme
+import com.android.developers.androidify.theme.LocalAnimateBoundsScope
 import com.android.developers.androidify.theme.components.AboutButton
 import com.android.developers.androidify.theme.components.AndroidifyTopAppBar
 import com.android.developers.androidify.theme.components.PrimaryButton
@@ -266,6 +268,7 @@ private fun CustomizeExportContents(
             )
         }
     }
+
     when (layoutType) {
         CustomizeExportLayoutType.Medium -> CustomizeExportScreenScaffold(
             snackbarHostState,
@@ -318,29 +321,34 @@ private fun CustomizeExportLayoutCompact(
     toolSelector: ToolSelectorComposable,
     actionButtons: @Composable (Modifier) -> Unit,
 ) {
-    Column(
-        modifier = Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Box(
-            modifier = Modifier
-                .weight(1f, fill = true),
-            contentAlignment = Alignment.Center,
-        ) {
-            imageResult(
-                state.exportImageCanvas,
-            )
+    LookaheadScope {
+        CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
+
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.SpaceBetween,
+            ) {
+                Box(
+                    modifier = Modifier
+                        .weight(1f, fill = true),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    imageResult(
+                        state.exportImageCanvas,
+                    )
+                }
+                Spacer(modifier = Modifier.height(16.dp))
+                toolSelector(Modifier, true)
+                Spacer(modifier = Modifier.height(16.dp))
+                toolDetail(Modifier, true)
+                Spacer(modifier = Modifier.height(16.dp))
+                actionButtons(Modifier)
+                Spacer(modifier = Modifier.height(24.dp))
+            }
         }
-        Spacer(modifier = Modifier.height(16.dp))
-        toolSelector(Modifier, true)
-        Spacer(modifier = Modifier.height(16.dp))
-        toolDetail(Modifier, true)
-        Spacer(modifier = Modifier.height(16.dp))
-        actionButtons(Modifier)
-        Spacer(modifier = Modifier.height(24.dp))
     }
 }
 
@@ -353,50 +361,54 @@ private fun CustomizeExportLayoutMedium(
     toolSelector: ToolSelectorComposable,
     actionButtons: @Composable (Modifier) -> Unit,
 ) {
-    Row(
-        Modifier
-            .fillMaxSize()
-            .padding(paddingValues),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.SpaceBetween,
-    ) {
-        Box(
-            modifier = Modifier.weight(0.6f),
-            contentAlignment = Alignment.Center,
-        ) {
-            imageResult(
-                state.exportImageCanvas,
-            )
-        }
-        Column(
-            Modifier
-                .weight(0.4f)
-                .fillMaxHeight(),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.SpaceBetween,
-        ) {
+    LookaheadScope {
+        CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
             Row(
                 Modifier
-                    .weight(1f)
-                    .fillMaxSize(),
-                horizontalArrangement = Arrangement.SpaceAround,
+                    .fillMaxSize()
+                    .padding(paddingValues),
                 verticalAlignment = Alignment.CenterVertically,
-
+                horizontalArrangement = Arrangement.SpaceBetween,
             ) {
-                Box(modifier = Modifier.weight(1f)) {
-                    toolDetail(Modifier.align(Alignment.CenterEnd), false)
+                Box(
+                    modifier = Modifier.weight(0.6f),
+                    contentAlignment = Alignment.Center,
+                ) {
+                    imageResult(
+                        state.exportImageCanvas,
+                    )
                 }
-                Spacer(modifier = Modifier.size(16.dp))
-                toolSelector(Modifier.requiredSizeIn(minWidth = 56.dp), false)
-                Spacer(modifier = Modifier.size(16.dp))
+                Column(
+                    Modifier
+                        .weight(0.4f)
+                        .fillMaxHeight(),
+                    horizontalAlignment = Alignment.CenterHorizontally,
+                    verticalArrangement = Arrangement.SpaceBetween,
+                ) {
+                    Row(
+                        Modifier
+                            .weight(1f)
+                            .fillMaxSize(),
+                        horizontalArrangement = Arrangement.SpaceAround,
+                        verticalAlignment = Alignment.CenterVertically,
+
+                        ) {
+                        Box(modifier = Modifier.weight(1f)) {
+                            toolDetail(Modifier.align(Alignment.CenterEnd), false)
+                        }
+                        Spacer(modifier = Modifier.size(16.dp))
+                        toolSelector(Modifier.requiredSizeIn(minWidth = 56.dp), false)
+                        Spacer(modifier = Modifier.size(16.dp))
+                    }
+                    Spacer(modifier = Modifier.size(16.dp))
+                    actionButtons(
+                        Modifier
+                            .align(Alignment.End)
+                            .padding(end = 16.dp),
+                    )
+                    Spacer(modifier = Modifier.size(24.dp))
+                }
             }
-            Spacer(modifier = Modifier.size(16.dp))
-            actionButtons(
-                Modifier
-                    .align(Alignment.End)
-                    .padding(end = 16.dp),
-            )
-            Spacer(modifier = Modifier.size(24.dp))
         }
     }
 }

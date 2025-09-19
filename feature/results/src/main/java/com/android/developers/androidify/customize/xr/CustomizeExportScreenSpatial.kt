@@ -24,9 +24,11 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.LookaheadScope
 import androidx.compose.ui.unit.dp
 import androidx.xr.compose.spatial.ContentEdge
 import androidx.xr.compose.spatial.Orbiter
@@ -46,6 +48,7 @@ import com.android.developers.androidify.customize.CustomizeExportState
 import com.android.developers.androidify.customize.ExportImageCanvas
 import com.android.developers.androidify.customize.ToolDetailComposable
 import com.android.developers.androidify.customize.ToolSelectorComposable
+import com.android.developers.androidify.theme.LocalAnimateBoundsScope
 import com.android.developers.androidify.xr.DisableSharedTransition
 import com.android.developers.androidify.xr.MainPanelWorkaround
 import com.android.developers.androidify.xr.SquiggleBackgroundSubspace
@@ -94,8 +97,15 @@ fun CustomizeExportLayoutSpatial(
                             topBar = {},
                             containerColor = Color.Transparent,
                         ) {
-                            Box(Modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-                                imageResult(state.exportImageCanvas)
+                            LookaheadScope {
+                                CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
+                                    Box(
+                                        Modifier.fillMaxSize(),
+                                        contentAlignment = Alignment.Center
+                                    ) {
+                                        imageResult(state.exportImageCanvas)
+                                    }
+                                }
                             }
                         }
                     }
