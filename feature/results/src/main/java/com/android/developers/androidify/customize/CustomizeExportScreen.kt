@@ -71,6 +71,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import com.android.developers.androidify.customize.watchface.WatchFaceModalSheet
 import com.android.developers.androidify.customize.xr.CustomizeExportLayoutSpatial
 import com.android.developers.androidify.results.PermissionRationaleDialog
 import com.android.developers.androidify.results.R

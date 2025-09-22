@@ -68,6 +68,8 @@ interface WatchFaceInstallationRepository {
     suspend fun getAvailableWatchFaces(): Result<List<WatchFaceAsset>>
 
     suspend fun resetInstallationStatus()
+
+    suspend fun prepareForTransfer()
 }
 
 class WatchFaceInstallationRepositoryImpl @Inject constructor(
@@ -126,5 +128,9 @@ class WatchFaceInstallationRepositoryImpl @Inject constructor(
     override suspend fun resetInstallationStatus() {
         wearAssetTransmitter.resetTransferId()
         manualStatusUpdates.tryEmit(WatchFaceInstallationStatus.NotStarted)
+    }
+
+    override suspend fun prepareForTransfer() {
+        manualStatusUpdates.tryEmit(WatchFaceInstallationStatus.Preparing)
     }
 }

@@ -42,6 +42,7 @@
         <item>Hey good looking!</item>
     </string-array>
     <string name="send_to_watch">Send to watch</string>
+    <string name="preparing_to_send">Preparing…</string>
     <string name="sending_to_watch">Sending to watch…</string>
     <string name="watch_face_sent">Watch face sent</string>
     <string name="send_to_watch_device">%s detected.</string>
