@@ -46,4 +46,6 @@ class EmptyWatchFaceInstallationRepositoryImpl @Inject constructor() : WatchFace
     }
 
     override suspend fun resetInstallationStatus() { }
+
+    override suspend fun prepareForTransfer() { }
 }

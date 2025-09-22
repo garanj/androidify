@@ -37,8 +37,9 @@ import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.watchface.WatchFaceAsset
 
 @Composable
-fun SendingWatchFacePanel(
+fun TransferringWatchFacePanel(
     modifier: Modifier = Modifier,
+    transferLabel: String,
     selectedWatchFace: WatchFaceAsset?,
 ) {
     Column(
@@ -61,8 +62,8 @@ fun SendingWatchFacePanel(
         }
         Spacer(modifier = Modifier.height(24.dp))
         WatchFacePanelButton(
-            modifier = modifier.padding(horizontal = 16.dp),
-            buttonText = stringResource(R.string.sending_to_watch),
+            modifier = Modifier.padding(horizontal = 16.dp),
+            buttonText = transferLabel,
             isSending = true,
             colors = ButtonDefaults.buttonColors(
                 contentColor = MaterialTheme.colorScheme.onSurface,
@@ -81,8 +82,25 @@ private fun SendingWatchFacePanelPreview() {
         previewPath = R.drawable.watch_face_preview,
     )
     AndroidifyTheme {
-        SendingWatchFacePanel(
+        TransferringWatchFacePanel(
             selectedWatchFace = watchFace1,
+            transferLabel = stringResource(R.string.sending_to_watch),
+        )
+    }
+}
+
+@OptIn(ExperimentalMaterial3Api::class)
+@Preview(showBackground = true)
+@Composable
+private fun PreparingWatchFacePanelPreview() {
+    val watchFace1 = WatchFaceAsset(
+        id = "watch_face_1",
+        previewPath = R.drawable.watch_face_preview,
+    )
+    AndroidifyTheme {
+        TransferringWatchFacePanel(
+            selectedWatchFace = watchFace1,
+            transferLabel = stringResource(R.string.preparing_to_send),
         )
     }
 }
