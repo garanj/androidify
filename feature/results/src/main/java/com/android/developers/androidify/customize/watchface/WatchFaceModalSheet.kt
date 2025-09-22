@@ -17,9 +17,12 @@ package com.android.developers.androidify.customize.watchface
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -108,14 +111,21 @@ fun WatchFaceModalSheet(
                     AnimatedContent(
                         targetState = installationStatus,
                         transitionSpec = {
-                            ContentTransform(
-                                targetContentEnter = fadeIn(
-                                    animationSpec = tween(durationMillis = 500),
-                                ),
-                                initialContentExit = fadeOut(
-                                    animationSpec = tween(durationMillis = 500),
-                                ),
-                            )
+                            if (
+                                initialState is WatchFaceInstallationStatus.Preparing &&
+                                targetState is WatchFaceInstallationStatus.Sending
+                            ) {
+                                EnterTransition.None togetherWith ExitTransition.None
+                            } else {
+                                ContentTransform(
+                                    targetContentEnter = fadeIn(
+                                        animationSpec = tween(durationMillis = 500),
+                                    ),
+                                    initialContentExit = fadeOut(
+                                        animationSpec = tween(durationMillis = 500),
+                                    ),
+                                )
+                            }
                         },
                     ) { installationStatus ->
                         when (installationStatus) {
