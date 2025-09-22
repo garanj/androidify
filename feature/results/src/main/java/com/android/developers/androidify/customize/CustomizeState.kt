@@ -21,6 +21,7 @@ import androidx.annotation.DrawableRes
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import com.android.developers.androidify.customize.watchface.WatchFaceSelectionState
 import com.android.developers.androidify.wear.common.ConnectedWatch
 import com.android.developers.androidify.wear.common.WatchFaceInstallationStatus
 
@@ -40,6 +41,7 @@ data class CustomizeExportState(
     val connectedWatch: ConnectedWatch? = null,
     val watchFaceInstallationStatus: WatchFaceInstallationStatus = WatchFaceInstallationStatus.NotStarted,
     val watchFaceSelectionState: WatchFaceSelectionState = WatchFaceSelectionState(),
+    val xrEnabled: Boolean = false,
 )
 
 interface ToolState {

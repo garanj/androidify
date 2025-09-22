@@ -190,7 +190,6 @@ class ResultsScreenTest {
         val configProvider = ConfigProvider(TestRemoteConfigDataSource(false))
         val viewModel = ResultsViewModel(testUri, originalImageUrl = testUri, null, configProvider)
 
-
         composeTestRule.setContent {
             // Disable animation
             SharedElementContextPreview {
