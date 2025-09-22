@@ -62,7 +62,7 @@ fun TransferringWatchFacePanel(
         }
         Spacer(modifier = Modifier.height(24.dp))
         WatchFacePanelButton(
-            modifier = modifier.padding(horizontal = 16.dp),
+            modifier = Modifier.padding(horizontal = 16.dp),
             buttonText = transferLabel,
             isSending = true,
             colors = ButtonDefaults.buttonColors(
