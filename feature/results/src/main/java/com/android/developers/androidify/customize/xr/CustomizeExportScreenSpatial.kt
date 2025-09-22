@@ -101,7 +101,7 @@ fun CustomizeExportLayoutSpatial(
                                 CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
                                     Box(
                                         Modifier.fillMaxSize(),
-                                        contentAlignment = Alignment.Center
+                                        contentAlignment = Alignment.Center,
                                     ) {
                                         imageResult(state.exportImageCanvas)
                                     }

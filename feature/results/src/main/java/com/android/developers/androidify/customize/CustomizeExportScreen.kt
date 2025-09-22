@@ -324,7 +324,6 @@ private fun CustomizeExportLayoutCompact(
 ) {
     LookaheadScope {
         CompositionLocalProvider(LocalAnimateBoundsScope provides this) {
-
             Column(
                 modifier = Modifier
                     .fillMaxSize()
@@ -393,7 +392,7 @@ private fun CustomizeExportLayoutMedium(
                         horizontalArrangement = Arrangement.SpaceAround,
                         verticalAlignment = Alignment.CenterVertically,
 
-                        ) {
+                    ) {
                         Box(modifier = Modifier.weight(1f)) {
                             toolDetail(Modifier.align(Alignment.CenterEnd), false)
                         }
