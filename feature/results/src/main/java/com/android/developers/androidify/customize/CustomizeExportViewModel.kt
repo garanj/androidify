@@ -34,6 +34,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -367,10 +368,11 @@ class CustomizeExportViewModel @AssistedInject constructor(
 
     fun installWatchFace() {
         val watchFaceToInstall = _state.value.watchFaceSelectionState.selectedWatchFace ?: return
-        transferJob = viewModelScope.launch {
-            val bitmap = state.value.exportImageCanvas.imageBitmap
-            val watch = state.value.connectedWatch
-            if (watch != null && bitmap != null) {
+        val bitmap = state.value.exportImageCanvas.imageBitmap
+        val watch = state.value.connectedWatch
+        if (watch != null && bitmap != null) {
+            transferJob = viewModelScope.launch(Dispatchers.Default) {
+                watchfaceInstallationRepository.prepareForTransfer()
                 val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
                 val response = watchfaceInstallationRepository
                     .createAndTransferWatchFace(watch, watchFaceToInstall, wfBitmap)

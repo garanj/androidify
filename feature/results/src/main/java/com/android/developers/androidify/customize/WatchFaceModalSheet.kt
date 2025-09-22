@@ -164,9 +164,17 @@ fun WatchFaceModalSheet(
                                 }
                             }
 
-                            is WatchFaceInstallationStatus.Sending -> {
-                                SendingWatchFacePanel(
+                            is WatchFaceInstallationStatus.Preparing -> {
+                                TransferringWatchFacePanel(
                                     selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
+                                    transferLabel = stringResource(R.string.preparing_to_send),
+                                )
+                            }
+
+                            is WatchFaceInstallationStatus.Sending -> {
+                                TransferringWatchFacePanel(
+                                    selectedWatchFace = watchFaceSelectionState.selectedWatchFace,
+                                    transferLabel = stringResource(R.string.sending_to_watch),
                                 )
                             }
 
