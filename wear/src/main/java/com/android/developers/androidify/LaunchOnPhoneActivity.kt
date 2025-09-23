@@ -20,11 +20,16 @@ import android.os.Bundle
 import android.util.Log
 import androidx.activity.ComponentActivity
 import androidx.core.net.toUri
+import androidx.lifecycle.lifecycleScope
 import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.widget.ConfirmationOverlay.OPEN_ON_PHONE_ANIMATION
+import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_INSTALLED_PHONE
+import com.google.android.gms.wearable.CapabilityClient
+import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.guava.await
-import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.tasks.await
 
 /**
  * A helper activity that launches the phone Androidify app. This Activity is only started from the
@@ -34,8 +39,6 @@ class LaunchOnPhoneActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        val intent = Intent(Intent.ACTION_VIEW, "androidify://launch".toUri())
-        intent.addCategory(Intent.CATEGORY_BROWSABLE)
         val helper = RemoteActivityHelper(this)
         val message: CharSequence = getString(R.string.continue_on_phone)
 
@@ -48,7 +51,14 @@ class LaunchOnPhoneActivity : ComponentActivity() {
             }
             .showOn(this)
 
-        runBlocking {
+        lifecycleScope.launch {
+            val phoneNodeId = getConnectedAndroidifyNodeId()
+            val intent = if (phoneNodeId != null) {
+                getAndroidifyIntent()
+            } else {
+                getPlayIntent()
+            }
+
             try {
                 helper.startRemoteActivity(intent).await()
             } catch (e: RemoteActivityHelper.RemoteIntentException) {
@@ -57,7 +67,34 @@ class LaunchOnPhoneActivity : ComponentActivity() {
         }
     }
 
-    fun onAnimationFinished() {
+    private suspend fun getConnectedAndroidifyNodeId(): String? {
+        val capabilityClient = Wearable.getCapabilityClient(this)
+
+        val capabilities = capabilityClient.getCapability(
+            ANDROIDIFY_INSTALLED_PHONE,
+            CapabilityClient.FILTER_REACHABLE,
+        )
+            .await()
+        return if (capabilities.nodes.isNotEmpty()) {
+            capabilities.nodes.first().id
+        } else {
+            null
+        }
+    }
+
+    private fun getPlayIntent(): Intent {
+        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
+        return intent
+    }
+
+    private fun getAndroidifyIntent(): Intent {
+        val intent = Intent(Intent.ACTION_VIEW, "androidify://launch".toUri())
+        intent.addCategory(Intent.CATEGORY_BROWSABLE)
+        return intent
+    }
+
+    private fun onAnimationFinished() {
         finish()
     }
 }
