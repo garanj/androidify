@@ -25,6 +25,8 @@ import androidx.wear.remote.interactions.RemoteActivityHelper
 import androidx.wear.widget.ConfirmationOverlay
 import androidx.wear.widget.ConfirmationOverlay.OPEN_ON_PHONE_ANIMATION
 import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_INSTALLED_PHONE
+import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_LAUNCH_URL
+import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_PLAY_URL
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Wearable
 import kotlinx.coroutines.guava.await
@@ -75,21 +77,17 @@ class LaunchOnPhoneActivity : ComponentActivity() {
             CapabilityClient.FILTER_REACHABLE,
         )
             .await()
-        return if (capabilities.nodes.isNotEmpty()) {
-            capabilities.nodes.first().id
-        } else {
-            null
-        }
+        return capabilities.nodes.firstOrNull()?.id
     }
 
     private fun getPlayIntent(): Intent {
-        val intent = Intent(Intent.ACTION_VIEW, "market://details?id=$packageName".toUri())
+        val intent = Intent(Intent.ACTION_VIEW, "$ANDROIDIFY_PLAY_URL$packageName".toUri())
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
         return intent
     }
 
     private fun getAndroidifyIntent(): Intent {
-        val intent = Intent(Intent.ACTION_VIEW, "androidify://launch".toUri())
+        val intent = Intent(Intent.ACTION_VIEW, ANDROIDIFY_LAUNCH_URL.toUri())
         intent.addCategory(Intent.CATEGORY_BROWSABLE)
         return intent
     }

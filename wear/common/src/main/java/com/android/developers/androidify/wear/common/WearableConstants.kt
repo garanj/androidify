@@ -23,6 +23,9 @@ object WearableConstants {
     const val ANDROIDIFY_INSTALLED_PHONE = "androidify_phone"
     const val ANDROIDIFY_TRANSFER_PATH_TEMPLATE = "/transfer_apk/%s"
 
+    const val ANDROIDIFY_PLAY_URL = "market://details?id="
+    const val ANDROIDIFY_LAUNCH_URL = "androidify://launch"
+
     const val SETUP_TIMEOUT_MS = 60_000L
     const val TRANSFER_TIMEOUT_MS = 60_000L
 }
