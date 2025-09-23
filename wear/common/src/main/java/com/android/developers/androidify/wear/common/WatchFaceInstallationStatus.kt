@@ -45,7 +45,7 @@ sealed class WatchFaceInstallationStatus() {
         val activationStrategy: WatchFaceActivationStrategy,
     ) : WatchFaceInstallationStatus()
 
-    object Preparing: WatchFaceInstallationStatus()
+    object Preparing : WatchFaceInstallationStatus()
 
     object Sending : WatchFaceInstallationStatus()
 

@@ -19,7 +19,7 @@ package com.android.developers.androidify.watchface.transfer
 
 import android.content.Context
 import com.android.developers.androidify.wear.common.ConnectedWatch
-import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_INSTALLED
+import com.android.developers.androidify.wear.common.WearableConstants.ANDROIDIFY_INSTALLED_WEAR
 import com.google.android.gms.wearable.CapabilityClient
 import com.google.android.gms.wearable.Node
 import com.google.android.gms.wearable.NodeClient
@@ -56,7 +56,7 @@ class WearDeviceRepositoryImpl @Inject constructor(
             val allDevices = nodeClient.connectedNodes.await().toSet()
             val reachableCapability =
                 capabilityClient.getCapability(
-                    ANDROIDIFY_INSTALLED,
+                    ANDROIDIFY_INSTALLED_WEAR,
                     CapabilityClient.FILTER_REACHABLE,
                 )
                     .await()
@@ -70,7 +70,7 @@ class WearDeviceRepositoryImpl @Inject constructor(
 
                     trySend(selectConnectedDevice(installedDevicesUpdated, allDevices))
                 }
-            capabilityClient.addListener(capabilityListener, ANDROIDIFY_INSTALLED)
+            capabilityClient.addListener(capabilityListener, ANDROIDIFY_INSTALLED_WEAR)
         } else {
             trySend(null)
         }
