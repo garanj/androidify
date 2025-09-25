@@ -33,8 +33,8 @@ import com.android.developers.androidify.xr.SquiggleBackgroundSubspace
 
 @Composable
 fun AboutScreenSpatial(onBackPressed: () -> Unit, bottomButtons: @Composable () -> Unit) {
+    MainPanelWorkaround()
     SquiggleBackgroundSubspace(500.dp) {
-        MainPanelWorkaround()
         SpatialPanel {
             Orbiter(
                 ContentEdge.Top,
