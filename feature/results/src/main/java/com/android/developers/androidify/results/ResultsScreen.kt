@@ -138,11 +138,13 @@ fun ResultsScreenContents(
             },
             actions = {
                 AboutButton { onAboutPress() }
-                if (couldRequestFullSpace()) {
-                    RequestFullSpaceIconButton()
-                }
-                if (couldRequestHomeSpace()) {
-                    RequestHomeSpaceIconButton()
+                if (state.xrEnabled) {
+                    if (couldRequestFullSpace()) {
+                        RequestFullSpaceIconButton()
+                    }
+                    if (couldRequestHomeSpace()) {
+                        RequestHomeSpaceIconButton()
+                    }
                 }
             },
         )
