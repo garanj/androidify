@@ -44,6 +44,9 @@ sealed class WatchFaceInstallationStatus() {
         val validationToken: String,
         val activationStrategy: WatchFaceActivationStrategy,
     ) : WatchFaceInstallationStatus()
+
+    object Preparing : WatchFaceInstallationStatus()
+
     object Sending : WatchFaceInstallationStatus()
 
     @Serializable

@@ -49,6 +49,7 @@ fun WatchFaceOnboardingScreen(
 
         when (state) {
             is WatchFaceInstallationStatus.Receiving,
+            is WatchFaceInstallationStatus.Preparing,
             is WatchFaceInstallationStatus.Sending,
             -> {
                 TransmissionScreen()

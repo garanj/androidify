@@ -15,10 +15,21 @@
  */
 package com.android.developers.androidify.customize
 
-import com.android.developers.androidify.watchface.WatchFaceAsset
+import androidx.compose.runtime.Composable
+import androidx.xr.compose.platform.LocalSpatialCapabilities
+import com.android.developers.androidify.util.isAtLeastMedium
 
-data class WatchFaceSelectionState(
-    val watchFaces: List<WatchFaceAsset> = emptyList(),
-    val selectedWatchFace: WatchFaceAsset? = null,
-    val isLoadingWatchFaces: Boolean = true,
-)
+enum class CustomizeExportLayoutType {
+    Compact,
+    Medium,
+    Spatial,
+}
+
+@Composable
+fun calculateLayoutType(enableXr: Boolean = false): CustomizeExportLayoutType {
+    return when {
+        LocalSpatialCapabilities.current.isSpatialUiEnabled && enableXr -> CustomizeExportLayoutType.Spatial
+        isAtLeastMedium() -> CustomizeExportLayoutType.Medium
+        else -> CustomizeExportLayoutType.Compact
+    }
+}
