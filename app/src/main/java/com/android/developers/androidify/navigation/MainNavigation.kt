@@ -31,6 +31,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.unit.IntOffset
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewmodel.navigation3.rememberViewModelStoreNavEntryDecorator
@@ -184,6 +185,7 @@ fun MainNavigation() {
             }
             entry<About> {
                 val context = LocalContext.current
+                val uriHandler = LocalUriHandler.current
                 AboutScreen(
                     onBackPressed = {
                         backStack.removeLastOrNull()
@@ -191,6 +193,12 @@ fun MainNavigation() {
                     onLicensesClicked = {
                         context.startActivity(Intent(context, OssLicensesMenuActivity::class.java))
                     },
+                    onPrivacyClicked = {
+                        uriHandler.openUri("https://policies.google.com/privacy")
+                    },
+                    onTermsClicked = {
+                        uriHandler.openUri("https://policies.google.com/terms")
+                    }
                 )
             }
         },
