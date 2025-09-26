@@ -24,6 +24,7 @@ import androidx.compose.ui.Modifier
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.viewModelScope
 import com.android.developers.androidify.RemoteConfigDataSource
+import com.android.developers.androidify.customize.watchface.WatchFaceSelectionState
 import com.android.developers.androidify.data.ImageGenerationRepository
 import com.android.developers.androidify.util.LocalFileProvider
 import com.android.developers.androidify.watchface.WatchFaceAsset
@@ -34,6 +35,7 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted.Companion.WhileSubscribed
@@ -65,7 +67,7 @@ class CustomizeExportViewModel @AssistedInject constructor(
         ): CustomizeExportViewModel
     }
 
-    private val _state = MutableStateFlow(CustomizeExportState())
+    private val _state = MutableStateFlow(CustomizeExportState(xrEnabled = remoteConfigDataSource.isXrEnabled()))
     val state: StateFlow<CustomizeExportState> = combine(
         _state,
         watchfaceInstallationRepository.connectedWatch,
@@ -367,10 +369,11 @@ class CustomizeExportViewModel @AssistedInject constructor(
 
     fun installWatchFace() {
         val watchFaceToInstall = _state.value.watchFaceSelectionState.selectedWatchFace ?: return
-        transferJob = viewModelScope.launch {
-            val bitmap = state.value.exportImageCanvas.imageBitmap
-            val watch = state.value.connectedWatch
-            if (watch != null && bitmap != null) {
+        val bitmap = state.value.exportImageCanvas.imageBitmap
+        val watch = state.value.connectedWatch
+        if (watch != null && bitmap != null) {
+            transferJob = viewModelScope.launch(Dispatchers.Default) {
+                watchfaceInstallationRepository.prepareForTransfer()
                 val wfBitmap = imageGenerationRepository.removeBackground(bitmap)
                 val response = watchfaceInstallationRepository
                     .createAndTransferWatchFace(watch, watchFaceToInstall, wfBitmap)

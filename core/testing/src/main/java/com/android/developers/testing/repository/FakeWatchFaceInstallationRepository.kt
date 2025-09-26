@@ -75,6 +75,11 @@ class FakeWatchFaceInstallationRepository : WatchFaceInstallationRepository {
         _watchFaceInstallationStatus.value = WatchFaceInstallationStatus.NotStarted
     }
 
+    override suspend fun prepareForTransfer() {
+        transferId = generateTransferId()
+        _watchFaceInstallationStatus.value = WatchFaceInstallationStatus.Preparing
+    }
+
     private fun generateTransferId() = UUID.randomUUID().toString().take(8)
 
     public fun setWatchAsConnected() {
