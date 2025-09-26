@@ -59,9 +59,8 @@ fun ResultsScreenSpatial(
 ) {
     var offsetPose by remember { mutableStateOf(Pose()) }
     DisableSharedTransition {
+        MainPanelWorkaround()
         Subspace {
-            MainPanelWorkaround()
-
             SpatialPanel(
                 SubspaceModifier
                     .offset(z = 5.dp)
