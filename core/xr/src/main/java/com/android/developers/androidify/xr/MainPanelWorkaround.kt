@@ -31,7 +31,7 @@ import androidx.xr.scenecore.scene
 @Composable
 fun MainPanelWorkaround() {
     val session = LocalSession.current ?: return
-    DisposableEffect(Unit) {
+    DisposableEffect(session) {
         onDispose {
             session.scene.mainPanelEntity.setEnabled(false)
         }
