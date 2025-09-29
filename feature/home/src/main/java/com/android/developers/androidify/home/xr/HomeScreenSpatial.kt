@@ -69,8 +69,8 @@ fun HomeScreenContentsSpatial(
     onAboutClicked: () -> Unit,
 ) {
     DisableSharedTransition {
+        MainPanelWorkaround()
         SquiggleBackgroundSubspace(minimumHeight = 600.dp) {
-            MainPanelWorkaround()
             Orbiter(
                 position = ContentEdge.Top,
                 offsetType = OrbiterOffsetType.OuterEdge,
