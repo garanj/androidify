@@ -85,6 +85,7 @@ dependencies {
     implementation(libs.androidx.wear.remote.interactions)
     implementation(libs.horologist.compose.layout)
     implementation(libs.accompanist.permissions)
+    implementation(libs.androidx.work.runtime.ktx)
 
     "cliToolConfiguration"(libs.validator.push.cli)
 }
