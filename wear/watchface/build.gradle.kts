@@ -27,7 +27,7 @@ android {
         minSdk = 36
         targetSdk = 36
         // The default watch face version is kept in lock step with the Wear OS app.
-        versionCode = 60_000_000 + libs.versions.appVersionCode.get().toInt()
+        versionCode = libs.versions.appVersionWearOffset.get().toInt() + libs.versions.appVersionCode.get().toInt()
         versionName = libs.versions.appVersionName.get()
     }
 

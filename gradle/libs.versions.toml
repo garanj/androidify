@@ -2,6 +2,7 @@
 # build
 appVersionCode = "10"
 appVersionName = "1.3.0"
+appVersionWearOffset = "60000000"
 agp = "8.11.1"
 bcpkixJdk18on = "1.81"
 compileSdk = "36"

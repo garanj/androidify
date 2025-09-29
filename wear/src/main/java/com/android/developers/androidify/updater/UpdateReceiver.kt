@@ -29,11 +29,7 @@ import androidx.work.WorkManager
  * onReceive.
  */
 class UpdateReceiver : BroadcastReceiver() {
-    override fun onReceive(context: Context?, intent: Intent?) {
-        if (context == null || intent == null) {
-            return
-        }
-
+    override fun onReceive(context: Context, intent: Intent) {
         if (Intent.ACTION_MY_PACKAGE_REPLACED == intent.action) {
             val updateRequest = OneTimeWorkRequestBuilder<UpdateWorker>().build()
             val workManager = WorkManager.getInstance(context)

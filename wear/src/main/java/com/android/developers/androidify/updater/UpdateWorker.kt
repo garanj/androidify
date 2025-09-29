@@ -39,46 +39,46 @@ private const val TAG = "UpdateWorker"
  * and if so, updates the default watch face, taking also the new watch face validation token from
  * the manifest file.
  */
-class UpdateWorker(val appContext: Context, workerParams: WorkerParameters) :
+class UpdateWorker(appContext: Context, workerParams: WorkerParameters) :
     CoroutineWorker(appContext, workerParams) {
 
     override suspend fun doWork(): Result {
-        val watchFacePushManager = WatchFacePushManagerFactory.createWatchFacePushManager(appContext)
+        val watchFacePushManager = WatchFacePushManagerFactory.createWatchFacePushManager(applicationContext)
 
         val watchFaces = watchFacePushManager.listWatchFaces().installedWatchFaceDetails
             .associateBy { it.packageName }
 
-        val copiedFile = File.createTempFile("tmp", ".apk", appContext.cacheDir)
+        val copiedFile = File.createTempFile("tmp", ".apk", applicationContext.cacheDir)
         try {
-            copiedFile.deleteOnExit()
-            appContext.assets.open(defaultWatchFaceName).use { inputStream ->
+            applicationContext.assets.open(defaultWatchFaceName).use { inputStream ->
                 FileOutputStream(copiedFile).use { outputStream -> inputStream.copyTo(outputStream) }
             }
             val packageInfo =
-                appContext.packageManager.getPackageArchiveInfo(copiedFile.absolutePath, 0)
+                applicationContext.packageManager.getPackageArchiveInfo(copiedFile.absolutePath, 0)
 
             packageInfo?.let { newPkg ->
                 // Check if the default watch face is currently installed and should therefore be
                 // updated if the one in the assets folder has a higher version code.
                 watchFaces[newPkg.packageName]?.let { curPkg ->
                     if (newPkg.longVersionCode > curPkg.versionCode) {
-                        val pfd = ParcelFileDescriptor.open(
+                        ParcelFileDescriptor.open(
                             copiedFile,
                             ParcelFileDescriptor.MODE_READ_ONLY,
-                        )
-                        val token = getDefaultWatchFaceToken()
-                        if (token != null) {
-                            watchFacePushManager.updateWatchFace(curPkg.slotId, pfd, token)
-                            Log.d(TAG, "Watch face updated from ${curPkg.versionCode} to ${newPkg.longVersionCode}")
-                        } else {
-                            Log.w(TAG, "Watch face not updated, no token found")
+                        ).use { pfd ->
+                            val token = getDefaultWatchFaceToken()
+                            if (token != null) {
+                                watchFacePushManager.updateWatchFace(curPkg.slotId, pfd, token)
+                                Log.d(TAG, "Watch face updated from ${curPkg.versionCode} to ${newPkg.longVersionCode}")
+                            } else {
+                                Log.w(TAG, "Watch face not updated, no token found")
+                            }
                         }
-                        pfd.close()
                     }
                 }
             }
         } catch (e: IOException) {
             Log.w(TAG, "Watch face not updated", e)
+            return Result.failure()
         } finally {
             copiedFile.delete()
         }
@@ -86,8 +86,8 @@ class UpdateWorker(val appContext: Context, workerParams: WorkerParameters) :
     }
 
     private fun getDefaultWatchFaceToken(): String? {
-        val appInfo = appContext.packageManager.getApplicationInfo(
-            appContext.packageName,
+        val appInfo = applicationContext.packageManager.getApplicationInfo(
+            applicationContext.packageName,
             PackageManager.GET_META_DATA,
         )
         return appInfo.metaData?.getString(manifestTokenKey)
