@@ -26,8 +26,9 @@ android {
         applicationId = "com.android.developers.androidify.watchfacepush.defaultwf"
         minSdk = 36
         targetSdk = 36
-        versionCode = 1
-        versionName = "1.0"
+        // The default watch face version is kept in lock step with the Wear OS app.
+        versionCode = libs.versions.appVersionWearOffset.get().toInt() + libs.versions.appVersionCode.get().toInt()
+        versionName = libs.versions.appVersionName.get()
     }
 
     buildTypes {
