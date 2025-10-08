@@ -107,22 +107,22 @@ internal class ImageGenerationRepositoryImpl @Inject constructor(
     }
 
     override suspend fun saveImage(imageBitmap: Bitmap): Uri {
-        val cacheFile = localFileProvider.createCacheFile("shared_image_${UUID.randomUUID()}.jpg")
+        val cacheFile = localFileProvider.createCacheFile("shared_image_${UUID.randomUUID()}.png")
         localFileProvider.saveBitmapToFile(imageBitmap, cacheFile)
         return localFileProvider.sharingUriForFile(cacheFile)
     }
 
     override suspend fun saveImageToExternalStorage(imageBitmap: Bitmap): Uri {
-        val cacheFile = localFileProvider.createCacheFile("androidify_image_result_${UUID.randomUUID()}.jpg")
+        val cacheFile = localFileProvider.createCacheFile("androidify_image_result_${UUID.randomUUID()}.png")
         localFileProvider.saveBitmapToFile(imageBitmap, cacheFile)
-        return localFileProvider.saveToSharedStorage(cacheFile, cacheFile.name, "image/jpeg")
+        return localFileProvider.saveToSharedStorage(cacheFile, cacheFile.name, "image/png")
     }
 
     override suspend fun saveImageToExternalStorage(imageUri: Uri): Uri {
         return localFileProvider.saveUriToSharedStorage(
             imageUri,
-            "androidify_image_original_${UUID.randomUUID()}.jpg",
-            "image/jpeg",
+            "androidify_image_original_${UUID.randomUUID()}.png",
+            "image/png",
         )
     }
 
