@@ -24,9 +24,9 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.IntrinsicSize
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.safeDrawingPadding
@@ -44,18 +44,22 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.res.vectorResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation3.ui.LocalNavAnimatedContentScope
+import androidx.xr.compose.platform.LocalSpatialCapabilities
+import com.android.developers.androidify.home.xr.AboutScreenSpatial
 import com.android.developers.androidify.theme.AndroidifyTheme
 import com.android.developers.androidify.theme.LocalSharedTransitionScope
 import com.android.developers.androidify.theme.SharedElementContextPreview
@@ -66,155 +70,211 @@ import com.android.developers.androidify.util.LargeScreensPreview
 import com.android.developers.androidify.util.PhonePreview
 import com.android.developers.androidify.util.isAtLeastMedium
 
-@PhonePreview
-@Composable
-private fun AboutPreviewCompact() {
-    SharedElementContextPreview {
-        AboutScreen(isMediumWindowSize = false, {}, {})
-    }
-}
-
-@LargeScreensPreview
-@Composable
-private fun AboutPreviewLargeScreens() {
-    SharedElementContextPreview {
-        AboutScreen(isMediumWindowSize = true, {}, {})
-    }
-}
-
 @Composable
 fun AboutScreen(
-    isMediumWindowSize: Boolean = isAtLeastMedium(),
+    viewModel: AboutViewModel = hiltViewModel(),
     onBackPressed: () -> Unit,
+    onTermsClicked: () -> Unit,
+    onPrivacyClicked: () -> Unit,
     onLicensesClicked: () -> Unit,
+) {
+    val state by viewModel.state.collectAsStateWithLifecycle()
+    AboutScreenContents(
+        onBackPressed = onBackPressed,
+        onTermsClicked = onTermsClicked,
+        onPrivacyClicked = onPrivacyClicked,
+        onLicensesClicked = onLicensesClicked,
+        xrEnabled = state.isXrEnabled,
+    )
+}
+
+@Composable
+fun AboutScreenContents(
+    onBackPressed: () -> Unit,
+    onTermsClicked: () -> Unit,
+    onPrivacyClicked: () -> Unit,
+    onLicensesClicked: () -> Unit,
+    xrEnabled: Boolean = false,
+    isMediumWindowSize: Boolean = isAtLeastMedium(),
+) {
+    val bottomButtons = @Composable {
+        FooterButtons(
+            modifier = Modifier,
+            onTermsClicked = onTermsClicked,
+            onPrivacyClicked = onPrivacyClicked,
+            onLicensesClicked = onLicensesClicked,
+        )
+    }
+    when {
+        xrEnabled && LocalSpatialCapabilities.current.isSpatialUiEnabled ->
+            AboutScreenSpatial(onBackPressed = onBackPressed, bottomButtons = bottomButtons)
+
+        isMediumWindowSize ->
+            AboutScreenScaffold(topBar = { BackButton(onBackPressed) }) { contentPadding ->
+                AboutScreenMedium(
+                    padding = contentPadding,
+                    bottomButtons = bottomButtons,
+                )
+            }
+
+        else ->
+            AboutScreenScaffold(topBar = { BackButton(onBackPressed) }) { contentPadding ->
+                AboutScreenCompact(
+                    padding = contentPadding,
+                    bottomButtons = bottomButtons,
+                )
+            }
+    }
+}
+
+@Composable
+fun AboutScreenScaffold(
+    topBar: @Composable () -> Unit,
+    content: @Composable (PaddingValues) -> Unit,
 ) {
     val sharedElementScope = LocalSharedTransitionScope.current
     val navScope = LocalNavAnimatedContentScope.current
     with(sharedElementScope) {
         Scaffold(
-            topBar = {
-                IconButton(
-                    modifier = Modifier
-                        .safeDrawingPadding()
-                        .padding(16.dp),
-                    shape = CircleShape,
-                    colors = IconButtonDefaults.iconButtonColors(
-                        containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
-                        contentColor = MaterialTheme.colorScheme.onSurface,
-                    ),
-                    onClick = {
-                        onBackPressed()
-                    },
-                ) {
-                    Icon(
-                        rememberVectorPainter(ImageVector.vectorResource(com.android.developers.androidify.theme.R.drawable.rounded_close_24)),
-                        contentDescription = stringResource(R.string.about_back_content_description),
-                    )
-                }
-            },
+            topBar = topBar,
             containerColor = MaterialTheme.colorScheme.surfaceContainerHigh,
             modifier = Modifier
                 .sharedBoundsReveal(
                     rememberSharedContentState(SharedElementKey.AboutKey),
                     animatedVisibilityScope = navScope,
                 ),
-        ) { padding ->
-            if (isMediumWindowSize) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .safeDrawingPadding()
-                        .padding(padding)
-                        .verticalScroll(rememberScrollState())
-                        .padding(start = 24.dp, end = 24.dp, top = 24.dp),
-                    contentAlignment = Alignment.Center,
-                ) {
-                    Column(
-                        modifier = Modifier
-                            .wrapContentHeight()
-                            .width(700.dp),
-                    ) {
-                        Text(
-                            text = stringResource(R.string.how_it_works),
-                            style = MaterialTheme.typography.displayLarge,
-                        )
-                        Spacer(Modifier.size(48.dp))
-                        AboutMessage(textStyle = MaterialTheme.typography.headlineMedium)
-                        Spacer(Modifier.size(48.dp))
-                        Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
-                            BulletPoint(
-                                "1",
-                                stringResource(R.string.about_step1_title),
-                                stringResource(R.string.about_step1_label),
-                                modifier = Modifier.weight(1 / 3f),
-                                textStyle = MaterialTheme.typography.bodySmall,
-                            )
-                            BulletPoint(
-                                "2",
-                                stringResource(R.string.about_step2_title),
-                                stringResource(R.string.about_step2_label),
-                                modifier = Modifier.weight(1 / 3f),
-                                textStyle = MaterialTheme.typography.bodySmall,
-                            )
-                            BulletPoint(
-                                "3",
-                                stringResource(R.string.about_step3_title),
-                                stringResource(R.string.about_step3_label),
-                                modifier = Modifier.weight(1 / 3f),
-                                textStyle = MaterialTheme.typography.bodySmall,
-                            )
-                        }
-                        Spacer(Modifier.size(48.dp))
-                        FooterButtons(
-                            modifier = Modifier.padding(bottom = 8.dp),
-                            onLicensesClicked,
-                        )
-                    }
-                }
-            } else {
-                Column(
-                    modifier = Modifier
-                        .verticalScroll(rememberScrollState())
-                        .padding(padding)
-                        .padding(start = 24.dp, end = 24.dp, top = 24.dp),
-                ) {
-                    Text(
-                        text = stringResource(R.string.how_it_works),
-                        style = MaterialTheme.typography.displayLarge,
-                    )
-                    AboutMessage()
-                    Spacer(modifier = Modifier.size(36.dp))
-                    BulletPoint(
-                        "1",
-                        stringResource(R.string.about_step1_title),
-                        stringResource(R.string.about_step1_label),
-                    )
-                    Spacer(modifier = Modifier.size(24.dp))
-                    BulletPoint(
-                        "2",
-                        stringResource(R.string.about_step2_title),
-                        stringResource(R.string.about_step2_label),
-                    )
-                    Spacer(modifier = Modifier.size(24.dp))
-                    BulletPoint(
-                        "3",
-                        stringResource(R.string.about_step3_title),
-                        stringResource(R.string.about_step3_label),
-                    )
-                    Spacer(modifier = Modifier.size(24.dp))
-                    FooterButtons(modifier = Modifier.padding(bottom = 8.dp), onLicensesClicked)
-                }
+            content = content,
+        )
+    }
+}
+
+@Composable
+private fun AboutScreenCompact(
+    padding: PaddingValues,
+    bottomButtons: @Composable () -> Unit,
+) {
+    Column(
+        modifier = Modifier
+            .verticalScroll(rememberScrollState())
+            .padding(padding)
+            .padding(start = 24.dp, end = 24.dp, top = 24.dp),
+    ) {
+        Text(
+            text = stringResource(R.string.how_it_works),
+            style = MaterialTheme.typography.displayLarge,
+        )
+        AboutMessage()
+        Spacer(modifier = Modifier.size(36.dp))
+        BulletPoint(
+            "1",
+            stringResource(R.string.about_step1_title),
+            stringResource(R.string.about_step1_label),
+        )
+        Spacer(modifier = Modifier.size(24.dp))
+        BulletPoint(
+            "2",
+            stringResource(R.string.about_step2_title),
+            stringResource(R.string.about_step2_label),
+        )
+        Spacer(modifier = Modifier.size(24.dp))
+        BulletPoint(
+            "3",
+            stringResource(R.string.about_step3_title),
+            stringResource(R.string.about_step3_label),
+        )
+        Spacer(modifier = Modifier.size(24.dp))
+        bottomButtons()
+        Spacer(modifier = Modifier.size(8.dp))
+    }
+}
+
+@Composable
+fun AboutScreenMedium(
+    padding: PaddingValues,
+    bottomButtons: (@Composable () -> Unit)?,
+    modifier: Modifier = Modifier,
+) {
+    Box(
+        modifier = modifier
+            .safeDrawingPadding()
+            .padding(padding)
+            .verticalScroll(rememberScrollState())
+            .padding(start = 24.dp, end = 24.dp, top = 24.dp),
+        contentAlignment = Alignment.Center,
+    ) {
+        Column(
+            modifier = Modifier
+                .wrapContentHeight()
+                .width(700.dp),
+        ) {
+            Text(
+                text = stringResource(R.string.how_it_works),
+                style = MaterialTheme.typography.displayLarge,
+            )
+            Spacer(Modifier.size(48.dp))
+            AboutMessage(textStyle = MaterialTheme.typography.headlineMedium)
+            Spacer(Modifier.size(48.dp))
+            Row(horizontalArrangement = Arrangement.spacedBy(16.dp)) {
+                BulletPoint(
+                    "1",
+                    stringResource(R.string.about_step1_title),
+                    stringResource(R.string.about_step1_label),
+                    modifier = Modifier.weight(1 / 3f),
+                    textStyle = MaterialTheme.typography.bodySmall,
+                )
+                BulletPoint(
+                    "2",
+                    stringResource(R.string.about_step2_title),
+                    stringResource(R.string.about_step2_label),
+                    modifier = Modifier.weight(1 / 3f),
+                    textStyle = MaterialTheme.typography.bodySmall,
+                )
+                BulletPoint(
+                    "3",
+                    stringResource(R.string.about_step3_title),
+                    stringResource(R.string.about_step3_label),
+                    modifier = Modifier.weight(1 / 3f),
+                    textStyle = MaterialTheme.typography.bodySmall,
+                )
+            }
+            if (bottomButtons != null) {
+                Spacer(Modifier.size(48.dp))
+                bottomButtons()
+                Spacer(Modifier.size(8.dp))
             }
         }
     }
 }
 
 @Composable
-private fun FooterButtons(
+fun BackButton(onBackPressed: () -> Unit, modifier: Modifier = Modifier) {
+    IconButton(
+        modifier = modifier
+            .safeDrawingPadding()
+            .padding(16.dp),
+        shape = CircleShape,
+        colors = IconButtonDefaults.iconButtonColors(
+            containerColor = MaterialTheme.colorScheme.surfaceContainerLowest,
+            contentColor = MaterialTheme.colorScheme.onSurface,
+        ),
+        onClick = {
+            onBackPressed()
+        },
+    ) {
+        Icon(
+            rememberVectorPainter(ImageVector.vectorResource(com.android.developers.androidify.theme.R.drawable.rounded_close_24)),
+            contentDescription = stringResource(R.string.about_back_content_description),
+        )
+    }
+}
+
+@Composable
+fun FooterButtons(
     modifier: Modifier = Modifier,
+    onTermsClicked: () -> Unit,
+    onPrivacyClicked: () -> Unit,
     onLicensesClicked: () -> Unit,
 ) {
-    val uriHandler = LocalUriHandler.current
     FlowRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(16.dp),
@@ -222,13 +282,13 @@ private fun FooterButtons(
     ) {
         SecondaryOutlinedButton(
             onClick = {
-                uriHandler.openUri("https://policies.google.com/terms")
+                onTermsClicked()
             },
             buttonText = stringResource(R.string.terms),
         )
         SecondaryOutlinedButton(
             onClick = {
-                uriHandler.openUri("https://policies.google.com/privacy")
+                onPrivacyClicked()
             },
             buttonText = stringResource(R.string.privacy),
         )
@@ -242,7 +302,7 @@ private fun FooterButtons(
 }
 
 @Composable
-private fun AboutMessage(textStyle: TextStyle = MaterialTheme.typography.bodyLarge) {
+fun AboutMessage(textStyle: TextStyle = MaterialTheme.typography.bodyLarge) {
     Text(
         stringResource(R.string.about_message),
         style = textStyle.copy(fontWeight = FontWeight.Bold),
@@ -284,6 +344,34 @@ fun BulletPoint(
                 modifier = Modifier,
             )
         }
+    }
+}
+
+@PhonePreview
+@Composable
+private fun AboutPreviewCompact() {
+    SharedElementContextPreview {
+        AboutScreenContents(
+            isMediumWindowSize = false,
+            onBackPressed = {},
+            onTermsClicked = {},
+            onPrivacyClicked = {},
+            onLicensesClicked = {},
+        )
+    }
+}
+
+@LargeScreensPreview
+@Composable
+private fun AboutPreviewLargeScreens() {
+    SharedElementContextPreview {
+        AboutScreenContents(
+            isMediumWindowSize = true,
+            onBackPressed = {},
+            onTermsClicked = {},
+            onPrivacyClicked = {},
+            onLicensesClicked = {},
+        )
     }
 }
 

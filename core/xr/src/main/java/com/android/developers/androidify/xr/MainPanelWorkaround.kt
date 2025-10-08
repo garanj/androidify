@@ -16,25 +16,24 @@
 package com.android.developers.androidify.xr
 
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.DisposableEffect
 import androidx.xr.compose.platform.LocalSession
 import androidx.xr.scenecore.scene
-import kotlinx.coroutines.delay
 
 /*
- * A composable that attempts to continually hide the mainPanel.
+ * A composable that hides the mainPanel when it is disposed. When placed outside of an (Application)Subspace,
+ * this composable will be disposed after the Subspace, hiding the mainPanelEntity again.
  *
- * This is a temporary workaround for b/440325404, that causes the mainPanelEntity when an
+ * This is a temporary workaround for b/440325404, that causes the mainPanelEntity to appear when an
  * ApplicationSubspace transitions out of the composition due to a race condition when transitioning
  * the two hierarchies.
  */
 @Composable
 fun MainPanelWorkaround() {
-    val session = LocalSession.current
-    LaunchedEffect(null) {
-        while (true) {
-            delay(100L)
-            session?.scene?.mainPanelEntity?.setEnabled(false)
+    val session = LocalSession.current ?: return
+    DisposableEffect(session) {
+        onDispose {
+            session.scene.mainPanelEntity.setEnabled(false)
         }
     }
 }

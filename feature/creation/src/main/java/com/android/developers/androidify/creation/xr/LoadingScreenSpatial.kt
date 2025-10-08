@@ -52,12 +52,12 @@ private const val squiggleSafeContentHeight = 0.6f
 fun LoadingScreenSpatial(
     onCancelPress: () -> Unit,
 ) {
+    MainPanelWorkaround()
     BackgroundSubspace(
         aspectRatio = 1.4f,
         minimumHeight = 500.dp,
         drawable = CreationR.drawable.squiggle_light,
     ) {
-        MainPanelWorkaround()
         Orbiter(
             position = ContentEdge.Top,
             offsetType = OrbiterOffsetType.OuterEdge,
