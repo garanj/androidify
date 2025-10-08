@@ -151,7 +151,7 @@ fun EditScreenScaffoldWithAppBar(
                 },
                 actions = {
                     AboutButton { onAboutPressed() }
-                    if (couldRequestFullSpace()) {
+                    if (uiState.xrEnabled && couldRequestFullSpace()) {
                         RequestFullSpaceIconButton()
                     }
                 },
